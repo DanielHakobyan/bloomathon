@@ -2,11 +2,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const issueForm = document.getElementById("issueForm");
   const issuesList = document.getElementById("issuesList");
 
-  // Function to load issues
+  // Load issues from MongoDB
   async function loadIssues() {
     const response = await fetch("/issues/");
     const issues = await response.json();
     issuesList.innerHTML = "";
+
     issues.forEach((issue) => {
       const li = document.createElement("li");
       li.innerHTML = `<strong>${issue.title}</strong>: ${issue.description} <br> Location: ${issue.location} | Status: ${issue.status}`;
@@ -14,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Handle form submission (only on report_issue.html)
+  // Handle form submission (only if form exists)
   if (issueForm) {
     issueForm.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -36,13 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         alert("Issue reported successfully!");
         issueForm.reset();
+        loadIssues(); // Reload issues after adding a new one
       } else {
         alert("Failed to report issue.");
       }
     });
   }
 
-  // Load issues only on view_issues.html
+  // Load issues only if the issues list exists
   if (issuesList) {
     loadIssues();
   }
