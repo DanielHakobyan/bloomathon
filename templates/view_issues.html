@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Reported Issues</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 p-10">
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h1 class="text-3xl font-bold text-center text-indigo-600 mb-4">Reported Issues</h1>
@@ -13,14 +15,29 @@
         <!-- Display Issues List -->
         <ul class="space-y-4">
             {% for issue in issues %}
-                <li class="p-4 border rounded-md bg-blue-50">
-                    <h2 class="font-semibold text-xl">{{ issue.title }}</h2>
-                    <p class="mt-2">{{ issue.description }}</p>
-                    <p class="mt-2 text-sm text-gray-600">Location: {{ issue.location }}</p>
-                    <p class="mt-2 text-sm text-gray-600">Status: {{ issue.status }}</p>
-                </li>
+            <li class="p-4 border rounded-md bg-blue-50">
+                <h2 class="font-semibold text-xl">{{ issue.title }}</h2>
+                <p class="mt-2">{{ issue.description }}</p>
+                <p class="mt-2 text-sm text-gray-600">Location: {{ issue.location }}</p>
+                <p class="mt-2 text-sm text-gray-600">Status: {{ issue.status }}</p>
+
+                <!-- Show the photo if available -->
+                {% if issue.photo %}
+                <p class="mt-2">
+                    <strong>Photo:</strong> 
+                    <img src="{{ issue.photo }}" alt="Issue Photo" class="w-64 h-64 object-cover cursor-pointer" onclick="openFullscreen('{{ issue.photo }}')">
+                </p>
+            {% endif %}
+
+                <!-- Show the video if available -->
+                {% if issue.video %}
+                <p class="mt-2"><strong>Video:</strong> <video controls class="w-64 h-64">
+                        <source src="{{ issue.video }}" type="video/mp4">Your browser does not support the video tag.
+                    </video></p>
+                {% endif %}
+            </li>
             {% else %}
-                <li class="text-center text-gray-500">No issues reported yet.</li>
+            <li class="text-center text-gray-500">No issues reported yet.</li>
             {% endfor %}
         </ul>
 
@@ -29,5 +46,8 @@
             <a href="/" class="bg-indigo-500 text-white py-2 px-4 rounded-lg">Back to Home</a>
         </div>
     </div>
+
+    <script src="/static/script.js"></script>
 </body>
+
 </html>
