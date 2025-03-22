@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report an Issue</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report an Issue</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    /* Ensure the map container is visible */
+    #osm-map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-    <h1>Report an Issue</h1>
-    <form id="issueForm" action="/report/" method="POST" enctype="multipart/form-data">
-        <input type="text" id="title" name="title" placeholder="Title" required>
-        <textarea id="description" name="description" placeholder="Description" required></textarea>
-        <input type="text" id="location" name="location" placeholder="Location" required>
-        <label for="photo">Photo:</label>
-        <input type="file" id="photo" name="photo" accept="image/*">
-        <br>
-        <label for="video">Video:</label>
-        <input type="file" id="video" name="video" accept="video/*">
-        <br>
-        <button type="submit">Submit Issue</button>
-    </form>
+  <h1>Report an Issue</h1>
+  <form id="issueForm" action="/report/" method="POST" enctype="multipart/form-data">
+    <input type="text" id="title" name="title" placeholder="Title" required>
+    <textarea id="description" name="description" placeholder="Description" required></textarea>
+    <input type="text" id="location" name="location" placeholder="Location" readonly>
 
-    <a href="/" class="button">Back to Home</a>
+    <!-- Map container -->
+    <div id="osm-map"></div>
 
-    <script src="/static/script.js"></script>
+    <button type="button" id="useMyLocation">📍 Use My Location</button>
+
+    <label for="photo">Photo:</label>
+    <input type="file" id="photo" name="photo" accept="image/*">
+    <br>
+    <label for="video">Video:</label>
+    <input type="file" id="video" name="video" accept="video/*">
+    <br>
+    <button type="submit">Submit Issue</button>
+  </form>
+
+  <a href="/" class="button">Back to Home</a>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>
