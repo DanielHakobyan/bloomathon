@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Request, HTTPException, File, UploadFile, Form
+from fastapi import FastAPI, Request, HTTPException, File, UploadFile, Form, Depends
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -7,12 +7,17 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from bson import ObjectId
 from dotenv import load_dotenv
+from auth import router as auth_router, get_current_user  # Import the auth router and get_current_user function
+import auth
 
 # Load environment variables from .env file
 load_dotenv()
 
 # FastAPI setup
 app = FastAPI()
+
+# Include authentication routes
+app.include_router(auth_router, prefix="/auth")
 
 # MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI")
@@ -35,43 +40,64 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Report Issue (Save to MongoDB)
+# Report Issue (Save to MongoDB) - Protected by Authentication
 @app.get("/report-issue", response_class=HTMLResponse)
-async def report_issue_page(request: Request):
+async def report_issue_page(request: Request, current_user: dict = Depends(get_current_user)):
+    if not current_user.get("is_verified", False):
+        raise HTTPException(status_code=403, detail="You need to verify your email before reporting an issue.")
     return templates.TemplateResponse("report_issue.html", {"request": request})
 
-@app.post("/report/", response_model=dict)
-async def report_issue(
-    title: str = Form(...), 
-    description: str = Form(...), 
-    location: str = Form(...), 
-    photo: UploadFile = File(None), 
-    video: UploadFile = File(None)
+
+@app.post("/report/")
+async def report_issue_page(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    location: str = Form(...),
+    photo: UploadFile = File(None),
+    video: UploadFile = File(None),
+    current_user: dict = Depends(auth.get_current_user)
 ):
+    print(f"Received data: title={title}, description={description}, location={location}")
+
+    # Parse location (Lat: xxx, Lng: yyy)
+    location_parts = location.split(",")
+    if len(location_parts) == 2:
+        lat = float(location_parts[0].replace("Lat:", "").strip())
+        lng = float(location_parts[1].replace("Lng:", "").strip())
+    else:
+        lat = None
+        lng = None
+
+    # Issue handling
     issue_data = {
         "title": title,
         "description": description,
-        "location": location,
+        "location": location,  # You can save this as a string or also store lat/lng separately
+        "latitude": lat,
+        "longitude": lng,
+        "reported_by": current_user["email"],  # User email from the token
     }
 
-    # Handle file uploads (photo/video)
+    # Handle file uploads
     if photo:
         photo_id = await upload_to_gridfs(photo)
-        issue_data['photo'] = str(photo_id)
+        issue_data["photo"] = str(photo_id)
     
     if video:
         video_id = await upload_to_gridfs(video)
-        issue_data['video'] = str(video_id)
+        issue_data["video"] = str(video_id)
 
-    # Insert issue into MongoDB
+    # Insert into DB
     result = await db.issues.insert_one(issue_data)
     
     if result.inserted_id:
         return {"message": "Issue reported successfully!", "id": str(result.inserted_id)}
+    
     raise HTTPException(status_code=500, detail="Failed to report issue.")
 
+# Helper function to store files in GridFS
 async def upload_to_gridfs(file: UploadFile):
-    """ Helper function to store file in GridFS """
     file_data = await file.read()  # Read file data
     file_id = await fs_bucket.upload_from_stream(file.filename, file_data)
     return file_id
@@ -111,6 +137,10 @@ async def news_page(request: Request):
 @app.get("/city")
 async def city_page(request: Request):
     return templates.TemplateResponse("city.html", {"request": request})
+
+@app.get("/for_tourists")
+async def for_tourists_page(request: Request):
+    return templates.TemplateResponse("for_tourists.html", {"request": request})
 
 # Handle lifecycle events
 @app.on_event("startup")

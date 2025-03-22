@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Վանաձոր Տեսարժան Վայրեր և Սննդի Կետեր</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 5px solid #34495e;
+        }
+
+        header h1 {
+            font-size: 56px;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 25px;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #e74c3c;
+        }
+
+        section {
+            padding: 60px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 48px;
+            color: #2980b9;
+            margin-bottom: 40px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2980b9, #2c3e50);
+            background-clip: unset;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #sights, #food, #other {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .sight, .food-place, .other-place {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: calc(33.33% - 17px); /* 3 տարր իրար կողք */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .sight:hover, .food-place:hover, .other-place:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .sight img, .food-place img, .other-place img {
+            width: fit-content;
+            height: fit-content;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sight h3, .food-place h3, .other-place h3 {
+            font-size: 28px;
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .sight p, .food-place p, .other-place p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        /* Լրացուցիչ ոճեր */
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1c5980;
+        }
+
+        /* Գունավոր բաժիններ */
+        .section-title {
+            background: linear-gradient(90deg, #e74c3c, #2980b9);
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Վանաձոր Տեսարժան Վայրեր և Սննդի Կետեր</h1>
+        <nav>
+            <ul>
+                <li><a href="#sights">Տեսարժան վայրեր</a></li>
+                <li><a href="#food">Սննդի կետեր</a></li>
+                <li><a href="#other">Լրացուցիչ տեղեկություններ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="sights">
+        <div class="section-title">
+            <h2>Տեսարժան Վայրեր</h2>
+        </div>
+        <div class="sight">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHaIwWUJKjda0dHKm8wxQBuodWgbOThGz-Fw&s" alt="Սուրբ Գրիգոր Նարեկացի եկեղեցի">
+            <h3>Սուրբ Գրիգոր Նարեկացի եկեղեցի</h3>
+            <p>Սուրբ Գրիգոր Նարեկացի եկեղեցին Վանաձորի կարևոր կրոնական կառույցներից մեկն է։ Այն հայտնի է իր գեղեցիկ ճարտարապետությամբ և հոգևոր մթնոլորտով։ Եկեղեցին կառուցվել է 2002 թվականին և նվիրված է հայ մեծ բանաստեղծ Գրիգոր Նարեկացուն։</p>
+            <a href="https://hy.wikipedia.org/wiki/%D5%8D%D5%B8%D6%82%D6%80%D5%A2_%D4%B3%D6%80%D5%AB%D5%A3%D5%B8%D6%80_%D5%86%D5%A1%D6%80%D5%A5%D5%AF%D5%A1%D6%81%D5%AB_%D5%A5%D5%AF%D5%A5%D5%B2%D5%A5%D6%81%D5%AB_(%D5%8E%D5%A1%D5%B6%D5%A1%D5%B1%D5%B8%D6%80)" class="btn">Ավելին</a>
+        </div>
+        <div class="sight">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Vanadzor_Fine_Art_Museum.jpg/300px-Vanadzor_Fine_Art_Museum.jpg" alt="Պատկերասրահ">
+            <h3>Պատկերասրահ</h3>
+            <p>Վանաձորի պատկերասրահը ներկայացնում է հայ և միջազգային արվեստի գործեր։ Այստեղ կարելի է տեսնել նկարներ, քանդակներ և այլ արվեստի գործեր։ Պատկերասրահը նաև կազմակերպում է ցուցահանդեսներ և մշակութային միջոցառումներ։</p>
+            <a href="https://myarmenia.si.edu/en/guide/experience/tour-vanadzor-fine-arts-museum/index.html" class="btn">Ավելին</a>
+        </div>
+        <div class="sight">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSawAeBda63p_lU_nXlhvxFVDLEuK_ZqHReIHpuX_BVG1ae9KXmeWs6aCUynbNvTzm0hdo&usqp=CAU" alt="Հրաուարակ">
+            <h3>Հրապարակ</h3>
+            <p>Հրապարակը Վանաձորի մշակութային կյանքի կենտրոնն է։ Այստեղ անցկացվում են համերգներ, թատերական ներկայացումներ և այլ մշակութային միջոցառումներ։ Հրաուարակը գտնվում է բացօթյա և ունի հիանալի տեսարան դեպի շրջակա բնությունը։</p>
+            <a href="https://hy.wikipedia.org/wiki/%D5%80%D5%A1%D5%B5%D6%84%D5%AB_%D5%B0%D6%80%D5%A1%D5%BA%D5%A1%D6%80%D5%A1%D5%AF" class="btn">Ավելին</a>
+        </div>
+        <div class="sight">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn0ellsc3AW-m0R_pTH1kT7F7PeWpvUOy_gg&s" alt="Բուսաբանական այգի">
+            <h3>Բուսաբանական այգի</h3>
+            <p>Վանաձորի բուսաբանական այգին հիանալի վայր է բնության սիրահարների համար։ Այստեղ կարելի է տեսնել բազմաթիվ բույսեր, ծաղիկներ և ծառեր։ Այգին իդեալական վայր է զբոսանքների և հանգստի համար։</p>
+            <a href="https://botany.am/en/the-vanadzor-botanical-garden/" class="btn">Ավելին</a>
+        </div>
+        <div class="sight">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZL8C-8fSnGZMwxGqv-MEk0DeX9RTes3IrSGnQ_1ZJLhUp-8kuHg32bcczdEm9Uo2kQ1U&usqp=CAU" alt="Լճեր">
+            <h3>Լճեր</h3>
+            <p>Վանաձորի շրջակայքում կան մի քանի գեղեցիկ լճեր, որոնք հիանալի վայրեր են բնության սիրահարների համար։ Այստեղ կարելի է զբաղվել ձկնորսությամբ, նավարկությամբ կամ պարզապես վայելել բնության գեղեցկությունը։</p>
+            <a href="https://www.google.com/maps/place/3+Lakes/@40.8023306,44.4999558,675m/data=!3m2!1e3!4b1!4m6!3m5!1s0x4041bbfec6a0a967:0xa7ede9200db78178!8m2!3d40.8016449!4d44.4998992!16s%2Fg%2F1tjv1_2b?entry=ttu&g_ep=EgoyMDI1MDMxOS4yIKXMDSoASAFQAw%3D%3D" class="btn">Ավելին</a>
+        </div>
+    </section>
+
+    <section id="food">
+        <div class="section-title">
+            <h2>Սննդի Կետեր</h2>
+        </div>
+        <div class="food-place">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR04zadOW6ThrfZTu0ORD5gT1Ne2MqnaRUrFQ&s" alt="ԿՖՍ">
+            <h3>ԿՖՍ</h3>
+            <p>ԿՖՍ-ը հայտնի է իր համեղ և արագ պատրաստվող ուտեստներով, ինչպիսիք են թխվածքաբլիթները, կարտոֆիլը և տարբեր տեսակի սենդվիչները։ Հարմար վայր է ընտանեկան հանդիպումների և ընկերների հետ ժամանակ անցկացնելու համար։</p>
+            <a href="https://www.kfcarmenia.com/menu#featured" class="btn">Ավելին</a>
+        </div>
+        <div class="food-place">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDEu7q77fvr4SbKo_w9gjVLNVRt2rouemIQA&s" alt="Տաշիր Պիցցա">
+            <h3>Տաշիր Պիցցա</h3>
+            <p>Տաշիր Պիցցան առաջարկում է տարբեր տեսակի պիցցաներ, որոնք պատրաստվում են թարմ բաղադրիչներից։ Այստեղ կարելի է վայելել նաև պաստան, սալաթներ և այլ իտալական ուտեստներ։</p>
+            <a href="https://tashirpizza.am/" class="btn">Ավելին</a>
+        </div>
+        <div class="food-place">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsWbVeEXK3V7ei5x8ayBCnjX6iTFJQtdLLQQ&s" alt="Dolce Box">
+            <h3>Dolce Box</h3>
+            <p>Dolce Box-ը հայտնի է իր քաղցրավենիքներով և դեսերտներով։ Այստեղ կարելի է գտնել տորթեր, մուսեր, մակարոններ և այլ քաղցր ուտեստներ, որոնք պատրաստվում են բարձրորակ բաղադրիչներից։</p>
+            <a href="https://www.instagram.com/dolcebox_arm/?hl=en" class="btn">Instagram</a>
+        </div>
+        <div class="food-place">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk_RoZQaEEmF3OOAVNPTRJYD4CIrFWBHGuEA&s" alt="Jaaz">
+            <h3>Jaaz</h3>
+            <p>Jaaz-ը առաջարկում է համեղ և բազմազան ուտեստներ, այդ թվում՝ բուրգերներ, սենդվիչներ և սալաթներ։ Այստեղ կարելի է վայելել նաև թարմ հյութեր և սուրճ։</p>
+            <a href="https://www.instagram.com/jazzcafe.vanadzor/?hl=en" class="btn">Instagram</a>
+        </div>
+        <div class="food-place">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUEoYDw8-Cr7kod_ovooJYT5u4IM1bRVGGo5ahaP-ZAZXGc2J4MeV97l4xp0RwVRI8DuA&usqp=CAU" alt="Panorama">
+            <h3>Panorama</h3>
+            <p>Panorama-ն հայտնի է իր բարձրակարգ սպասարկմամբ, յուրահատուկ ոճով և բազմազան ճաշացանկով։</p>
+            <a href="https://www.instagram.com/panorama_vanadzor/?hl=en" class="btn">Instagram</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 Վանաձոր Տեսարժան Վայրեր և Սննդի Կետեր | Բոլոր իրավունքները պաշտպանված են</p>
+    </footer>
+</body>
+</html>
