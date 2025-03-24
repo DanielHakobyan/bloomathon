@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter City</title>
+    <title>News</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Welcome to the City Page</h1>
+    <h1>Latest News</h1>
     <a href="/" class="button">Back to Home</a>
+
+    <div class="news-container">
+        {% for article in news %}
+            <div class="news-item">
+                <h2><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h2>
+                {% if article.image_url %}
+                    <img src="{{ article.image_url }}" alt="News Image">
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>
