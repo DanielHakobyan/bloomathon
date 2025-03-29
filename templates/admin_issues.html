@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel - Manage Issues</h1>
+    <ul>
+        {% for issue in issues %}
+            <li>
+                <strong>{{ issue.title }}</strong> - Status: {{ issue.status }}
+                <form action="/admin/issues/{{ issue._id }}/update" method="post">
+                    <select name="status">
+                        <option value="resolved">Resolved</option>
+                        <option value="canceled">Canceled</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
