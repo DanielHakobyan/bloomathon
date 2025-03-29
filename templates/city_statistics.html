@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>City Statistics</title>
+</head>
+<body>
+    <h1>City Statistics</h1>
+    <p>Total Issues: {{ total_issues }}</p>
+    <p>Resolved Issues: {{ resolved_issues_count }}</p>
+
+    <h2>Resolved Issues:</h2>
+    <ul>
+        {% for issue in resolved_issues %}
+            <li>
+                <strong>{{ issue.title }}</strong> - {{ issue.description }} 
+                <br><strong>Location:</strong> {{ issue.location }}
+                <br><strong>Status:</strong> {{ issue.status }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">Back to Home</a>
+</body>
+</html>
