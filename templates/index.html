@@ -1,122 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Armenia</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Vanadzor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<script src="/static/script.js"></script>
+  </head>
 
-<body
-    class="h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-indigo-300 relative overflow-hidden">
-    <div class="absolute inset-0 pointer-events-none">
-        <svg class="absolute w-40 opacity-50 top-10 left-10 animate-pulse" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="#8ecae6" />
-        </svg>
-        <svg class="absolute w-32 opacity-70 top-1/3 right-10 animate-bounce" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="35" fill="#f4a261" />
-        </svg>
-        <svg class="absolute w-28 opacity-60 bottom-10 left-1/4 animate-spin-slow" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="30" fill="#90be6d" />
-        </svg>
-    </div>
-    <div class="text-center bg-white bg-opacity-90 p-10 rounded-2xl shadow-xl backdrop-blur-md z-10">
-        <h1 class="text-4xl font-bold text-indigo-700">Welcome to Armenia</h1>
-        <p class="text-gray-700 mt-2">Explore Armenia and its beautiful cities.</p>
+  <script src="/static/script.js"></script>
 
-        <div class="mt-6 space-y-3">
-            <button onclick="window.location.href='/report-issue'"
-                class="w-full bg-yellow-100 text-yellow-700 py-3 rounded-lg shadow-md hover:bg-yellow-300 transition">
-                Report an Issue
-            </button>
-            <button onclick="window.location.href='/transport'"
-                class="w-full bg-green-100 text-green-700 py-3 rounded-lg shadow-md hover:bg-green-300 transition">
-                Transport Info
-            </button>
-            <button onclick="window.location.href='/news'"
-                class="w-full bg-purple-100 text-purple-700 py-3 rounded-lg shadow-md hover:bg-purple-300 transition">
-                Latest News
-            </button>
-            <button onclick="window.location.href='/city-statistics'"
-                class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg shadow-md hover:bg-gray-300 transition">
-                City Statistics
-            </button>
-            <button onclick="window.location.href='/for_tourists'"
-                class="w-full bg-blue-100 text-blue-700 py-3 rounded-lg shadow-md hover:bg-blue-300 transition">
-                You are a tourist? Check where to go!
-            </button>
-            <button onclick="window.location.href='/issues'"
-                class="w-full bg-red-100 text-red-700 py-3 rounded-lg shadow-md hover:bg-red-300 transition">
-                View Reported Issues
-            </button>
+  <body
+    class="font-sans bg-gradient-to-b from-blue-200 to-indigo-300 text-gray-800"
+  >
+    <!-- Header Section -->
+    <header class="bg-white shadow-md fixed w-full top-0 left-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-2xl font-bold text-indigo-700">Վանաձոր</h1>
+        <nav class="space-x-6">
+          <a href="/" class="text-indigo-700 hover:text-indigo-900">Home</a>
+          <a href="/about" class="text-indigo-700 hover:text-indigo-900"
+            >About</a
+          >
+          <a href="/contact" class="text-indigo-700 hover:text-indigo-900"
+            >Contact</a
+          >
+          <a
+            href="/auth/login"
+            class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-900"
+            >Login</a
+          >
+        </nav>
+      </div>
+    </header>
 
-            <!-- Authentication Buttons -->
-            <button onclick="window.location.href='/auth/register'"
-                class="w-full bg-indigo-100 text-indigo-700 py-3 rounded-lg shadow-md hover:bg-indigo-300 transition">
-                Register
-            </button>
-            <button onclick="window.location.href='/auth/login'"
-                class="w-full bg-indigo-200 text-indigo-800 py-3 rounded-lg shadow-md hover:bg-indigo-400 transition">
-                Login
-            </button>
-            <button onclick="logoutUser()"
-                class="w-full bg-red-200 text-red-800 py-3 rounded-lg shadow-md hover:bg-red-400 transition">
-                Logout
-            </button>
+    <!-- Hero Section -->
+    <section
+      class="relative h-[70vh] flex items-center justify-center bg-cover bg-center text-center text-white"
+      style="
+        background-image: url('https://vanadzor.am/vanadzor/uploads/10835407_847996811913471_1843146931865305606_o.jpg');
+      "
+    >
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div class="z-10">
+        <h1 class="text-5xl font-extrabold mb-4">Բարի Գալուստ Վանաձոր</h1>
+        <p class="text-xl mb-6">
+          Ուսումնասիրեք Վանաձորի գեղեցկությունը, տեսարժան վայրերը և օգնեք
+          բարելավել մեր քաղաքը։
+        </p>
+        <a
+          href="/auth/register"
+          class="bg-indigo-700 text-white px-6 py-3 rounded-lg text-lg hover:bg-indigo-900 transition"
+          >Get Started</a
+        >
+      </div>
+    </section>
 
-            <!-- Email Verification -->
-            <!-- <button onclick="window.location.href='/auth/verify'"
-                class="w-full bg-yellow-200 text-yellow-800 py-3 rounded-lg shadow-md hover:bg-yellow-400 transition">
-                Verify Email
-            </button> -->
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold text-indigo-700 mb-12">
+          Ուսումնասիրեք Վանաձորը և օգնեք բարելավել այն
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+          <!-- Report an Issue Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/report-issue'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Հաղորդել խնդրի մասին
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Հաղորդեք ցանկացած խնդիր և մենք կզբաղվենք դրանով
+            </p>
+          </div>
+
+          <!-- Latest News Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/news'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Վերջին լուրերը
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Եղեք տեղեկացված Վանաձորի մասին վերջին նորություններին
+            </p>
+          </div>
+
+          <!-- Tourist Destinations Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/for_tourists'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Տուրիստական ուղեցույց
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Պարզեք, թե ուր գնալ Վանաձորում որպես զբոսաշրջիկ:
+            </p>
+          </div>
+
+          <!-- City Statistics Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/city-statistics'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Քաղաքի խնդիրների վիճակագրություն
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Տեղեկացեք, թե ինչ խնդիրներ են արդեն լուծվել։
+            </p>
+          </div>
+
+          <!-- Reported Issues Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/issues'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Խնդիրների հաղորդագրությունները
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Ծանոթացեք այն խնդիրներին, որոնց մասին մյուսները հայտնել են
+              Վանաձորում:
+            </p>
+          </div>
+          <!-- Create Event Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/create_event'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Ստեղծել միջոցառում
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Ստեղծեք Ձեր միջոցառումները մեր կայքում և կիսվեք այլ մարդկանց հետ
+              Վանաձորում:
+            </p>
+          </div>
+
+          <!-- View Events Card -->
+          <div
+            class="bg-gradient-to-b from-gray-200 to-gray-400 p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
+            onclick="window.location.href='/view_events'"
+          >
+            <h3 class="text-xl font-semibold text-[#341ab3] mb-4">
+              Դիտել միջոցառումները
+            </h3>
+            <p class="text-gray-700 mb-4">
+              Տեղեկացեք Վանաձորում տեղի ունեցող առաջիկա միջոցառումների մասին:
+            </p>
+          </div>
         </div>
-    </div>
+      </div>
+    </section>
 
-    <script>
-function logoutUser() {
-    // Remove the JWT token from cookies
-    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    
-    // Make a logout request to the backend to ensure the server deletes the cookie too
-    fetch('/auth/logout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        // On success, alert and redirect to the login page or home
-        alert(data.message);
-        window.location.href = '/';
-    })
-    .catch(error => {
-        console.error("Logout error:", error);
-    });
-}
-    </script>
-    
-
-    <style>
-        .animate-spin-slow {
-            animation: spin 20s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-
-</body>
-
+    <!-- Footer -->
+    <footer class="bg-indigo-700 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <p>© <span id="year"></span> Built with Python(FastAPI) and MongoDB</p>
+        <script>
+          document.getElementById("year").textContent =
+            new Date().getFullYear();
+        </script>
+        <div class="mt-4"></div>
+      </div>
+    </footer>
+  </body>
 </html>

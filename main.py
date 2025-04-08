@@ -12,15 +12,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from news_scraper import fetch_news
 from fastapi.responses import RedirectResponse
+from datetime import datetime
 
-# Load environment variables
+
 load_dotenv()
 
-# FastAPI setup
 app = FastAPI()
 app.include_router(auth.router, prefix="/auth")
 
-# MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("DB_NAME")
 
@@ -28,13 +27,11 @@ client = AsyncIOMotorClient(MONGO_URI)
 db = client[DB_NAME]
 fs_bucket = AsyncIOMotorGridFSBucket(db)
 
-# Jinja2 template setup
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 news_collection = db.news 
 
-# Set up APScheduler for daily news scraping
 async def run_fetch_news():
     await fetch_news(db)  
 
@@ -42,12 +39,10 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(run_fetch_news, trigger=IntervalTrigger(days=1))  
 scheduler.start()
 
-# Home page
 @app.get("/", response_class=HTMLResponse)
 async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Report Issue (Protected)
 @app.get("/report-issue", response_class=HTMLResponse)
 async def report_issue_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
     if not current_user.get("is_verified", False):
@@ -65,7 +60,6 @@ async def report_issue(
     video: UploadFile = File(None),
     current_user: dict = Depends(auth.get_current_user)
 ):
-    # Parse location
     location_parts = location.split(",")
     lat, lng = (float(location_parts[0].replace("Lat:", "").strip()), 
                 float(location_parts[1].replace("Lng:", "").strip())) if len(location_parts) == 2 else (None, None)
@@ -83,21 +77,18 @@ async def report_issue(
         "status": "pending",
     }
 
-    # Handle file uploads
-    if photo:
+    if photo and photo.filename:
         issue_data["photo"] = str(await upload_to_gridfs(photo))
-    if video:
+    if video and video.filename:
         issue_data["video"] = str(await upload_to_gridfs(video))
 
     result = await db.issues.insert_one(issue_data)
     return {"message": "Issue reported!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
 
-# Helper function to store files in GridFS
 async def upload_to_gridfs(file: UploadFile):
     file_id = await fs_bucket.upload_from_stream(file.filename, await file.read())
     return file_id
 
-# Get all reported issues (Public)
 @app.get("/issues/", response_class=HTMLResponse)
 async def get_issues(request: Request):
     issues = await db.issues.find().to_list(100)
@@ -107,7 +98,6 @@ async def get_issues(request: Request):
         issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
     return templates.TemplateResponse("view_issues.html", {"request": request, "issues": issues})
 
-# Admin Panel - View All Issues (Admin Only)
 @app.get("/admin/issues", response_class=HTMLResponse)
 async def admin_issues_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
     if current_user["role"] != "admin":
@@ -118,21 +108,17 @@ async def admin_issues_page(request: Request, current_user: dict = Depends(auth.
         issue["_id"] = str(issue["_id"])
     return templates.TemplateResponse("admin_issues.html", {"request": request, "issues": issues})
 
-# Update issue status (Admin Only)
 @app.post("/admin/issues/{issue_id}/update")
 async def update_issue_status(issue_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
     if current_user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Access denied")
 
-    # Validate the issue ID
     if not ObjectId.is_valid(issue_id):
         raise HTTPException(status_code=400, detail="Invalid issue ID format")
 
-    # Validate the status to ensure only "resolved" or "canceled" are used
     if status not in ["resolved", "canceled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
 
-    # Update the issue status in the database
     result = await db.issues.update_one(
         {"_id": ObjectId(issue_id)}, {"$set": {"status": status}}
     )
@@ -140,32 +126,65 @@ async def update_issue_status(issue_id: str, status: str = Form(...), current_us
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Issue not found or already updated")
 
-    # Redirect back to the issues page after updating the status
     return RedirectResponse(url="/admin/issues", status_code=303)
+
+
+@app.get("/admin/events", response_class=HTMLResponse)
+async def admin_events_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    events = await db.events.find().to_list()
+    for event in events:
+        event["_id"] = str(event["_id"])
+    return templates.TemplateResponse("admin_events.html", {"request": request, "events": events})
+
+@app.post("/admin/events/{event_id}/update")
+async def update_events_status(event_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    if not ObjectId.is_valid(event_id):
+        raise HTTPException(status_code=400, detail="Invalid event ID format")
+
+    if status not in ["resolved", "canceled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    result = await db.events.update_one(
+        {"_id": ObjectId(event_id)}, {"$set": {"status": status}}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found or already updated")
+
+    return RedirectResponse(url="/admin/events", status_code=303)
 
 @app.get("/city-statistics", response_class=HTMLResponse)
 async def city_statistics(request: Request):
-    # Calculate total issues
     total_issues = await db.issues.count_documents({})
-
-    # Calculate resolved issues count
     resolved_issues_count = await db.issues.count_documents({"status": "resolved"})
+    resolved_issues = await db.issues.find({"status": "resolved"}).to_list()
 
-    # Fetch the resolved issues details (e.g., title, description)
-    resolved_issues = await db.issues.find({"status": "resolved"}).to_list(100)
+    for issue in resolved_issues:
+        issue["_id"] = str(issue["_id"])
+        issue["photo"] = f"/files/{issue['photo']}" if issue.get("photo") else None
+        issue["video"] = f"/files/{issue['video']}" if issue.get("video") else None
 
-    # Pass data to the template
+        # Convert created_at to a human-readable format
+        if "created_at" in issue and isinstance(issue["created_at"], datetime):
+            issue["created_at"] = issue["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+
     return templates.TemplateResponse(
         "city_statistics.html",
         {
             "request": request,
             "total_issues": total_issues,
             "resolved_issues_count": resolved_issues_count,
-            "resolved_issues": resolved_issues
+            "resolved_issues": resolved_issues,
         }
     )
 
-# Retrieve file from GridFS
+
 @app.get("/files/{file_id}")
 async def get_file(file_id: str):
     try:
@@ -173,7 +192,6 @@ async def get_file(file_id: str):
     except:
         raise HTTPException(404, "File not found")
 
-# Static pages
 @app.get("/transport", response_class=HTMLResponse)
 async def transport_page(request: Request):
     return templates.TemplateResponse("transport.html", {"request": request})
@@ -203,15 +221,69 @@ async def get_news_articles():
         article["image_url"] = f"/news/image/{article['image_id']}" if "image_id" in article else None
     return articles
 
-# Fetch news image
 @app.get("/news/image/{image_id}")
 async def get_news_image(image_id: str):
     try:
         return StreamingResponse(await fs_bucket.open_download_stream(ObjectId(image_id)), media_type="image/jpeg")
     except:
         raise HTTPException(404, "Image not found")
+    
 
-# On startup: Fetch news if DB is empty
+@app.get("/view_events/", response_class=HTMLResponse)
+async def get_events(request: Request):
+    events = await db.events.find().to_list(100)
+    for event in events:
+        event["_id"] = str(event["_id"])
+        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
+        event["video"] = f"/files/{event['video']}" if event.get('video') else None
+    return templates.TemplateResponse("view_events.html", {"request": request, "events": events})
+
+@app.get("/create_event", response_class=HTMLResponse)
+async def create_event_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if not current_user.get("is_verified", False):
+        raise HTTPException(status_code=403, detail="Verify email first.")
+    return templates.TemplateResponse("create_event.html", {"request": request})
+@app.post("/event")
+async def report_issue(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    datetime: str = Form(...),
+    duration: str = Form(...),
+    location: str = Form(...),
+    location_description: str = Form(...),
+    photo: UploadFile = File(None),
+    video: UploadFile = File(None),
+    current_user: dict = Depends(auth.get_current_user)
+):
+    location_parts = location.split(",")
+    lat, lng = (float(location_parts[0].replace("Lat:", "").strip()), 
+                float(location_parts[1].replace("Lng:", "").strip())) if len(location_parts) == 2 else (None, None)
+
+    event_data = {
+        "title": title,
+        "description": description,
+        "datetime": datetime,
+        "duration": duration,
+        "location": location,
+        "location_description": location_description,
+        "latitude": lat,
+        "longitude": lng,
+        "reported_by": current_user["email"],
+        "photo": None,
+        "video": None,
+        "status": "pending",
+    }
+
+    if photo and photo.filename:
+        event_data["photo"] = str(await upload_to_gridfs(photo))
+    if video and video.filename:
+        event_data["video"] = str(await upload_to_gridfs(video))
+
+    result = await db.events.insert_one(event_data)
+    return {"message": "Event submitted successfully!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
+
+
 @app.on_event("startup")
 async def startup():
     if await db.news.count_documents({}) == 0:
