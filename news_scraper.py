@@ -74,8 +74,8 @@ async def upload_image_to_gridfs(db, img_url):
         file_id = await fs_bucket.upload_from_stream(img_url.split("/")[-1], io.BytesIO(img_content))
         return file_id
     except Exception as e:
-        print(f"❌ Failed to upload image {img_url}: {e}")
-        return None  # Return None if upload fails
+        print(f"Failed to upload image {img_url}: {e}")
+        return None  
 
 import requests
 from bs4 import BeautifulSoup
@@ -118,17 +118,17 @@ async def upload_image_to_gridfs(db, img_url):
         file_id = await fs_bucket.upload_from_stream(img_url.split("/")[-1], io.BytesIO(img_content))
         return file_id
     except Exception as e:
-        print(f"❌ Failed to upload image {img_url}: {e}")
+        print(f"Failed to upload image {img_url}: {e}")
         return None  # Return None if upload fails
 
 async def fetch_news(db):
     """Fetches latest news and stores in MongoDB."""
     
-    # ✅ Check if the database already has news
+
     existing_news_count = await db.news.count_documents({})
     if existing_news_count > 0:
-        print("📰 News already exists in DB. Skipping immediate fetch.")
-        return  # Skip fetching if news already exists
+        print("News already exists in DB. Skipping immediate fetch.")
+        return
 
     print("⚡ Fetching news now since DB is empty!")
 
@@ -143,14 +143,14 @@ async def fetch_news(db):
             response = requests.get(site["url"], headers=headers, timeout=10)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to retrieve news from {site['url']}: {e}")
+            print(f"Failed to retrieve news from {site['url']}: {e}")
             continue
 
         soup = BeautifulSoup(response.text, "html.parser")
         articles = soup.select(site["title_selector"])
 
         if not articles:
-            print(f"⚠️ No articles found on {site['url']} with selector {site['title_selector']}")
+            print(f"No articles found on {site['url']} with selector {site['title_selector']}")
             continue
 
         articles_processed = 0
@@ -162,7 +162,7 @@ async def fetch_news(db):
             link = article["href"] if article.has_attr("href") else None
 
             if title in unique_articles or not link:
-                continue  # Skip duplicates or invalid links
+                continue  
 
             unique_articles.add(title)
 
@@ -174,7 +174,7 @@ async def fetch_news(db):
                 news_response = requests.get(link, headers=headers, timeout=10)
                 news_response.raise_for_status()
             except requests.exceptions.RequestException as e:
-                print(f"❌ Failed to retrieve article {link}: {e}")
+                print(f"Failed to retrieve article {link}: {e}")
                 continue
 
             news_soup = BeautifulSoup(news_response.text, "html.parser")
@@ -182,38 +182,31 @@ async def fetch_news(db):
             
             img_url = None
             if img_tag:
-                # ✅ Handle lazy-loaded images (`data-src` or `src`)
                 img_url = img_tag.get("data-src") or img_tag.get("src") or img_tag.get("srcset")
 
-            # ✅ Ensure full image URL
+            # Ensure full image URL
             if img_url:
                 img_url = urljoin(site["url"], img_url)
             
-            # ✅ Upload image to GridFS
             image_id = None
-            if img_url and not img_url.startswith("data:image"):  # Ignore invalid image URLs
+            if img_url and not img_url.startswith("data:image"): 
                 image_id = await upload_image_to_gridfs(db, img_url)
 
-            # ✅ Store in MongoDB
             news_data = {
                 "title": title,
                 "link": link,
-                "image_id": str(image_id) if image_id else None,  # Store image ID if available
+                "image_id": str(image_id) if image_id else None,  
                 "published_at": datetime.now(),
             }
 
             await db.news.update_one({"title": title}, {"$set": news_data}, upsert=True)
             articles_processed += 1
 
-    print("✅ News fetching completed.")
+    print("News fetching completed.")
 
 
 
 
-
-
-
-# Insert or update the news data in the database
     await db.news.update_one(
     {"title": title},
     {"$set": news_data},

@@ -2,22 +2,170 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>Register</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background-color: #354152;
+        color: #ffffff;
+        font: 300 1rem/1.5 "Helvetica Neue", sans-serif;
+      }
+
+      body.align {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        perspective: 1000px;
+      }
+
+      .card {
+        width: 100%;
+        padding: 3rem 2rem;
+        background: #354152;
+        box-shadow: 0 0 250px #341ab3;
+        border-radius: 1rem;
+        text-align: center;
+        transition: transform 0.6s ease-in-out;
+      }
+
+      .card.exit {
+        transform: rotateY(90deg);
+        opacity: 0;
+      }
+
+      .site__logo {
+        margin-bottom: 2rem;
+        max-width: 30%;
+        height: auto;
+      }
+
+      h2 {
+        font-size: 2.75rem;
+        font-weight: 100;
+        margin: 0 0 1rem;
+        text-transform: uppercase;
+      }
+
+      a,
+      button.flip-btn {
+        color: #7e8ba3;
+        background: none;
+        border: none;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+      }
+
+      .form__field {
+        margin-bottom: 1rem;
+      }
+
+      input {
+        font: inherit;
+        padding: 0.5rem 1rem;
+        border: 1px solid #242c37;
+        border-radius: 999px;
+        background-color: transparent;
+        text-align: center;
+        width: 100%;
+        outline: none;
+        color: #fff;
+      }
+
+      input::placeholder {
+        color: #ffffff;
+      }
+
+      input[type="email"] {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M256.017 273.436l-205.17-170.029h410.904l-205.734 170.029zm-.034 55.462l-205.983-170.654v250.349h412v-249.94l-206.017 170.245z"/></svg>');
+        background-repeat: no-repeat;
+        background-size: 1.5rem;
+        background-position: 1rem 50%;
+        padding-left: 3rem;
+      }
+
+      input[type="password"] {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M195.334 223.333h-50v-62.666c0-61.022 49.645-110.667 110.666-110.667 61.022 0 110.667 49.645 110.667 110.667v62.666h-50v-62.666c0-33.452-27.215-60.667-60.667-60.667-33.451 0-60.666 27.215-60.666 60.667v62.666zm208.666 30v208.667h-296v-208.667h296zm-121 87.667c0-14.912-12.088-27-27-27s-27 12.088-27 27c0 7.811 3.317 14.844 8.619 19.773 4.385 4.075 6.881 9.8 6.881 15.785v22.942h23v-22.941c0-5.989 2.494-11.708 6.881-15.785 5.302-4.93 8.619-11.963 8.619-19.774z"/></svg>');
+        background-repeat: no-repeat;
+        background-size: 1.5rem;
+        background-position: 1rem 50%;
+        padding-left: 3rem;
+      }
+
+      input[type="submit"] {
+        background-image: linear-gradient(160deg, #8ceabb 0%, #378f7b 100%);
+        color: white;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+        cursor: pointer;
+      }
+    </style>
   </head>
-  <body>
-    <h1>Login</h1>
-    <form action="/auth/login" method="POST">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required />
+  <body class="align">
+    <div class="container">
+      <div class="card" id="loginCard">
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
+          alt="Logo"
+          class="site__logo"
+        />
+        <h2>Login</h2>
+        <form action="/auth/login" method="POST" class="form">
+          <div class="form__field">
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div class="form__field">
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••••••"
+              required
+            />
+          </div>
+          <div class="form__field">
+            <input type="submit" value="Log In" />
+          </div>
+        </form>
+        <p>
+          Don't have an account?
+          <a href="/auth/register">Register</a>
+        </p>
+        <p>
+          <a href="/" style="color: #8ceabb">Go to Home</a>
+        </p>
+      </div>
+    </div>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
+    <script>
+      const goToLoginBtn = document.getElementById("goToRegister");
+      const loginCard = document.getElementById("loginCard");
 
-      <button type="submit">Login</button>
-    </form>
+      goToRegisterBtn.addEventListener("click", () => {
+        loginCard.classList.add("exit");
 
-    <p>Don't have an account? <a href="/auth/register">Register here</a></p>
+        // Wait for the animation to finish before redirecting
+        setTimeout(() => {
+          window.location.href = "/auth/register";
+        }, 600); // Match the CSS transition time
+      });
+    </script>
   </body>
 </html>

@@ -109,14 +109,14 @@
         font-weight: 500;
       }
 
-      .issues-container {
+      .events-container {
         background: white;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         overflow: hidden;
       }
 
-      .issues-header {
+      .events-header {
         display: grid;
         grid-template-columns: 3fr 1fr 1fr;
         padding: 1rem 1.5rem;
@@ -126,7 +126,7 @@
         color: #64748b;
       }
 
-      .issue-card {
+      .event-card {
         display: grid;
         grid-template-columns: 3fr 1fr 1fr;
         padding: 1.25rem 1.5rem;
@@ -134,15 +134,15 @@
         transition: background 0.2s;
       }
 
-      .issue-card:last-child {
+      .event-card:last-child {
         border-bottom: none;
       }
 
-      .issue-card:hover {
+      .event-card:hover {
         background-color: #f9fafb;
       }
 
-      .issue-title {
+      .event-title {
         font-weight: 500;
         color: var(--dark);
       }
@@ -210,8 +210,8 @@
       <aside class="sidebar">
         <div class="sidebar-title">IssueTracker</div>
         <nav>
-          <a href="#" class="nav-item active">Issues</a>
-          <a href="/admin/events" class="nav-item">Events</a>
+          <a href="/admin/issues" class="nav-item">Issues</a>
+          <a href="#" class="nav-item active">Events</a>
         </nav>
       </aside>
 
@@ -224,24 +224,24 @@
           </div>
         </div>
 
-        <div class="issues-container">
-          <div class="issues-header">
-            <div>Issue</div>
+        <div class="events-container">
+          <div class="events-header">
+            <div>Event</div>
             <div>Status</div>
             <div>Actions</div>
           </div>
 
-          {% for issue in issues %}
-          <div class="issue-card">
-            <div class="issue-title">{{ issue.title }}</div>
+          {% for event in events %}
+          <div class="event-card">
+            <div class="event-title">{{ event.title }}</div>
             <div>
-              <span class="status-badge status-{{ issue.status }}">
-                {{ issue.status|capitalize }}
+              <span class="status-badge status-{{ event.status }}">
+                {{ event.status|capitalize }}
               </span>
             </div>
             <div class="action-form">
               <form
-                action="/admin/issues/{{ issue._id }}/update"
+                action="/admin/events/{{ event._id }}/update"
                 method="post"
                 class="action-form"
               >

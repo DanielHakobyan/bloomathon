@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Վանաձոր | Սպասվող Իրադարձություններ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Open Sans", sans-serif;
+        background: #f8fafc;
+        min-height: 100vh;
+      }
+
+      .header-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      }
+
+      .event-card {
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .event-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+      }
+
+      .event-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .status-resolved::before {
+        background-color: #10b981;
+      }
+      .status-canceled::before {
+        background-color: #ef4444;
+      }
+      .status-pending::before {
+        background-color: #f59e0b;
+      }
+
+      .badge-resolved {
+        background-color: #dcfce7;
+        color: #047857;
+      }
+      .badge-canceled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+      .badge-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-6">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="header-gradient rounded-xl shadow-lg text-white p-6 mb-8">
+        <div class="text-center">
+          <h1 class="text-3xl md:text-4xl font-bold mb-3">
+            Վանաձորի Սպասվող Իրադարձություններ
+          </h1>
+          <p class="text-lg opacity-90">
+            Քաղաքացիների կողմից ներկայացված միջոցառումների և այլ
+            իրադարձությունների ցանկ
+          </p>
+        </div>
+      </div>
+    </div>
+
+<!-- Events List -->
+<div class="space-y-4">
+  {% for event in events %}
+  <div class="event-card bg-white status-{{ event.status|lower|replace(' ', '-') }}">
+      <div class="p-5">
+          <div class="flex flex-col md:flex-row justify-between gap-4">
+              <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                      <h2 class="text-xl font-semibold text-gray-800">
+                          {{ event.title }}
+                      </h2>
+                      <span class="px-3 py-1 rounded-full text-xs font-medium badge-{{ event.status|lower|replace(' ', '-') }}">
+                          {{ event.status }}
+                      </span>
+                  </div>
+                  
+                  <p class="text-gray-600 mb-4">{{ event.description }}</p>
+                  
+                  <div class="flex flex-wrap gap-4 text-sm">
+                      <div class="flex items-center text-gray-500">
+                          <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          {{ event.location }}
+                      </div>
+                      <div class="flex items-center text-gray-500">
+                          <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                          {{ event.datetime }}
+                      </div>
+                      <div class="flex items-center text-gray-500">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ event.duration }}
+                    </div>
+                  </div>
+              </div>
+          </div>
+          {% if event.photo and event.photo != "None" %}
+          <p class="mt-2">
+            <strong>Photo:</strong>
+            <img src="{{ event.photo }}" class="w-64 h-64 object-cover" />
+          </p>
+          {% endif %} {% if event.video and event.video != "None" %}
+          <p class="mt-2">
+            <strong>Video:</strong>
+            <video controls class="w-64 h-64">
+              <source src="{{ event.video }}" type="video/mp4" />
+            </video>
+          </p>
+          {% endif %}
+      </div>
+
+  </div>
+  {% else %}
+  <div class="text-center py-16 bg-white rounded-lg shadow-sm">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h3 class="mt-4 text-xl font-medium text-gray-800">
+          Իրադարձություններ չեն գտնվել
+      </h3>
+      <p class="mt-2 text-gray-600">
+          Դեռևս ոչ մի իրադարձություն չի ներկայացվել
+      </p>
+  </div>
+  {% endfor %}
+</div>
+</div>
+</body>
+</html> 
