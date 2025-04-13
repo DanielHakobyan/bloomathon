@@ -25,7 +25,7 @@
       .button {
         display: inline-block;
         padding: 12px 25px;
-        background-color: #3498db;
+        background-color: #006d77;
         color: white;
         text-decoration: none;
         border-radius: 50px;
@@ -71,7 +71,7 @@
         line-height: 1.4;
       }
       .news-item a {
-        color: #3498db;
+        color: #006d77;
         text-decoration: none;
         font-weight: 500;
         transition: color 0.3s ease;
@@ -99,10 +99,7 @@
     </style>
   </head>
   <body>
-    <h1>Latest News</h1>
-    <div class="button-container">
-      <a href="/" class="button">Back to Home</a>
-    </div>
+    <h1>Վերջին լուրերը</h1>
 
     <div class="news-container">
       {% for article in news %}
@@ -115,6 +112,9 @@
         {% endif %}
       </div>
       {% endfor %}
+    </div>
+    <div class="button-container">
+      <a href="/" class="button">Back to Home</a>
     </div>
   </body>
 </html>

@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const token = Cookies.get("access_token"); // Get the token from cookies
+  const loginBtn = document.getElementById("login-btn");
+  const logoutForm = document.getElementById("logout-form");
+
+  // Toggle visibility based on the presence of the access token
+  if (token) {
+    // If token exists, show logout form and hide login button
+    loginBtn?.classList.add("hidden"); // Hide login button
+    logoutForm?.classList.remove("hidden"); // Show logout form
+  } else {
+    // If token does not exist, hide logout form and show login button
+    logoutForm?.classList.add("hidden"); // Hide logout form
+    loginBtn?.classList.remove("hidden"); // Show login button
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
   const issueForm = document.getElementById("issueForm");
   const useMyLocationBtn = document.getElementById("useMyLocation");
   const locationInput = document.getElementById("location");

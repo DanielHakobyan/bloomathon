@@ -193,11 +193,11 @@ async def login(email: str = Form(...), password: str = Form(...)):
         expires_delta=access_token_expires,
     )
 
-    response = RedirectResponse(url="/auth/login-success", status_code=303)
+    response = RedirectResponse(url="/", status_code=303)
     response.set_cookie(
         key="access_token", 
         value=access_token, 
-        httponly=True, 
+        httponly=False, 
         max_age=3600,  
         secure=False, 
         samesite="Lax"
@@ -211,12 +211,15 @@ async def login_success_page(request: Request):
 
 from datetime import datetime, timedelta
 
+from fastapi.responses import RedirectResponse
+
 @router.post("/logout")
-async def logout(response: Response):
+async def logout():
+    response = RedirectResponse(url="/", status_code=303)  # Redirect to home
     response.delete_cookie(
-        "access_token", 
-        path="/",  
-        secure=False,  
-        samesite="Lax"  
+        key="access_token",
+        path="/",
+        secure=False,
+        samesite="Lax"
     )
-    return {"message": "Logged out successfully"}
+    return response

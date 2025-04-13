@@ -21,11 +21,11 @@
     />
     <style>
       :root {
-        --primary-blue: #006d77;
-        --light-blue: #edf6f9;
-        --lighter-blue: #fafafa;
-        --accent-blue: #83c5be;
-        --dark-blue: #005b63;
+        --teal-deep: #006d77;
+        --mint-ice: #edf6f9;
+        --pure-white: #fafafa;
+        --mint-medium: #83c5be;
+        --teal-dark: #005b63;
         --white: #ffffff;
         --light-gray: #f0f0f0;
         --medium-gray: #ccc;
@@ -40,8 +40,8 @@
       }
 
       body {
-        font-family: "Open Sans", sans-serif;
-        background-color: var(--lighter-blue);
+        font-family: "Inter", sans-serif;
+        background-color: var(--pure-white);
         color: #333;
         min-height: 100vh;
         line-height: 1.6;
@@ -127,7 +127,7 @@
 
       .logo {
         font-size: 2.5rem;
-        color: var(--primary-blue);
+        color: var(--teal-deep);
         margin-bottom: 1rem;
         font-weight: 700;
         position: relative;
@@ -142,14 +142,14 @@
         transform: translateX(-50%);
         width: 60px;
         height: 3px;
-        background: var(--primary-blue);
+        background: var(--teal-deep);
         border-radius: 3px;
       }
 
       h1 {
         font-size: 2rem;
         margin: 1rem 0;
-        color: var(--dark-blue);
+        color: var(--teal-dark);
         font-weight: 600;
       }
 
@@ -182,8 +182,8 @@
         height: 5px;
         background: linear-gradient(
           90deg,
-          var(--primary-blue),
-          var(--accent-blue)
+          var(--teal-deep),
+          var(--mint-medium)
         );
       }
 
@@ -202,7 +202,7 @@
         display: block;
         margin-bottom: 0.5rem;
         font-weight: 600;
-        color: var(--dark-blue);
+        color: var(--teal-dark);
         font-size: 1rem;
       }
 
@@ -211,7 +211,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--primary-blue);
+        color: var(--teal-deep);
       }
 
       input,
@@ -228,12 +228,11 @@
       }
 
       input:focus,
-      textarea:focus,
-      select:focus {
+      textarea:focus {
         outline: none;
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 3px rgba(74, 137, 220, 0.2);
-        background: var(--white);
+        border-color: rgba(68, 231, 217, 0.635);
+        box-shadow: 0 0 0 3px rgba(68, 231, 217, 0.635);
+        transition: all 0.2s ease;
       }
 
       textarea {
@@ -267,24 +266,24 @@
       }
 
       .btn-primary {
-        background-color: var(--primary-blue);
+        background-color: var(--teal-deep);
         color: white;
       }
 
       .btn-primary:hover {
-        background-color: var(--dark-blue);
+        background-color: var(--teal-dark);
         transform: translateY(-2px);
         box-shadow: var(--shadow);
       }
 
       .btn-secondary {
-        background-color: var(--light-blue);
-        color: var(--primary-blue);
-        border: 1px solid var(--primary-blue);
+        background-color: var(--mint-ice);
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
       }
 
       .btn-secondary:hover {
-        background-color: var(--primary-blue);
+        background-color: var(--teal-deep);
         color: white;
         transform: translateY(-2px);
       }
@@ -311,14 +310,14 @@
       }
 
       .file-label:hover {
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-        background-color: var(--light-blue);
+        border-color: var(--teal-deep);
+        color: var(--teal-deep);
+        background-color: var(--teal-deep);
       }
 
       .file-label i {
         margin-right: 8px;
-        color: var(--primary-blue);
+        color: var(--teal-deep);
       }
 
       .location-buttons {
@@ -362,7 +361,7 @@
         position: absolute;
         top: 5px;
         right: 5px;
-        background-color: var(--primary-blue);
+        background-color: var(--teal-deep);
         color: white;
         width: 20px;
         height: 20px;
@@ -381,36 +380,38 @@
         margin-top: 1rem;
         background: linear-gradient(
           90deg,
-          var(--primary-blue),
-          var(--accent-blue)
+          var(--teal-deep),
+          var(--mint-medium)
         );
         color: white;
         font-weight: 600;
       }
 
       .submit-btn:hover {
-        background: linear-gradient(
-          90deg,
-          var(--dark-blue),
-          var(--primary-blue)
-        );
+        background: linear-gradient(90deg, var(--teal-dark), var(--teal-deep));
         transform: translateY(-2px);
       }
 
       .back-btn {
         background-color: transparent;
-        color: var(--primary-blue);
-        border: 1px solid var(--primary-blue);
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
         padding: 10px 20px;
       }
 
       .back-btn:hover {
-        background-color: var(--light-blue);
+        background-color: var(--mint-ice);
       }
 
       @media (max-width: 768px) {
         .container {
           padding: 1.5rem;
+        }
+        .official-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
+          padding: 1rem;
         }
 
         .logo {
@@ -434,7 +435,44 @@
           margin-right: 0;
         }
       }
+
+      .official-header {
+        background-color: var(--teal-deep);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .official-header .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .official-logo {
+        height: 150px;
+      }
+
+      .official-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0;
+        color: white;
+      }
+
+      .official-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-top: 0.3rem;
+      }
     </style>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <!-- Animated background elements -->
@@ -443,12 +481,18 @@
     <div class="bg-circle circle-3"></div>
 
     <div class="container">
-      <header>
-        <div class="logo">Vanadzor</div>
-        <h1>Հաղորդել Խնդիր</h1>
-        <p class="subtitle">
-          Օգնեք մեզ բարելավել Վանաձոր քաղաքը Ձեր հետադարձ կապով
-        </p>
+      <header class="official-header">
+        <div class="logo-container">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
+            alt="Վանաձորի Քաղաքապետարանի զինանշան"
+            class="official-logo"
+          />
+          <div>
+            <h1 class="official-title">Վանաձորի Քաղաքապետարան</h1>
+            <p class="official-subtitle">Օգնեք մեզ բարելավել մեր քաղաքը</p>
+          </div>
+        </div>
       </header>
 
       <form
@@ -551,7 +595,11 @@
       </a>
 
       <div class="footer">
-        <p>© <span id="year"></span> Built with Python(FastAPI) and MongoDB</p>
+        <p>
+          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+          reserved. This code is proprietary and confidential. Unauthorized
+          copying, redistribution, modification, or use is strictly prohibited.
+        </p>
       </div>
 
       <script>

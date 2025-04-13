@@ -21,13 +21,17 @@
     />
     <style>
       :root {
-        --primary-color: #1a3e72; /* Մուգ կապույտ պաշտոնական գույն */
-        --secondary-color: #f8f9fa;
-        --accent-color: #d4af37; /* Ոսկեգույն ակցենտ */
-        --text-color: #333;
-        --border-color: #dee2e6;
-        --success-color: #28a745;
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --border-color: #3e8edf;
+        --teal-deep: #006d77;
+        --mint-ice: #edf6f9;
+        --pure-white: #fafafa;
+        --mint-medium: #83c5be;
+        --teal-dark: #005b63;
+        --white: #ffffff;
+        --light-gray: #f0f0f0;
+        --medium-gray: #ccc;
+        --dark-gray: #333;
+        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
       }
 
       * {
@@ -51,14 +55,13 @@
       }
 
       .official-header {
-        background-color: var(--primary-color);
+        background-color: var(--teal-deep);
         color: white;
         padding: 1.5rem;
         border-radius: 8px 8px 0 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: var(--shadow);
       }
 
       .official-header .logo-container {
@@ -84,11 +87,35 @@
       }
 
       .form-container {
-        background: white;
-        border-radius: 0 0 8px 8px;
+        background: var(--white);
+        border-radius: 12px;
         padding: 2.5rem;
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 50px rgba(68, 231, 217, 0.635),
+          0 0 30px rgba(131, 197, 190, 0.2); /* Glow effect */
+        margin-bottom: 2rem;
+        border: 1px solid var(--medium-gray);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .form-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--teal-deep),
+          var(--mint-medium)
+        );
+      }
+      .form-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15),
+          0 0 40px rgba(0, 255, 229, 0.82);
       }
 
       .form-section {
@@ -105,17 +132,17 @@
 
       .section-title {
         font-size: 1.25rem;
-        color: var(--primary-color);
+        color: var(--teal-deep);
         margin-bottom: 1.5rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--accent-color);
+        border-bottom: 2px solid var(--teal-deep);
         display: flex;
         align-items: center;
         gap: 0.75rem;
       }
 
       .section-title i {
-        color: var(--accent-color);
+        color: var(--teal-deep);
       }
 
       .form-group {
@@ -126,7 +153,7 @@
         display: block;
         margin-bottom: 0.5rem;
         font-weight: 500;
-        color: var(--primary-color);
+        color: var(--teal-deep);
       }
 
       .input-container {
@@ -138,7 +165,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--primary-color);
+        color: var(--teal-deep);
       }
 
       input,
@@ -157,7 +184,7 @@
       textarea:focus,
       select:focus {
         outline: none;
-        border-color: var(--primary-color);
+        border-color: var(--teal-deep);
         box-shadow: 0 0 0 3px rgba(26, 62, 114, 0.1);
         background-color: white;
       }
@@ -192,7 +219,7 @@
       }
 
       .btn-primary {
-        background-color: var(--primary-color);
+        background-color: var(--teal-deep);
         color: white;
       }
 
@@ -203,8 +230,8 @@
 
       .btn-secondary {
         background-color: white;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
       }
 
       .btn-secondary:hover {
@@ -245,13 +272,13 @@
       }
 
       .file-label:hover {
-        border-color: var(--primary-color);
+        border-color: var(--teal-deep);
         background-color: #e9ecef;
       }
 
       .file-label i {
         margin-right: 8px;
-        color: var(--primary-color);
+        color: var(--teal-deep);
       }
 
       .preview-container {
@@ -317,8 +344,8 @@
 
       .back-btn {
         background-color: transparent;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
       }
 
       .back-btn:hover {
@@ -335,6 +362,11 @@
       .required-field::after {
         content: " *";
         color: #dc3545;
+      }
+      .divider {
+        border-top: 1px dashed rgba(0, 255, 229, 0.82);
+        width: 100%;
+        margin: 2rem 0;
       }
 
       @media (max-width: 768px) {
@@ -406,7 +438,7 @@
           </div>
         </div>
       </header>
-
+      <div class="divider"></div>
       <form
         id="eventForm"
         class="form-container"

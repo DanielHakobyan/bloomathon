@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Մեր Մասին</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+
+    <script
+      src="https://kit.fontawesome.com/yourkitcode.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      :root {
+        --bg-color: #ccc;
+        --primary: #44e7d9;
+        --accent: #833ab4;
+        --shadow: 0 20px 50px rgba(68, 231, 217, 0.635),
+          0 0 30px rgba(131, 197, 190, 0.2);
+        --radius: 16px;
+        --text-dark: #333;
+        --text-light: #000;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Orbitron", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-dark);
+        min-height: 100vh;
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .about-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        max-width: 900px;
+        width: 100%;
+        backdrop-filter: blur(8px);
+      }
+
+      h1 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+        text-align: center;
+        text-shadow: 0 0 10px var(--primary);
+      }
+
+      p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+      }
+
+      .glow {
+        color: var(--accent);
+        text-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
+      }
+
+      ul {
+        list-style: none;
+        padding-left: 1.5rem;
+      }
+
+      li {
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+      }
+
+      @media (max-width: 768px) {
+        .about-container {
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+      .divider {
+        border-top: 1px dashed rgba(0, 255, 229, 0.82);
+        width: 100%;
+        margin: 2rem 0;
+      }
+      .footer {
+        font-family: "Roboto", sans-serif;
+        text-align: center;
+        margin-top: 2rem;
+        color: #555;
+      }
+      .footer p {
+        margin: 0;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="about-container">
+      <h1>Մեր Մասին</h1>
+      <p>
+        Vanadzor Issues հարթակը ստեղծվել է մեկ նպատակով՝ վերածել Վանաձորը ավելի
+        մաքուր, անվտանգ ու արձագանքող քաղաքի՝ քաղաքի բնակիչների և
+        ծառայությունների համագործակցության միջոցով։
+      </p>
+
+      <h2>Ինչու է սա կարևոր</h2>
+      <p>
+        Մեր շրջապատում հաճախ հանդիպում ենք խնդիրների՝ փոսեր ճանապարհին, վնասված
+        լույսեր, ապօրինի աղբամաններ, կոտրված նստարաններ և այլն։ Շատ դեպքերում
+        դրանք մնում են աննկատ կամ անարձագանք։ Այս հավելվածը տալիս է մի հարթակ,
+        որտեղ դու կարող ես հաղորդել խնդիրները մի քանի հպումով, կիսվել համայնքի
+        հետ և ազդել փոփոխության վրա։
+      </p>
+
+      <h2>Հիմնական Հնարավորություններ</h2>
+      <ul>
+        <li>
+          📍 <strong>Տեղակայման վրա հիմնված հաղորդում</strong>՝ ընտրիր քարտեզի
+          վրա կետ կամ օգտագործիր քո ընթացիկ տեղակայումը՝ խնդիր հաղորդելու համար։
+        </li>
+        <li>
+          📷 <strong>Լուսանկարի կցում</strong>՝ բեռնի՛ր լուսանկար՝ խնդիրն առավել
+          հասկանալի և տեսանելի դարձնելու համար։
+        </li>
+        <li>
+          📝 <strong>Մանրամասն նկարագրություն</strong>՝ ավելացրու վերնագիր,
+          կատեգորիա և մանրամասն նկարագրություն՝ խնդիրը ճիշտ ներկայացնելու համար։
+        </li>
+        <li>
+          🧑‍🤝‍🧑 <strong>Համայնքի արձագանք</strong>՝ դիտիր ուրիշների հաղորդած
+          խնդիրները, քվեարկիր և թող մեկնաբանություն։
+        </li>
+        <li>
+          🚀 <strong>Իրական ժամանակում թարմացումներ (շուտով հասանելի)</strong>՝
+          ստացիր ծանուցումներ քո հաղորդած կամ սիրած խնդիրների կարգավիճակի մասին՝
+          «հաղորդվել է», «լուծման փուլում», «լուծված» և այլն։
+        </li>
+        <li>
+          🗂️
+          <strong>Վարչական վահանակ (քաղաքային ծառայությունների համար)</strong>՝
+          առանձնացված կառավարման էջ՝ պաշտոնական արձագանքի և մոնիթորինգի համար։
+        </li>
+      </ul>
+      <div class="divider"></div>
+      <div class="footer">
+        <p>
+          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+          reserved.
+        </p>
+        <p>
+          This code is proprietary and confidential. Unauthorized copying,
+          redistribution, modification, or use is strictly prohibited.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

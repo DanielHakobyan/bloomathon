@@ -43,6 +43,10 @@ scheduler.start()
 async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
 @app.get("/report-issue", response_class=HTMLResponse)
 async def report_issue_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
     if not current_user.get("is_verified", False):
