@@ -48,6 +48,69 @@
         line-height: 1.6;
       }
 
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        background: #006d771e;
+        z-index: -1;
+        animation: float 15s infinite linear;
+      }
+      /* ✨ Enhanced ambient lighting */
+      .bg-glow {
+        position: fixed;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(131, 197, 190, 0.2),
+          transparent 70%
+        );
+        box-shadow: 0 0 100px 40px rgba(131, 197, 190, 0.15);
+        z-index: -2;
+        animation: glowFloat 20s ease-in-out infinite alternate;
+      }
+
+      .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -50px;
+        left: -50px;
+        animation-delay: 0s;
+      }
+
+      .circle-2 {
+        width: 200px;
+        height: 200px;
+        bottom: 100px;
+        right: -50px;
+        animation-delay: 3s;
+      }
+
+      .circle-3 {
+        width: 150px;
+        height: 150px;
+        top: 30%;
+        right: 20%;
+        animation-delay: 6s;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+          transform: translate(20px, 20px) rotate(5deg);
+        }
+        50% {
+          transform: translate(0, 40px) rotate(0deg);
+        }
+        75% {
+          transform: translate(-20px, 20px) rotate(-5deg);
+        }
+        100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+      }
+
       .container {
         max-width: 900px;
         margin: 2rem auto;
@@ -173,11 +236,11 @@
       select {
         width: 100%;
         padding: 12px 15px 12px 40px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--medium-gray);
         border-radius: 6px;
         font-size: 1rem;
         transition: all 0.2s ease;
-        background-color: var(--secondary-color);
+        background-color: var(--light-gray);
       }
 
       input:focus,
@@ -424,6 +487,10 @@
     </style>
   </head>
   <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+
     <div class="container">
       <header class="official-header">
         <div class="logo-container">

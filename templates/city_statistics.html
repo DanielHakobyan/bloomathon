@@ -146,6 +146,17 @@
           {% endfor %}
         </div>
       </div>
+      <div class="footer">
+        <p>
+          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+          reserved. This code is proprietary and confidential. Unauthorized
+          copying, redistribution, modification, or use is strictly prohibited.
+        </p>
+      </div>
+
+      <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+      </script>
     </div>
   </body>
 </html>

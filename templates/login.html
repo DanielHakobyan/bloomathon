@@ -152,6 +152,23 @@
           <a href="/" style="color: #8ceabb">Go to Home</a>
         </p>
       </div>
+      <footer
+        style="background-color: var(--teal-dark); color: var(--white)"
+        class="py-12"
+      >
+        <div class="max-w-7xl mx-auto px-6 text-center">
+          <p>
+            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+            reserved. This code is proprietary and confidential. Unauthorized
+            copying, redistribution, modification, or use is strictly
+            prohibited.
+          </p>
+          <script>
+            document.getElementById("year").textContent =
+              new Date().getFullYear();
+          </script>
+        </div>
+      </footer>
     </div>
 
     <script>

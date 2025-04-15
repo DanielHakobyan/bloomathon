@@ -5,202 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Վանաձոր | Հաղորդված Խնդիրներ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+
     <style>
+      :root {
+        --teal-deep: #006d77;
+        --mint-ice: #edf6f9;
+        --pure-white: #fafafa;
+        --mint-medium: #83c5be;
+        --teal-dark: #005b63;
+        --white: #ffffff;
+        --light-gray: #f0f0f0;
+        --medium-gray: #ccc;
+        --dark-gray: #333;
+        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      /* .card {
+        animation: fadeInUp 0.6s ease both;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+      }
+
+      img,
+      video {
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+
+      img.loaded,
+      video.loaded {
+        opacity: 1;
+      } */
+
       body {
         font-family: "Open Sans", sans-serif;
-        background: linear-gradient(-45deg, #f5f7fa, #e4e8f0, #d8e1f0, #e0e8f8);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        min-height: 100vh;
+        background-color: var(--mint-ice);
+        color: var(--dark-gray);
+        scroll-behavior: smooth;
       }
 
-      @keyframes gradientBG {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      .issue-card {
+      .card {
+        background-color: var(--white);
+        border-left: 4px solid var(--mint-medium);
+        box-shadow: var(--shadow);
         transition: all 0.3s ease;
-        border-left: 4px solid;
-        backdrop-filter: blur(8px);
-        background-color: rgba(255, 255, 255, 0.8);
       }
 
-      .issue-card:hover {
+      .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
       }
-
-      /* Գույներ՝ ըստ կարգավիճակի */
 
       .status-pending {
-        border-left-color: #f59e0b; /* Նարնջագույն */
-      }
-      .status-resolved {
-        border-left-color: #10b981; /* Կանաչ */
-      }
-      .status-canceled {
-        border-left-color: #ef4444; /* Կարմիր */
+        border-left-color: #f59e0b;
       }
 
-      /* Badge գույներ */
-      .badge-new {
-        background-color: #ede9fe;
-        color: #7c3aed;
+      .status-resolved {
+        border-left-color: #10b981;
       }
+
+      .status-canceled {
+        border-left-color: #ef4444;
+      }
+
+      .badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.6rem;
+        border-radius: 9999px;
+        display: inline-block;
+      }
+
       .badge-pending {
         background-color: #fef3c7;
-        color: #d97706;
+        color: #b45309;
       }
-      .badge-in-progress {
-        background-color: #dbeafe;
-        color: #1d4ed8;
-      }
+
       .badge-resolved {
-        background-color: #dcfce7;
-        color: #047857;
+        background-color: #d1fae5;
+        color: #065f46;
       }
+
       .badge-canceled {
         background-color: #fee2e2;
-        color: #b91c1c;
+        color: #991b1b;
+      }
+
+      .navbar {
+        backdrop-filter: blur(12px);
+        background-color: rgba(255, 255, 255, 0.7);
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+      }
+
+      .glass-wrapper {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+      }
+
+      #backToTop {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: var(--teal-deep);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 50%;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        display: none;
+        z-index: 50;
+        transition: background 0.3s ease;
+      }
+
+      #backToTop:hover {
+        background-color: var(--teal-dark);
       }
     </style>
   </head>
-  <body class="p-6">
-    <div class="max-w-6xl mx-auto relative z-10">
-      <div class="glass-effect rounded-xl shadow-lg overflow-hidden p-8">
+  <body class="pt-20">
+    <!-- Sticky Navbar -->
+    <nav
+      class="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center"
+    >
+      <h1 class="text-xl font-bold text-[color:var(--teal-deep)]">
+        Վանաձոր • Հաղորդված Խնդիրներ
+      </h1>
+      <div class="space-x-2">
+        <select
+          id="filterStatus"
+          class="text-sm px-3 py-1 rounded border border-gray-300 bg-white"
+        >
+          <option value="all">Բոլորը</option>
+          <option value="pending">Սպասում է</option>
+          <option value="resolved">Լուծված</option>
+          <option value="canceled">Մերժված</option>
+        </select>
+      </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass-wrapper mt-6">
         <div class="text-center mb-10">
-          <h1 class="text-4xl font-bold text-indigo-700 mb-3">
-            Վանաձորի Հաղորդված Խնդիրներ
-          </h1>
-          <p class="text-lg text-indigo-600">
-            Քաղաքացիների կողմից հաղորդված խնդիրների ցանկ
+          <h2 class="text-3xl font-bold text-[color:var(--teal-deep)] mb-2">
+            Հաղորդված Խնդիրներ
+          </h2>
+          <p class="text-md text-gray-600">
+            Տեսեք Վանաձորում հաղորդված խնդիրների ցանկը։
           </p>
         </div>
 
-        <div class="space-y-6">
+        <div id="issuesContainer" class="space-y-6">
           {% for issue in issues %}
           <div
-            class="issue-card p-6 rounded-lg status-{{ issue.status|lower|replace(' ', '-') }}"
+            class="card p-6 rounded-lg status-{{ issue.status|lower|replace(' ', '-') }} issue"
+            data-status="{{ issue.status|lower|replace(' ', '-') }}"
+            data-aos="fade-up"
           >
             <div
-              class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+              class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
             >
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
-                  <h2 class="text-xl font-semibold text-gray-800">
+                  <h3 class="text-xl font-semibold text-gray-800">
                     {{ issue.title }}
-                  </h2>
+                  </h3>
                   <span
-                    class="px-3 py-1 rounded-full text-xs font-medium badge-{{ issue.status|lower|replace(' ', '-') }}"
+                    class="badge badge-{{ issue.status|lower|replace(' ', '-') }}"
+                    >{{ issue.status }}</span
                   >
-                    {{ issue.status }}
-                  </span>
                 </div>
                 <p class="text-gray-600">{{ issue.description }}</p>
-                <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-                  <div class="flex items-center text-sm text-gray-500">
-                    <svg
-                      class="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      ></path>
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                    </svg>
-                    {{ issue.location }}
-                  </div>
-                  <div class="flex items-center text-sm text-gray-500">
-                    <svg
-                      class="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    {{ issue.created_at }}
-                  </div>
+
+                <div
+                  class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500"
+                >
+                  <div class="flex items-center">📍 {{ issue.location }}</div>
+                  <div class="flex items-center">📅 {{ issue.created_at }}</div>
                 </div>
               </div>
-              <div class="flex items-center">
+
+              <div class="text-sm font-medium">
                 {% if issue.status == 'pending' %}
-                <span
-                  class="text-xs px-2 py-1 bg-amber-100 text-amber-800 rounded"
+                <span class="text-amber-700 bg-amber-100 px-2 py-1 rounded"
                   >Սպասում է հաստատման</span
                 >
                 {% elif issue.status == 'canceled' %}
-                <span
-                  class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded"
+                <span class="text-red-800 bg-red-100 px-2 py-1 rounded"
                   >Մերժված է</span
                 >
                 {% elif issue.status == 'resolved' %}
-                <span
-                  class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded"
-                  >Հաջողությամբ լուծված</span
+                <span class="text-green-800 bg-green-100 px-2 py-1 rounded"
+                  >Լուծված է</span
                 >
                 {% endif %}
               </div>
             </div>
+
             {% if issue.photo and issue.photo != "None" %}
-            <p class="mt-2">
-              <strong>Photo:</strong>
-              <img src="{{ issue.photo }}" class="w-64 h-64 object-cover" />
-            </p>
+            <div class="mt-4">
+              <img
+                src="{{ issue.photo }}"
+                class="w-full max-w-sm rounded mt-2 shadow"
+              />
+            </div>
             {% endif %} {% if issue.video and issue.video != "None" %}
-            <p class="mt-2">
-              <strong>Video:</strong>
-              <video controls class="w-64 h-64">
+            <div class="mt-4">
+              <video controls class="w-full max-w-sm mt-2 rounded shadow">
                 <source src="{{ issue.video }}" type="video/mp4" />
               </video>
-            </p>
+            </div>
             {% endif %}
           </div>
-
           {% else %}
-          <div class="text-center py-16 glass-effect rounded-lg">
-            <svg
-              class="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <h3 class="mt-4 text-xl font-medium text-gray-800">
+          <div class="text-center py-20 empty-state">
+            <h3 class="text-xl font-medium text-[color:var(--dark-gray)]">
               Խնդիրներ չեն գտնվել
             </h3>
             <p class="mt-2 text-gray-600">Դեռևս ոչ մի խնդիր չի հաղորդվել։</p>
@@ -208,6 +250,80 @@
           {% endfor %}
         </div>
       </div>
+      <footer
+        style="background-color: var(--teal-dark); color: var(--white)"
+        class="py-12"
+      >
+        <div class="max-w-7xl mx-auto px-6 text-center">
+          <p>
+            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+            reserved. This code is proprietary and confidential. Unauthorized
+            copying, redistribution, modification, or use is strictly
+            prohibited.
+          </p>
+          <script>
+            document.getElementById("year").textContent =
+              new Date().getFullYear();
+          </script>
+        </div>
+      </footer>
     </div>
+
+    <!-- Back to Top -->
+    <div
+      id="backToTop"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-4 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.5 15.75l7.5-7.5 7.5 7.5"
+        />
+      </svg>
+    </div>
+
+    <script>
+      function applyFilter() {
+        const val = document.getElementById("filterStatus").value;
+        const issues = document.querySelectorAll(".issue");
+
+        issues.forEach((issue) => {
+          issue.style.display =
+            val === "all" || issue.dataset.status === val ? "block" : "none";
+        });
+
+        // Refresh AOS only for visible items
+        setTimeout(() => {
+          AOS.refreshHard(); // use refreshHard to fix elements that change visibility
+        }, 100);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const filterSelect = document.getElementById("filterStatus");
+        filterSelect.addEventListener("change", applyFilter);
+
+        AOS.init({
+          once: false, // allow animations to re-trigger
+          duration: 600,
+          easing: "ease-in-out",
+        });
+
+        applyFilter(); // Apply filter on page load
+
+        // Back to top button
+        const backToTop = document.getElementById("backToTop");
+        window.addEventListener("scroll", () => {
+          backToTop.style.display = window.scrollY > 300 ? "block" : "none";
+        });
+      });
+    </script>
   </body>
 </html>
