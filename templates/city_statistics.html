@@ -3,142 +3,162 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Վանաձոր | Հաղորդված Խնդիրներ</title>
+    <title>Վանաձոր | Լուծված Խնդիրներ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
+      :root {
+        --teal-deep: #006d77;
+        --mint-ice: #edf6f9;
+        --pure-white: #fafafa;
+        --mint-medium: #83c5be;
+        --teal-dark: #005b63;
+        --white: #ffffff;
+        --light-gray: #f0f0f0;
+        --medium-gray: #ccc;
+        --dark-gray: #333;
+        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
       body {
         font-family: "Open Sans", sans-serif;
-        background: linear-gradient(-45deg, #f5f7fa, #e4e8f0, #d8e1f0, #e0e8f8);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        min-height: 100vh;
+        background-color: var(--mint-ice);
+        color: var(--dark-gray);
+        scroll-behavior: smooth;
       }
 
-      @keyframes gradientBG {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
+      .glass-wrapper {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
       }
 
-      .issue-card {
+      .card {
+        background-color: var(--white);
+        border-left: 4px solid var(--mint-medium);
+        box-shadow: var(--shadow);
         transition: all 0.3s ease;
-        border-left: 4px solid;
-        backdrop-filter: blur(8px);
-        background-color: rgba(255, 255, 255, 0.8);
       }
 
-      .issue-card:hover {
+      .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
       }
 
-      .status-pending {
-        border-left-color: #f59e0b; /* Orange */
-      }
       .status-resolved {
-        border-left-color: #10b981; /* Green */
+        border-left-color: #10b981;
       }
-      .status-canceled {
-        border-left-color: #ef4444; /* Red */
+
+      .badge-resolved {
+        background-color: #d1fae5;
+        color: #065f46;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.6rem;
+        border-radius: 9999px;
       }
+      .custom-colored-shadow {
+        box-shadow: 0 8px 20px #065f46; /* var(--mint-medium) with transparency */
+      }
+      .custom-bg-color{
+        background-color: var(--medium-gray);
+      }
+
     </style>
   </head>
-  <body class="p-6">
-    <div class="max-w-6xl mx-auto">
-      <div class="glass-effect rounded-xl shadow-lg overflow-hidden p-8">
+  <body class="pt-20">
+    <nav class="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-start items-center">
+      <h1 class="text-xl font-bold text-[color:var(--teal-deep)]">
+        Վանաձոր • Խնդիրների վիճակագրություն
+      </h1>
+    </nav>
+    
+    
+    <!-- Header -->
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass-wrapper mt-6">
         <div class="text-center mb-10">
-          <h1 class="text-4xl font-bold text-indigo-700 mb-3">
-            Վանաձորի Հաղորդված Խնդիրներ
-          </h1>
-          <p class="text-lg text-indigo-600">
-            Քաղաքացիների կողմից հաղորդված խնդիրների վիճակագրություն
-          </p>
-        </div>
+          <div class="flex items-center justify-center gap-4 mb-10">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
+              alt="Վանաձորի Քաղաքապետարանի զինանշան"
+              class="w-20 h-auto md:w-24 rounded shadow"
+            />
+            <div>
+              <h2 class="text-3xl font-bold text-[color:var(--teal-deep)] leading-tight">
+                Վանաձորում Լուծված Խնդիրներ
+              </h2>
+              <p class="text-md text-gray-600 mt-1">
+                Քաղաքացիների կողմից հաղորդված լուծված խնդիրների ցանկ
+              </p>
+            </div>
+          </div>
+          
 
-        <!-- Statistics Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+        <!-- Stats Section -->
+        <div class="custom-bg-color p-6 rounded-lg mb-10 custom-colored-shadow" data-aos="fade-up">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">
             Վիճակագրություն
-          </h2>
-          <p class="text-lg text-gray-600">
-            Ընդհանուր խնդիրներ: <strong>{{ total_issues }}</strong>
-          </p>
-          <p class="text-lg text-gray-600">
-            Լուծված խնդիրներ: <strong>{{ resolved_issues_count }}</strong>
-          </p>
+          </h3>
+          <div class="text-gray-600 space-y-1">
+            <p>Ընդհանուր խնդիրներ: <strong>{{ total_issues }}</strong></p>
+            <p>
+              Լուծված խնդիրներ: <strong>{{ resolved_issues_count }}</strong>
+            </p>
+          </div>
         </div>
 
-        <!-- All Issues -->
-        <h2 class="text-2xl font-bold text-indigo-700 mb-4">Բոլոր խնդիրները</h2>
-        <div class="space-y-6">
-          {% for issue in issues %}
+        <!-- Resolved Issues -->
+        <div id="resolvedIssues" class="space-y-8">
+          {% for issue in resolved_issues %}
           <div
-            class="issue-card p-6 rounded-lg status-{{ issue.status|lower|replace(' ', '-') }}"
+            class="card p-6 rounded-lg status-resolved"
+            data-aos="fade-up"
+            data-aos-delay="{{ (loop.index0 + 100) }}"
           >
             <div
-              class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+              class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
             >
               <div class="flex-1">
-                <h2 class="text-xl font-semibold text-gray-800">
-                  {{ issue.title }}
-                </h2>
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    {{ issue.title }}
+                  </h3>
+                  <span class="badge-resolved">Լուծված</span>
+                </div>
                 <p class="text-gray-600">{{ issue.description }}</p>
                 <p class="text-sm text-gray-500 mt-2">
-                  Վայրը: {{ issue.location }} | Ամսաթիվ: {{ issue.created_at }}
+                  📍 Վայրը: {{ issue.location }} | 📅 Ամսաթիվ: {{
+                  issue.created_at }}
                 </p>
               </div>
             </div>
-          </div>
-          {% else %}
-          <div class="text-center py-8">
-            <h3 class="text-xl font-medium text-gray-800">
-              Խնդիրներ չեն գտնվել
-            </h3>
-          </div>
-          {% endfor %}
-        </div>
 
-        <!-- Resolved Issues Section -->
-        <h2 class="text-2xl font-bold text-green-600 mt-10 mb-4">
-          Լուծված խնդիրներ
-        </h2>
-        <div class="space-y-6">
-          {% for issue in resolved_issues %}
-          <div class="issue-card p-6 rounded-lg border-l-4 border-green-500">
-            <h2 class="text-xl font-semibold text-gray-800">
-              {{ issue.title }}
-            </h2>
-            <p class="text-gray-600">{{ issue.description }}</p>
-            <p class="text-sm text-gray-500 mt-2">
-              Վայրը: {{ issue.location }} | Ամսաթիվ: {{ issue.created_at }}
-            </p>
             {% if issue.photo and issue.photo != "None" %}
-            <p class="mt-2">
-              <strong>Photo:</strong>
-              <img src="{{ issue.photo }}" class="w-64 h-64 object-cover" />
-            </p>
+            <div class="mt-4">
+              <img
+                src="{{ issue.photo }}"
+                class="w-full max-w-sm rounded mt-2 shadow"
+              />
+            </div>
             {% endif %} {% if issue.video and issue.video != "None" %}
-            <p class="mt-2">
-              <strong>Video:</strong>
-              <video controls class="w-64 h-64">
+            <div class="mt-4">
+              <video controls class="w-full max-w-sm mt-2 rounded shadow">
                 <source src="{{ issue.video }}" type="video/mp4" />
               </video>
-            </p>
+            </div>
             {% endif %}
           </div>
           {% else %}
-          <div class="text-center py-8">
+          <div class="text-center py-12">
             <h3 class="text-xl font-medium text-gray-800">
               Լուծված խնդիրներ չեն գտնվել
             </h3>
@@ -146,17 +166,23 @@
           {% endfor %}
         </div>
       </div>
-      <div class="footer">
+
+      <!-- Footer -->
+      <footer class="mt-10 py-10 text-center text-sm text-gray-500">
         <p>
           Copyright © <span id="year"></span> Daniel Hakobyan. All rights
           reserved. This code is proprietary and confidential. Unauthorized
           copying, redistribution, modification, or use is strictly prohibited.
         </p>
-      </div>
-
-      <script>
-        document.getElementById("year").textContent = new Date().getFullYear();
-      </script>
+        <script>
+          document.getElementById("year").textContent =
+            new Date().getFullYear();
+        </script>
+      </footer>
     </div>
+
+    <script>
+      AOS.init({ once: true, duration: 600, easing: "ease-in-out" });
+    </script>
   </body>
 </html>
