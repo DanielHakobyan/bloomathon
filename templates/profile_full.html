@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Վանաձոր | Խնդիրներ և Իրադարձություններ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --teal-deep: #006f60; /* Dark teal */
+        --teal-dark: #004d3f; /* Darker teal for footer background */
+        --white: #ffffff;
+        --dark-gray: #2f2f2f; /* Dark gray */
+      }
+
+      /* You can add your other styles here as needed */
+    </style>
+  </head>
+
+  <body class="pt-20">
+    <!-- Navbar -->
+    <nav
+      class="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center"
+    >
+      <h1 class="text-xl font-bold text-[color:var(--teal-deep)]">
+        Վանաձոր • Խնդիրներ և Իրադարձություններ
+      </h1>
+      <div class="space-x-2">
+        <select
+          id="filterStatus"
+          class="text-sm px-3 py-1 rounded border border-gray-300 bg-white"
+        >
+          <option value="all">Բոլորը</option>
+          <option value="pending">Սպասում է</option>
+          <option value="resolved">Լուծված</option>
+          <option value="canceled">Մերժված</option>
+        </select>
+      </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass-wrapper mt-6">
+        <!-- Issues Section -->
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold text-[color:var(--teal-deep)] mb-2">
+            Հաղորդված Խնդիրներ
+          </h2>
+          <p class="text-md text-gray-600">
+            Տեսեք Վանաձորում հաղորդված խնդիրների ցանկը։
+          </p>
+        </div>
+
+        <div id="issuesContainer" class="space-y-6">
+          {% for issue in issues %}
+
+          <div
+            class="card p-6 rounded-lg status-{{ issue.status|lower|replace(' ', '-') }} issue"
+            data-status="{{ issue.status|lower|replace(' ', '-') }}"
+            data-aos="fade-up"
+          >
+            <div
+              class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
+            >
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-xl font-semibold text-gray-800">
+                    {{ issue.title }}
+                  </h3>
+                  <span
+                    class="badge badge-{{ issue.status|lower|replace(' ', '-') }}"
+                    >{{ issue.status }}</span
+                  >
+                </div>
+                <p class="text-gray-600">{{ issue.description }}</p>
+
+                <div
+                  class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500"
+                >
+                  <div class="flex items-center">📍 {{ issue.location }}</div>
+                  <div class="flex items-center">📅 {{ issue.created_at }}</div>
+                </div>
+              </div>
+
+              <div class="text-sm font-medium">
+                {% if issue.status == 'pending' %}
+                <span class="text-amber-700 bg-amber-100 px-2 py-1 rounded"
+                  >Սպասում է հաստատման</span
+                >
+                {% elif issue.status == 'canceled' %}
+                <span class="text-red-800 bg-red-100 px-2 py-1 rounded"
+                  >Մերժված է</span
+                >
+                {% elif issue.status == 'resolved' %}
+                <span class="text-green-800 bg-green-100 px-2 py-1 rounded"
+                  >Լուծված է</span
+                >
+                {% endif %}
+              </div>
+            </div>
+
+            {% if issue.photo and issue.photo != "None" %}
+            <div class="mt-4">
+              <img
+                src="{{ issue.photo }}"
+                class="w-full max-w-sm rounded mt-2 shadow"
+              />
+            </div>
+            {% endif %} {% if issue.video and issue.video != "None" %}
+            <div class="mt-4">
+              <video controls class="w-full max-w-sm mt-2 rounded shadow">
+                <source src="{{ issue.video }}" type="video/mp4" />
+              </video>
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="text-center py-20 empty-state">
+            <h3 class="text-xl font-medium text-[color:var(--dark-gray)]">
+              Խնդիրներ չեն գտնվել
+            </h3>
+            <p class="mt-2 text-gray-600">Դեռևս ոչ մի խնդիր չի հաղորդվել։</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer
+        style="background-color: var(--teal-dark); color: var(--white)"
+        class="py-12 mt-10"
+      >
+        <div class="max-w-7xl mx-auto px-6 text-center">
+          <p>
+            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+            reserved.
+          </p>
+          <script>
+            document.getElementById("year").textContent =
+              new Date().getFullYear();
+          </script>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div
+      id="backToTop"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-4 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.5 15.75l7.5-7.5 7.5 7.5"
+        />
+      </svg>
+    </div>
+
+    <script>
+      function applyFilter() {
+        const val = document.getElementById("filterStatus").value;
+        const issues = document.querySelectorAll(".issue");
+
+        issues.forEach((issue) => {
+          issue.style.display =
+            val === "all" || issue.dataset.status === val ? "block" : "none";
+        });
+
+        setTimeout(() => {
+          AOS.refreshHard();
+        }, 100);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const filterSelect = document.getElementById("filterStatus");
+        filterSelect.addEventListener("change", applyFilter);
+        AOS.init({ once: false, duration: 600, easing: "ease-in-out" });
+        applyFilter();
+
+        const backToTop = document.getElementById("backToTop");
+        window.addEventListener("scroll", () => {
+          backToTop.style.display = window.scrollY > 300 ? "block" : "none";
+        });
+      });
+    </script>
+  </body>
+</html>

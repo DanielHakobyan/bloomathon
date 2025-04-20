@@ -75,6 +75,20 @@
           >
             Logout
           </button>
+          <button
+            id="toggle-profile"
+            style="color: var(--teal-dark)"
+            class="hover:underline"
+          >
+            Profile
+          </button>
+
+          <!-- <a
+            href="/profile"
+            style="color: var(--teal-dark)"
+            class="hover:underline"
+            >Profile</a
+          > -->
         </nav>
       </div>
     </header>
@@ -294,27 +308,161 @@
       </footer>
     </section>
 
+    <div
+      id="profile-panel"
+      style="
+        position: fixed;
+        top: 80px;
+        right: 100px;
+        width: 350px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+      "
+    >
+      <div id="profile-content">
+        <!-- Will be filled by JavaScript -->
+      </div>
+    </div>
+
+    <!-- {% if user %}
+    <div
+      id="profile-panel"
+      style="
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        width: 260px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+      "
+    >
+      <p style="font-weight: bold; color: #333">👤 {{ user.email }}</p>
+      <p style="margin-top: 4px; font-size: 14px; color: #666">
+        You are logged in
+      </p>
+      <a
+        href="/profile/full"
+        style="
+          display: inline-block;
+          margin-top: 12px;
+          padding: 8px 12px;
+          background-color: #006d77;
+          color: white;
+          border-radius: 8px;
+          text-decoration: none;
+        "
+      >
+        Go to Profile
+      </a>
+    </div>
+    {% endif %} -->
+
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", async function () {
         const token = Cookies.get("access_token");
         const loginBtn = document.getElementById("login-btn");
         const logoutBtn = document.getElementById("logout-btn");
+        const profilePanel = document.getElementById("profile-panel");
+        const profileContent = document.getElementById("profile-content");
+        const toggleProfile = document.getElementById("toggle-profile");
 
+        // Update login/logout button visibility
         if (token) {
           loginBtn?.classList.add("hidden");
           logoutBtn?.classList.remove("hidden");
+
+          try {
+            const res = await fetch("/me", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            console.log("User data:", data); // ← Add this
+
+            profileContent.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+  <img src="https://img.freepik.com/premium-vector/user-profile-person-avatar-identity-login-icon-vector_1277826-985.jpg?w=360"
+       alt="Profile"
+       style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+  <span style="font-weight: bold; color: #333">${data.email}</span>
+</div>
+    <p style="margin-top: 4px; font-size: 14px; color: #666">You are logged in</p>
+    <a
+      href="/profile/full"
+      style="display: inline-block; margin-top: 12px; padding: 8px 12px; background-color: #006d77; color: white; border-radius: 8px; text-decoration: none;"
+    >Go to Profile</a>
+    <form action="/auth/logout" method="POST" style="margin-top: 8px;">
+  <button
+    type="submit"
+    style="
+      padding: 8px 12px;
+      background-color: #83c5be;
+      color: black;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    "
+  >
+    Logout
+  </button>
+</form>
+  `;
+          } catch (err) {
+            console.error("Failed to fetch profile:", err);
+          }
         } else {
           loginBtn?.classList.remove("hidden");
           logoutBtn?.classList.add("hidden");
+
+          profileContent.innerHTML = `
+      <p style="font-weight: bold; color: #333">Not logged in</p>
+      <a
+        href="/auth/login"
+        style="display: inline-block; margin-top: 12px; padding: 8px 12px; background-color: #006d77; color: white; border-radius: 8px; text-decoration: none;"
+      >Login</a>
+      <a
+        href="/auth/register"
+        style="display: inline-block; margin-top: 8px; padding: 8px 12px; background-color: #83c5be; color: black; border-radius: 8px; text-decoration: none;"
+      >Register</a>
+    `;
         }
 
         logoutBtn?.addEventListener("click", async () => {
           try {
             const response = await fetch("/auth/logout", { method: "POST" });
+            Cookies.remove("access_token");
             window.location.href = response.redirected ? response.url : "/";
           } catch (err) {
             console.error("Logout failed:", err);
             alert("Something went wrong while logging out.");
+          }
+        });
+
+        toggleProfile?.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (profilePanel) {
+            profilePanel.style.display =
+              profilePanel.style.display === "none" ? "block" : "none";
+          }
+        });
+
+        // Hide the profile panel when clicking outside
+        document.addEventListener("click", (e) => {
+          if (
+            profilePanel &&
+            !profilePanel.contains(e.target) &&
+            !toggleProfile.contains(e.target)
+          ) {
+            profilePanel.style.display = "none";
           }
         });
       });

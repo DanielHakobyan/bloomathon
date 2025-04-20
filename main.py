@@ -14,7 +14,6 @@ from news_scraper import fetch_news
 from fastapi.responses import RedirectResponse
 from datetime import datetime
 
-
 load_dotenv()
 
 app = FastAPI()
@@ -31,6 +30,13 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 news_collection = db.news 
+users_collection = db.get_collection("users")
+issues_collection = db.get_collection("issues")
+events_collection = db.get_collection("events")
+
+# Dependency to get the DB session
+def get_db():
+    return db
 
 async def run_fetch_news():
     await fetch_news(db)  
@@ -38,6 +44,17 @@ async def run_fetch_news():
 scheduler = BackgroundScheduler()
 scheduler.add_job(run_fetch_news, trigger=IntervalTrigger(days=1))  
 scheduler.start()
+
+def str_to_objectid(id: str) -> ObjectId:
+    try:
+        return ObjectId(id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
+    
+
+@app.get("/me")
+def get_current_user(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    return {"email": current_user.get("email")}
 
 @app.get("/", response_class=HTMLResponse)
 async def homepage(request: Request):
@@ -290,6 +307,28 @@ async def report_issue(
 
     result = await db.events.insert_one(event_data)
     return {"message": "Event submitted successfully!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
+
+# @app.get("/profile", response_class=HTMLResponse)
+# async def profile_panel(request: Request, current_user: dict = Depends(auth.get_current_user)):
+#     return templates.TemplateResponse("profile.html", {"request": request, "user": current_user})
+
+
+@app.get("/profile/full", response_class=HTMLResponse)
+async def full_profile(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    user_email = current_user["email"]
+
+    # Filter only issues reported by this user
+    issues = await issues_collection.find({"reported_by": user_email}).to_list(100)
+
+    for issue in issues:
+        issue["_id"] = str(issue["_id"])
+        issue["photo"] = f"/files/{issue['photo']}" if issue.get('photo') else None
+        issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
+
+    return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues})
+
+
+
 
 
 @app.on_event("startup")

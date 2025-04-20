@@ -1,15 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-  <h1>Welcome, {{ user.email }}</h1>
-  <p>Your role: {{ user.role }}</p>
-  <p>You are successfully logged in!</p>
-  <a href="/auth/logout">Logout</a>
-</body>
-</html>
+<div
+  style="
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 260px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  "
+>
+  <p style="font-weight: bold; color: #333">👤 {{ user.email }}</p>
+  <p style="margin-top: 4px; font-size: 14px; color: #666">You are logged in</p>
+  <a
+    href="/profile/full"
+    style="
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background-color: #006d77;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+    "
+  >
+    Go to Profile
+  </a>
+</div>
