@@ -198,7 +198,9 @@
                     >{{ issue.status }}</span
                   >
                 </div>
-                <p class="text-gray-600">{{ issue.description }}</p>
+                <p class="text-gray-600" id="issueDescription-{{ issue._id }}">
+                  {{ issue.description }}
+                </p>
 
                 <div
                   class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500"
@@ -239,6 +241,21 @@
               </video>
             </div>
             {% endif %}
+            <textarea
+              id="suggestion-input-{{ issue.id }}"
+              class="w-full mt-4 p-2 border rounded"
+              placeholder="Մուտքագրեք առաջարկ..."
+            ></textarea>
+            <button
+              onclick="getSuggestion('{{ issue._id }}')"
+              class="mt-2 px-4 py-2 bg-[color:var(--teal-deep)] text-white rounded"
+            >
+              Առաջարկ AI-ի միջոցով
+            </button>
+            <div
+              id="suggestion-box-{{ issue._id }}"
+              class="mt-2 text-sm text-gray-700"
+            ></div>
           </div>
           {% else %}
           <div class="text-center py-20 empty-state">
@@ -289,6 +306,73 @@
         />
       </svg>
     </div>
+
+    <script>
+      async function getSuggestion(issueId) {
+        console.log("getSuggestion called for issue ID:", issueId); // Verify the correct ID is received
+
+        const descriptionElement = document.getElementById(
+          `issueDescription-${issueId}`
+        );
+        const box = document.getElementById(`suggestion-box-${issueId}`);
+
+        console.log("Found Description Element:", descriptionElement); // Check if this is the correct element
+        console.log("Found Suggestion Box Element:", box); // <--- CRITICAL: Check if this is the correct element
+
+        if (!descriptionElement) {
+          console.error(
+            `Description element not found for ID: issueDescription-${issueId}`
+          );
+          // Maybe update an error message div here instead of returning
+          // box.textContent = "Error: Description element not found."; // Could cause error if box is null
+          return; // Exit if description element isn't found
+        }
+
+        if (!box) {
+          console.error(
+            `Suggestion box element not found for ID: suggestion-box-${issueId}`
+          );
+          // Alert or show an error on the page if the target box isn't found
+          // alert("Error: Target suggestion box not found!");
+          return; // Exit if the suggestion box isn't found
+        }
+
+        const description = descriptionElement.textContent.trim();
+
+        if (!description) {
+          box.textContent = "Խնդրում ենք մուտքագրել նկարագրություն։";
+          return;
+        }
+
+        box.textContent = "Արհեստական բանականությունը մտածում է..."; // This should appear in the correct box
+
+        try {
+          const formData = new FormData();
+          formData.append("description", description);
+
+          const response = await fetch("/ai/suggest", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+          console.log("API response:", data); // See the data received
+
+          if (response.ok && data.suggestion) {
+            // Check response status as well
+            box.textContent = data.suggestion; // This should update the correct box
+          } else {
+            // Handle API errors more specifically
+            const errorMsg = data.error || "Չհաջողվեց ստանալ առաջարկ։";
+            box.textContent = errorMsg;
+            console.error("API returned error:", data);
+          }
+        } catch (err) {
+          console.error("Fetch error:", err); // Log network or parsing errors
+          box.textContent = "Սերվերի սխալ։";
+        }
+      }
+    </script>
 
     <script>
       function applyFilter() {

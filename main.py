@@ -13,6 +13,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from news_scraper import fetch_news
 from fastapi.responses import RedirectResponse
 from datetime import datetime
+import httpx
 
 load_dotenv()
 
@@ -33,6 +34,8 @@ news_collection = db.news
 users_collection = db.get_collection("users")
 issues_collection = db.get_collection("issues")
 events_collection = db.get_collection("events")
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # Dependency to get the DB session
 def get_db():
@@ -172,7 +175,7 @@ async def update_events_status(event_id: str, status: str = Form(...), current_u
     if not ObjectId.is_valid(event_id):
         raise HTTPException(status_code=400, detail="Invalid event ID format")
 
-    if status not in ["resolved", "canceled"]:
+    if status not in ["completed", "canceled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
 
     result = await db.events.update_one(
@@ -319,13 +322,117 @@ async def full_profile(request: Request, current_user: dict = Depends(auth.get_c
 
     # Filter only issues reported by this user
     issues = await issues_collection.find({"reported_by": user_email}).to_list(100)
+    events = await events_collection.find({"reported_by": user_email}).to_list(100)
 
     for issue in issues:
         issue["_id"] = str(issue["_id"])
         issue["photo"] = f"/files/{issue['photo']}" if issue.get('photo') else None
         issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
+        # Ensure 'created_at' is in the correct format for display
+        if isinstance(issue.get("created_at"), datetime):
+            issue["created_at"] = issue["created_at"].strftime("%Y-%m-%d") # Adjust format as needed
 
-    return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues})
+    for event in events:
+        event["_id"] = str(event["_id"])
+        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
+        event["video"] = f"/files/{event['video']}" if event.get('video') else None
+        # Ensure 'date' is present and formatted correctly
+        # If your event datetime is stored differently, adjust accordingly
+        if isinstance(event.get("datetime"), str): # Assuming datetime is stored as string
+            event["date"] = event["datetime"].split(" ")[0] # Extract date part
+        elif isinstance(event.get("datetime"), datetime):
+            event["date"] = event["datetime"].strftime("%Y-%m-%d") # Format datetime object
+        elif "date" not in event:
+            event["date"] = "N/A" # Provide a default if no date
+
+    print("Issues fetched:", issues) # For debugging
+    print("Events fetched:", events)   # For debugging
+
+    return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues, "events": events})    
+
+@app.post("/profile/issues/{issue_id}/edit")
+async def edit_issue(issue_id: str, 
+                     title: str = Form(...), 
+                     description: str = Form(...),
+                     location_description: str = Form(...),
+                     current_user: dict = Depends(auth.get_current_user)):
+    issue = await db.issues.find_one({"_id": ObjectId(issue_id)})
+    if not issue or issue["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.issues.update_one(
+        {"_id": ObjectId(issue_id)},
+        {"$set": {"title": title, "description": description, "location_description": location_description}}
+    )
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/issues/{issue_id}/delete")
+async def delete_issue(issue_id: str, current_user: dict = Depends(auth.get_current_user)):
+    issue = await db.issues.find_one({"_id": ObjectId(issue_id)})
+    if not issue or issue["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.issues.delete_one({"_id": ObjectId(issue_id)})
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/events/{event_id}/edit")
+async def edit_event(event_id: str, 
+                     title: str = Form(...), 
+                     description: str = Form(...),
+                     location_description: str = Form(...),
+                     current_user: dict = Depends(auth.get_current_user)):
+    event = await db.events.find_one({"_id": ObjectId(event_id)})
+    if not event or event["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.events.update_one(
+        {"_id": ObjectId(event_id)},
+        {"$set": {"title": title, "description": description, "location_description": location_description}}
+    )
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/events/{event_id}/delete")
+async def delete_event(event_id: str, current_user: dict = Depends(auth.get_current_user)):
+    event = await db.events.find_one({"_id": ObjectId(event_id)})
+    if not event or event["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.events.delete_one({"_id": ObjectId(event_id)})
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+@app.post("/ai/suggest")
+async def ai_suggest(description: str = Form(...)):
+    prompt = f"""Citizen reported the following issue: "{description}"
+Suggest one or more actionable steps that city officials can take to resolve it."""
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant for municipal problem solving."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+            response.raise_for_status()
+            suggestion = response.json()["choices"][0]["message"]["content"]
+            return {"suggestion": suggestion.strip()}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 

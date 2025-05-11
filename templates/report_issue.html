@@ -528,6 +528,8 @@
           ></textarea>
         </div>
 
+        <button onclick="getSuggestion()">Suggest with AI</button>
+
         <div class="form-group">
           <label><i class="fas fa-map-marker-alt"></i> Տեղադրություն</label>
           <div class="location-buttons">
@@ -742,6 +744,13 @@
           previewContainer.appendChild(previewItem);
         }
       });
+    </script>
+    <script>
+      function getSuggestion() {
+        let val = document.getElementById("suggestion").value;
+        document.getElementById("suggestion").value = val.toUpperCase();
+        console.log(val);
+      }
     </script>
   </body>
 </html>
