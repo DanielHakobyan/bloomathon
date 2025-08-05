@@ -1,136 +1,349 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Latest News</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rockville News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
+      }
+
       body {
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(to right, #e6f7ff, #f0f9ff);
-        margin: 0;
-        padding: 0;
-        color: #333;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
-      h1 {
-        text-align: center;
-        font-size: 2.8em;
-        margin-top: 30px;
-        color: #2c3e50;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        font-weight: 300;
-        letter-spacing: 1px;
+
+      .hero-gradient {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--accent-gold) 100%);
       }
-      .button {
-        display: inline-block;
-        padding: 12px 25px;
-        background-color: #006d77;
-        color: white;
-        text-decoration: none;
-        border-radius: 50px;
-        margin: 30px 0;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
-      .button:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+
+      .text-gradient {
+        background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
-      .news-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 25px;
-        padding: 20px;
-        margin: 0 10%;
+
+      .card-hover {
+        transition: all 0.3s ease;
       }
-      .news-item {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-        padding: 25px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #e0e0e0;
-      }
-      .news-item:hover {
+
+      .card-hover:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        border-color: #d0d0d0;
+        box-shadow: var(--shadow-xl);
       }
-      .news-item h2 {
-        font-size: 1.5em;
-        color: #2c3e50;
-        margin-bottom: 15px;
-        transition: color 0.3s ease;
+
+      .news-image {
+        transition: all 0.3s ease;
+      }
+
+      .news-card:hover .news-image {
+        transform: scale(1.05);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+
+      .source-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
         font-weight: 500;
-        line-height: 1.4;
-      }
-      .news-item a {
-        color: #006d77;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-      .news-item a:hover {
-        color: #2980b9;
-        text-decoration: underline;
-      }
-      .news-item img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-top: 15px;
-        border: 1px solid #eee;
-      }
-      .news-item p {
-        color: #7f8c8d;
-        margin-top: 10px;
-        font-size: 0.9em;
-      }
-      .button-container {
-        text-align: center;
+        backdrop-filter: blur(10px);
       }
     </style>
   </head>
-  <body>
-    <h1>Վերջին լուրերը</h1>
 
-    <div class="news-container">
-      {% for article in news %}
-      <div class="news-item">
-        <h2>
-          <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
-        </h2>
-        {% if article.image_url %}
-        <img src="{{ article.image_url }}" alt="News Image" />
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
+        
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+          <a href="/about" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+          <a href="/contact" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
+          <a href="/news" class="text-blue-600 dark:text-blue-400 font-semibold">News</a>
+        </nav>
+
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+
+          <!-- Auth Buttons -->
+          <a id="login-btn" href="/auth/login" class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Login
+          </a>
+          <button id="logout-btn" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-16 hero-gradient overflow-hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+             alt="Rockville City" class="w-full h-full object-cover opacity-30">
+      </div>
+      
+      <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-float">
+          Rockville <span class="text-yellow-400">News</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-gray-200">
+          Stay informed about the latest happenings in our vibrant community
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button onclick="refreshNews()" class="px-8 py-4 bg-yellow-500 text-gray-900 rounded-lg text-lg font-semibold hover:bg-yellow-400 transition-colors transform hover:scale-105">
+            <i class="fas fa-sync-alt mr-2"></i>
+            Refresh News
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">Latest News</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Get the latest updates from Rockville and surrounding areas. From local government announcements to community events, 
+            stay connected with what's happening in your city.
+          </p>
+        </div>
+
+        {% if news %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {% for article in news %}
+          <div class="bg-white dark:bg-gray-700 rounded-2xl overflow-hidden card-hover shadow-lg border border-gray-200 dark:border-gray-600 news-card">
+            <div class="relative">
+              {% if article.image_url %}
+              <img src="{{ article.image_url }}" alt="News Image" class="w-full h-48 object-cover news-image">
+              {% else %}
+              <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <i class="fas fa-newspaper text-white text-4xl"></i>
+              </div>
+              {% endif %}
+              {% if article.source %}
+              <div class="source-badge">{{ article.source }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="p-6">
+              <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white line-clamp-3">
+                <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  {{ article.title }}
+                </a>
+              </h3>
+              
+              <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div class="flex items-center space-x-2">
+                  <i class="fas fa-calendar-alt text-blue-500"></i>
+                  <span>{{ article.published_at.strftime('%B %d, %Y') if article.published_at else 'Recent' }}</span>
+                </div>
+                <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+          <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-newspaper text-gray-400 text-3xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">No News Available</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-8">
+            We're currently updating our news feed. Please check back soon for the latest updates from Rockville.
+          </p>
+          <button onclick="refreshNews()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-sync-alt mr-2"></i>
+            Try Again
+          </button>
+        </div>
         {% endif %}
       </div>
-      {% endfor %}
-    </div>
-    <div class="button-container">
-      <a href="/" class="button">Back to Home</a>
-    </div>
-    <footer
-      style="background-color: var(--teal-dark); color: var(--white)"
-      class="py-12"
-    >
+    </section>
+
+    <!-- News Sources Section -->
+    <section class="py-20 bg-gray-100 dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">News Sources</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            We aggregate news from trusted local sources to keep you informed about everything happening in Rockville
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-building text-white text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">City of Rockville</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Official city announcements and updates</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg text-center">
+            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Patch Rockville</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Local community news and events</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg text-center">
+            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-landmark text-white text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Montgomery County</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">County-level news and services</p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg text-center">
+            <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-newspaper text-white text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Local Media</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Washington Post, NBC Washington, and more</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
       <div class="max-w-7xl mx-auto px-6 text-center">
-        <p>
-          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-          reserved. This code is proprietary and confidential. Unauthorized
-          copying, redistribution, modification, or use is strictly prohibited.
+        <div class="flex items-center justify-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-city text-white text-xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 mb-4">
+          Building a better community together through technology and civic engagement.
         </p>
-        <script>
-          document.getElementById("year").textContent =
-            new Date().getFullYear();
-        </script>
+        <p class="text-gray-500">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
+        </p>
       </div>
     </footer>
+
+    <script>
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const html = document.documentElement;
+      
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      html.classList.toggle('dark', currentTheme === 'dark');
+      
+      darkModeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+      });
+
+      // Profile functionality
+      document.addEventListener('DOMContentLoaded', async function () {
+        const token = Cookies.get('access_token');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (token) {
+          loginBtn?.classList.add('hidden');
+          logoutBtn?.classList.remove('hidden');
+
+          logoutBtn?.addEventListener('click', async () => {
+            try {
+              const response = await fetch('/auth/logout', { method: 'POST' });
+              Cookies.remove('access_token');
+              window.location.href = response.redirected ? response.url : '/';
+            } catch (err) {
+              console.error('Logout failed:', err);
+              alert('Something went wrong while logging out.');
+            }
+          });
+        } else {
+          loginBtn?.classList.remove('hidden');
+          logoutBtn?.classList.add('hidden');
+        }
+      });
+
+      // Refresh news function
+      function refreshNews() {
+        window.location.reload();
+      }
+
+      // Update year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>

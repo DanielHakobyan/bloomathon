@@ -16,15 +16,19 @@ from fastapi import Response
 from datetime import datetime, timezone
 from fastapi import FastAPI, Response, APIRouter
 
+# Load environment variables
+load_dotenv()
+
 app = FastAPI()
 router = APIRouter()
 
 
-load_dotenv()
+
 
 router = APIRouter()
 
 MONGO_URI = os.getenv("MONGO_URI")
+
 DB_NAME = os.getenv("DB_NAME")
 client = AsyncIOMotorClient(MONGO_URI)
 db = client[DB_NAME]

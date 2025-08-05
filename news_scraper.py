@@ -1,216 +1,47 @@
 import requests
-from bs4 import BeautifulSoup
-import io
-from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from datetime import datetime
-from urllib.parse import urljoin
+from motor.motor_asyncio import AsyncIOMotorClient
+import asyncio
+import os
 
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+QUERY = "Rockville MD"
+API_URL = f"https://newsapi.org/v2/everything?q={QUERY}&language=en&pageSize=10&apiKey={NEWS_API_KEY}"
 
-news_data = {}
-
-WEBSITES = [
-    {
-        "url": "https://vanadzor.am/news/",
-        "title_selector": "h4.entry-title a",
-        "link_selector": "h4.entry-title a",
-        "image_selector": "img",
-        "max_articles": 6,
-    },
-    {
-        "url": "https://am.sputniknews.ru/geo_Vanadzor/",
-        "title_selector": "a.list__title",
-        "link_selector": "a",
-        "image_selector": "img",
-        "max_articles": 3,
-    },
-    {
-        "url": "https://ru.aravot.am/tag/%D0%B2%D0%B0%D0%BD%D0%B0%D0%B4%D0%B7%D0%BE%D1%80/",
-        "title_selector": "h6.fs-13.mb-0 a",
-        "link_selector": "h6.fs-13.mb-0 a",
-        "image_selector": "img.rounded",
-        "max_articles": 1,
-    },
-]
-
-async def upload_image_to_gridfs(db, img_url):
-    img_response = requests.get(img_url)
-    img_content = img_response.content
-    fs_bucket = AsyncIOMotorGridFSBucket(db)
-    file_id = await fs_bucket.upload_from_stream(img_url.split("/")[-1], io.BytesIO(img_content))
-    return file_id
-
-WEBSITES = [
-    {
-        "url": "https://vanadzor.am/news/",
-        "title_selector": "h4.entry-title a",
-        "link_selector": "h4.entry-title a",
-        "image_selector": "img",
-        "max_articles": 6,
-    },
-    {
-        "url": "https://am.sputniknews.ru/geo_Vanadzor/",
-        "title_selector": "a.list__title",
-        "link_selector": "a",
-        "image_selector": "img",
-        "max_articles": 3,
-    },
-    {
-        "url": "https://ru.aravot.am/tag/%D0%B2%D0%B0%D0%BD%D0%B0%D0%B4%D0%B7%D0%BE%D1%80/",
-        "title_selector": "h6.fs-13.mb-0 a",
-        "link_selector": "h6.fs-13.mb-0 a",
-        "image_selector": "img.rounded",
-        "max_articles": 1,
-    },
-]
-
-async def upload_image_to_gridfs(db, img_url):
-    """Uploads image to GridFS and returns the file ID."""
-    try:
-        img_response = requests.get(img_url, timeout=10)
-        img_response.raise_for_status()
-        img_content = img_response.content
-
-        fs_bucket = AsyncIOMotorGridFSBucket(db)
-        file_id = await fs_bucket.upload_from_stream(img_url.split("/")[-1], io.BytesIO(img_content))
-        return file_id
-    except Exception as e:
-        print(f"Failed to upload image {img_url}: {e}")
-        return None  
-
-import requests
-from bs4 import BeautifulSoup
-import io
-from motor.motor_asyncio import AsyncIOMotorGridFSBucket
-from datetime import datetime
-
-WEBSITES = [
-    {
-        "url": "https://vanadzor.am/news/",
-        "title_selector": "h4.entry-title a",
-        "link_selector": "h4.entry-title a",
-        "image_selector": "img",
-        "max_articles": 6,
-    },
-    {
-        "url": "https://am.sputniknews.ru/geo_Vanadzor/",
-        "title_selector": "a.list__title",
-        "link_selector": "a",
-        "image_selector": "img",
-        "max_articles": 3,
-    },
-    {
-        "url": "https://ru.aravot.am/tag/%D0%B2%D0%B0%D0%BD%D0%B0%D0%B4%D0%B7%D0%BE%D1%80/",
-        "title_selector": "h6.fs-13.mb-0 a",
-        "link_selector": "h6.fs-13.mb-0 a",
-        "image_selector": "img.rounded",
-        "max_articles": 1,
-    },
-]
-
-async def upload_image_to_gridfs(db, img_url):
-    """Uploads image to GridFS and returns the file ID."""
-    try:
-        img_response = requests.get(img_url, timeout=10)
-        img_response.raise_for_status()
-        img_content = img_response.content
-
-        fs_bucket = AsyncIOMotorGridFSBucket(db)
-        file_id = await fs_bucket.upload_from_stream(img_url.split("/")[-1], io.BytesIO(img_content))
-        return file_id
-    except Exception as e:
-        print(f"Failed to upload image {img_url}: {e}")
-        return None  # Return None if upload fails
+MONGO_URI = "mongodb://localhost:27017"
+DB_NAME = "local_news"
 
 async def fetch_news(db):
-    """Fetches latest news and stores in MongoDB."""
-    
-
-    existing_news_count = await db.news.count_documents({})
-    if existing_news_count > 0:
-        print("News already exists in DB. Skipping immediate fetch.")
+    try:
+        response = requests.get(API_URL)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as e:
+        print(f"❌ Failed to fetch from NewsAPI: {e}")
         return
 
-    print("⚡ Fetching news now since DB is empty!")
+    articles = data.get("articles", [])
+    for article in articles:
+        title = article.get("title")
+        link = article.get("url")
+        published_at = article.get("publishedAt")
 
-    unique_articles = set()
-    for site in WEBSITES:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Referer": site["url"],
+        if not title or not link:
+            continue
+
+        news_item = {
+            "title": title,
+            "link": link,
+            "published_at": datetime.fromisoformat(published_at[:-1]) if published_at else datetime.utcnow(),
+            "source": article.get("source", {}).get("name"),
         }
-        try:
-            response = requests.get(site["url"], headers=headers, timeout=10)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to retrieve news from {site['url']}: {e}")
-            continue
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        articles = soup.select(site["title_selector"])
+        await db.news.update_one({"title": title}, {"$set": news_item}, upsert=True)
+        print(f"✅ Saved: {title}")
 
-        if not articles:
-            print(f"No articles found on {site['url']} with selector {site['title_selector']}")
-            continue
+    print("✅ News fetch completed.")
 
-        articles_processed = 0
-        for article in articles:
-            if articles_processed >= site["max_articles"]:
-                break
-
-            title = article.get_text(strip=True)
-            link = article["href"] if article.has_attr("href") else None
-
-            if title in unique_articles or not link:
-                continue  
-
-            unique_articles.add(title)
-
-            # Ensure full link
-            if not link.startswith("http"):
-                link = site["url"] + link if not link.startswith("/") else "https://" + site["url"].split("/")[2] + link
-
-            try:
-                news_response = requests.get(link, headers=headers, timeout=10)
-                news_response.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                print(f"Failed to retrieve article {link}: {e}")
-                continue
-
-            news_soup = BeautifulSoup(news_response.text, "html.parser")
-            img_tag = news_soup.select_one(site["image_selector"])
-            
-            img_url = None
-            if img_tag:
-                img_url = img_tag.get("data-src") or img_tag.get("src") or img_tag.get("srcset")
-
-            # Ensure full image URL
-            if img_url:
-                img_url = urljoin(site["url"], img_url)
-            
-            image_id = None
-            if img_url and not img_url.startswith("data:image"): 
-                image_id = await upload_image_to_gridfs(db, img_url)
-
-            news_data = {
-                "title": title,
-                "link": link,
-                "image_id": str(image_id) if image_id else None,  
-                "published_at": datetime.now(),
-            }
-
-            await db.news.update_one({"title": title}, {"$set": news_data}, upsert=True)
-            articles_processed += 1
-
-    print("News fetching completed.")
-
-
-
-
-    await db.news.update_one(
-    {"title": title},
-    {"$set": news_data},
-    upsert=True
-)   
-    articles_processed += 1
-
+if __name__ == "__main__":
+    client = AsyncIOMotorClient(MONGO_URI)
+    db = client[DB_NAME]
+    asyncio.run(fetch_news(db))

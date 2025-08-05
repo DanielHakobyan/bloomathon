@@ -1,177 +1,429 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Մեր Մասին</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-      rel="stylesheet"
-    />
-
-    <script
-      src="https://kit.fontawesome.com/yourkitcode.js"
-      crossorigin="anonymous"
-    ></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       :root {
-        --bg-color: #ccc;
-        --primary: #44e7d9;
-        --accent: #833ab4;
-        --shadow: 0 20px 50px rgba(68, 231, 217, 0.635),
-          0 0 30px rgba(131, 197, 190, 0.2);
-        --radius: 16px;
-        --text-dark: #333;
-        --text-light: #000;
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Orbitron", sans-serif;
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
       }
 
       body {
-        background-color: var(--bg-color);
-        color: var(--text-dark);
-        min-height: 100vh;
-        padding: 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      .about-container {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 2rem;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        max-width: 900px;
-        width: 100%;
-        backdrop-filter: blur(8px);
+      .hero-gradient {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--accent-gold) 100%);
       }
 
-      h1 {
-        color: var(--primary);
-        margin-bottom: 1rem;
-        font-size: 2.5rem;
-        text-align: center;
-        text-shadow: 0 0 10px var(--primary);
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
 
-      p {
-        font-size: 1.1rem;
-        line-height: 1.7;
-        margin-bottom: 1.5rem;
+      .text-gradient {
+        background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
-      .glow {
-        color: var(--accent);
-        text-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
+      .card-hover {
+        transition: all 0.3s ease;
       }
 
-      ul {
-        list-style: none;
-        padding-left: 1.5rem;
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
       }
 
-      li {
-        margin-bottom: 0.8rem;
-        font-size: 1.1rem;
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
       }
 
-      @media (max-width: 768px) {
-        .about-container {
-          padding: 1.5rem;
-        }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
 
-        h1 {
-          font-size: 2rem;
-        }
+      .feature-icon {
+        transition: all 0.3s ease;
       }
-      .divider {
-        border-top: 1px dashed rgba(0, 255, 229, 0.82);
-        width: 100%;
-        margin: 2rem 0;
-      }
-      .footer {
-        font-family: "Roboto", sans-serif;
-        text-align: center;
-        margin-top: 2rem;
-        color: #555;
-      }
-      .footer p {
-        margin: 0;
-        padding: 0.5rem 1rem;
-        font-size: 0.75rem;
+
+      .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
       }
     </style>
   </head>
-  <body>
-    <div class="about-container">
-      <h1>Մեր Մասին</h1>
-      <p>
-        Vanadzor Issues հարթակը ստեղծվել է մեկ նպատակով՝ վերածել Վանաձորը ավելի
-        մաքուր, անվտանգ ու արձագանքող քաղաքի՝ քաղաքի բնակիչների և
-        ծառայությունների համագործակցության միջոցով։
-      </p>
 
-      <h2>Ինչու է սա կարևոր</h2>
-      <p>
-        Մեր շրջապատում հաճախ հանդիպում ենք խնդիրների՝ փոսեր ճանապարհին, վնասված
-        լույսեր, ապօրինի աղբամաններ, կոտրված նստարաններ և այլն։ Շատ դեպքերում
-        դրանք մնում են աննկատ կամ անարձագանք։ Այս հավելվածը տալիս է մի հարթակ,
-        որտեղ դու կարող ես հաղորդել խնդիրները մի քանի հպումով, կիսվել համայնքի
-        հետ և ազդել փոփոխության վրա։
-      </p>
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
+        
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+          <a href="/about" class="text-blue-600 dark:text-blue-400 font-semibold">About</a>
+          <a href="/contact" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
+          <a href="/news" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">News</a>
+        </nav>
 
-      <h2>Հիմնական Հնարավորություններ</h2>
-      <ul>
-        <li>
-          📍 <strong>Տեղակայման վրա հիմնված հաղորդում</strong>՝ ընտրիր քարտեզի
-          վրա կետ կամ օգտագործիր քո ընթացիկ տեղակայումը՝ խնդիր հաղորդելու համար։
-        </li>
-        <li>
-          📷 <strong>Լուսանկարի կցում</strong>՝ բեռնի՛ր լուսանկար՝ խնդիրն առավել
-          հասկանալի և տեսանելի դարձնելու համար։
-        </li>
-        <li>
-          📝 <strong>Մանրամասն նկարագրություն</strong>՝ ավելացրու վերնագիր,
-          կատեգորիա և մանրամասն նկարագրություն՝ խնդիրը ճիշտ ներկայացնելու համար։
-        </li>
-        <li>
-          🧑‍🤝‍🧑 <strong>Համայնքի արձագանք</strong>՝ դիտիր ուրիշների հաղորդած
-          խնդիրները, քվեարկիր և թող մեկնաբանություն։
-        </li>
-        <li>
-          🚀 <strong>Իրական ժամանակում թարմացումներ (շուտով հասանելի)</strong>՝
-          ստացիր ծանուցումներ քո հաղորդած կամ սիրած խնդիրների կարգավիճակի մասին՝
-          «հաղորդվել է», «լուծման փուլում», «լուծված» և այլն։
-        </li>
-        <li>
-          🗂️
-          <strong>Վարչական վահանակ (քաղաքային ծառայությունների համար)</strong>՝
-          առանձնացված կառավարման էջ՝ պաշտոնական արձագանքի և մոնիթորինգի համար։
-        </li>
-      </ul>
-      <div class="divider"></div>
-      <div class="footer">
-        <p>
-          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-          reserved.
-        </p>
-        <p>
-          This code is proprietary and confidential. Unauthorized copying,
-          redistribution, modification, or use is strictly prohibited.
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+
+          <!-- Auth Buttons -->
+          <a id="login-btn" href="/auth/login" class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Login
+          </a>
+          <button id="logout-btn" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-16 hero-gradient overflow-hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+             alt="Rockville City" class="w-full h-full object-cover opacity-30">
+      </div>
+      
+      <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-float">
+          About <span class="text-yellow-400">Rockville</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-gray-200">
+          Building a smarter, more connected community through technology and civic engagement
         </p>
       </div>
-    </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">Our Mission</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            The Rockville City Portal was created with a simple yet powerful mission: to transform Rockville into a more responsive, 
+            transparent, and community-driven city by bridging the gap between residents and city services.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Why This Matters</h3>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              Every day, residents encounter issues in their community - potholes, broken streetlights, overflowing trash bins, 
+              damaged benches, and more. Too often, these problems go unreported or unresolved due to lack of an easy reporting system.
+            </p>
+            <p class="text-lg text-gray-600 dark:text-gray-400">
+              Our platform provides a simple, accessible way for residents to report issues, track their resolution, and stay 
+              informed about what's happening in their neighborhood. By making civic engagement effortless, we're building a 
+              stronger, more connected Rockville.
+            </p>
+          </div>
+          <div class="relative">
+            <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
+              <i class="fas fa-users text-6xl mb-4"></i>
+              <h4 class="text-2xl font-bold mb-4">Community First</h4>
+              <p class="text-blue-100">
+                We believe that the best solutions come from the community itself. 
+                Every report, every suggestion, every interaction helps make Rockville better.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-100 dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">Key Features</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Discover the powerful tools that make civic engagement simple, effective, and impactful
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Issue Reporting -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-blue-600 mb-6">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Issue Reporting</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Report problems in your neighborhood with just a few clicks. Add photos, descriptions, and precise locations 
+              to help city services respond quickly and effectively.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Photo attachments</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>GPS location mapping</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Category classification</li>
+            </ul>
+          </div>
+
+          <!-- Community Events -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-green-600 mb-6">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Community Events</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Discover and create community events that bring neighbors together. From block parties to volunteer cleanups, 
+              build stronger connections in your neighborhood.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Event creation & discovery</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>RSVP functionality</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Event sharing</li>
+            </ul>
+          </div>
+
+          <!-- Real-time Updates -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-purple-600 mb-6">
+              <i class="fas fa-broadcast-tower"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Real-time Updates</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Stay informed about the issues you care about. Get notifications when your reports are being processed, 
+              when work begins, and when problems are resolved.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Status tracking</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Email notifications</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Progress updates</li>
+            </ul>
+          </div>
+
+          <!-- City Statistics -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-orange-600 mb-6">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">City Statistics</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              View comprehensive statistics about reported issues, response times, and city improvements. 
+              Track the impact of community engagement on city services.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Issue analytics</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Response time tracking</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Progress visualization</li>
+            </ul>
+          </div>
+
+          <!-- News & Updates -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-red-600 mb-6">
+              <i class="fas fa-newspaper"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">News & Updates</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Stay connected with the latest news, announcements, and updates from Rockville. 
+              Get informed about city initiatives, events, and important community information.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Local news aggregation</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>City announcements</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Community updates</li>
+            </ul>
+          </div>
+
+          <!-- Admin Dashboard -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 card-hover shadow-lg">
+            <div class="feature-icon text-4xl text-indigo-600 mb-6">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Admin Dashboard</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Dedicated management interface for city officials to monitor, respond to, and manage 
+              community reports efficiently and transparently.
+            </p>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Issue management</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Response coordination</li>
+              <li><i class="fas fa-check text-green-500 mr-2"></i>Analytics dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">Our Values</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            The principles that guide everything we do
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-handshake text-3xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Transparency</h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We believe in open communication and clear visibility into how city services respond to community needs.
+            </p>
+          </div>
+
+          <div class="text-center">
+            <div class="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-users text-3xl text-green-600 dark:text-green-400"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Community</h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Every resident has a voice, and every voice matters. We're building a platform that empowers the community.
+            </p>
+          </div>
+
+          <div class="text-center">
+            <div class="w-20 h-20 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-rocket text-3xl text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Innovation</h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              We leverage technology to solve real community problems and make civic engagement accessible to everyone.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold mb-6">Ready to Make a Difference?</h2>
+        <p class="text-xl mb-8 text-blue-100">
+          Join thousands of Rockville residents who are already using the portal to improve their community.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/auth/register" class="px-8 py-4 bg-yellow-500 text-gray-900 rounded-lg text-lg font-semibold hover:bg-yellow-400 transition-colors transform hover:scale-105">
+            Get Started Today
+          </a>
+          <a href="/contact" class="px-8 py-4 border-2 border-white text-white rounded-lg text-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors">
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-city text-white text-xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 mb-4">
+          Building a better community together through technology and civic engagement.
+        </p>
+        <p class="text-gray-500">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const html = document.documentElement;
+      
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      html.classList.toggle('dark', currentTheme === 'dark');
+      
+      darkModeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+      });
+
+      // Profile functionality
+      document.addEventListener('DOMContentLoaded', async function () {
+        const token = Cookies.get('access_token');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (token) {
+          loginBtn?.classList.add('hidden');
+          logoutBtn?.classList.remove('hidden');
+
+          logoutBtn?.addEventListener('click', async () => {
+            try {
+              const response = await fetch('/auth/logout', { method: 'POST' });
+              Cookies.remove('access_token');
+              window.location.href = response.redirected ? response.url : '/';
+            } catch (err) {
+              console.error('Logout failed:', err);
+              alert('Something went wrong while logging out.');
+            }
+          });
+        } else {
+          loginBtn?.classList.remove('hidden');
+          logoutBtn?.classList.add('hidden');
+        }
+      });
+
+      // Update year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>

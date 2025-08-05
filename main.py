@@ -442,7 +442,6 @@ Suggest one or more actionable steps that city officials can take to resolve it.
 async def startup():
     if await db.news.count_documents({}) == 0:
         await fetch_news(db)
-    asyncio.create_task(run_fetch_news())
 
 @app.on_event("shutdown")
 def shutdown_scheduler():

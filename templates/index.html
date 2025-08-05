@@ -1,272 +1,525 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to Vanadzor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Rockville, Maryland</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.6.0/countUp.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       :root {
-        --teal-deep: #006d77;
-        --mint-ice: #edf6f9;
-        --pure-white: #fafafa;
-        --mint-medium: #83c5be;
-        --teal-dark: #005b63;
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --dark-blue: #1e3a8a;
+            --light-blue: #dbeafe;
         --white: #ffffff;
-        --light-gray: #f0f0f0;
-        --medium-gray: #ccc;
-        --dark-gray: #333;
-        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .dark {
+            --primary-blue: #3b82f6;
+            --secondary-blue: #60a5fa;
+            --accent-gold: #fbbf24;
+            --dark-blue: #1e40af;
+            --light-blue: #1e3a8a;
+            --white: #111827;
+            --gray-50: #1f2937;
+            --gray-100: #374151;
+            --gray-200: #4b5563;
+            --gray-300: #6b7280;
+            --gray-600: #9ca3af;
+            --gray-800: #e5e7eb;
+            --gray-900: #f9fafb;
+        }
+
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .flip-card {
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, var(--accent-gold), #fbbf24);
+            color: var(--gray-900);
+            transform: rotateY(180deg);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--accent-gold) 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .countup-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dropdown animations */
+        .dropdown-enter {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-enter-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-exit {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: all 0.15s ease-in;
+        }
+
+        .dropdown-exit-active {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+        }
+
+        /* Smooth dropdown transitions */
+        #profile-dropdown {
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            transform-origin: top right;
+        }
+
+        .countup-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .countup-container:hover::before {
+            left: 100%;
       }
     </style>
-    <script
-      src="https://kit.fontawesome.com/a076d05399.js"
-      crossorigin="anonymous"
-    ></script>
   </head>
 
-  <body
-    class="font-sans"
-    style="
-      background: linear-gradient(
-        to bottom,
-        var(--mint-medium),
-        var(--teal-deep)
-      );
-      color: var(--dark-gray);
-    "
-  >
-    <header
-      style="background-color: var(--white); box-shadow: var(--shadow)"
-      class="fixed w-full top-0 left-0 z-50"
-    >
-      <div
-        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
-      >
-        <h1 class="text-2xl font-bold" style="color: var(--teal-dark)">
-          Վանաձոր
-        </h1>
-        <nav class="space-x-6">
-          <a href="/" style="color: var(--teal-dark)" class="hover:underline"
-            >Home</a
-          >
-          <a
-            href="/about"
-            style="color: var(--teal-dark)"
-            class="hover:underline"
-            >About</a
-          >
-          <a
-            href="/contact"
-            style="color: var(--teal-dark)"
-            class="hover:underline"
-            >Contact</a
-          >
-          <a
-            id="login-btn"
-            href="/auth/login"
-            class="hidden px-4 py-2 rounded-lg"
-            style="background-color: var(--teal-dark); color: var(--white)"
-          >
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-city text-white text-lg"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+                <a href="/about" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+                <a href="/contact" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
+                <a href="/news" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">News</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <!-- Dark Mode Toggle -->
+                <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+
+                <!-- Auth Buttons -->
+                <a id="login-btn" href="/auth/login" class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Login
           </a>
-
-          <button
-            id="logout-btn"
-            class="hidden px-4 py-2 rounded-lg"
-            style="background-color: var(--teal-dark); color: var(--white)"
-          >
+                <button id="logout-btn" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
             Logout
           </button>
-          <button
-            id="toggle-profile"
-            style="color: var(--teal-dark)"
-            class="hover:underline"
-          >
-            Profile
+                <div class="relative">
+                    <button id="toggle-profile" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center space-x-2 cursor-pointer" onclick="toggleProfileDropdown()">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
           </button>
-
-          <!-- <a
-            href="/profile"
-            style="color: var(--teal-dark)"
-            class="hover:underline"
-            >Profile</a
-          > -->
-        </nav>
+                </div>
+                
+                <!-- Profile Dropdown - Moved outside container -->
+                <div id="profile-dropdown" class="fixed top-20 right-4 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50" style="display: none;">
+                    <div id="profile-content" class="p-4">
+                        <!-- Will be filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
       </div>
     </header>
 
-    <section
-      class="relative h-[70vh] flex items-center justify-center bg-cover bg-center text-center"
-      style="
-        background-image: url('https://vanadzor.am/vanadzor/uploads/10835407_847996811913471_1843146931865305606_o.jpg');
-        color: var(--pure-white);
-      "
-    >
-      <div
-        class="absolute inset-0"
-        style="background-color: rgba(0, 0, 0, 0.5)"
-      ></div>
-      <div class="z-10">
-        <h1 class="text-5xl font-extrabold mb-4">Բարի Գալուստ Վանաձոր</h1>
-        <p class="text-xl mb-6">
-          Ուսումնասիրեք Վանաձորի գեղեցկությունը, տեսարժան վայրերը և օգնեք
-          բարելավել մեր քաղաքը։
-        </p>
-        <a
-          href="/auth/register"
-          class="px-6 py-3 rounded-lg text-lg transition"
-          style="background-color: var(--teal-dark); color: var(--white)"
-        >
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center hero-gradient overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                 alt="Rockville City" class="w-full h-full object-cover opacity-30">
+        </div>
+        
+        <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+            <h1 class="text-6xl md:text-8xl font-bold mb-6 animate-float">
+                Welcome to <span class="text-yellow-400">Rockville</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-200">
+                Discover the charm of Maryland's vibrant city. Explore our community, 
+                report issues, and help make Rockville even better.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/auth/register" class="px-8 py-4 bg-yellow-500 text-gray-900 rounded-lg text-lg font-semibold hover:bg-yellow-400 transition-colors transform hover:scale-105">
           Get Started
         </a>
+                <a href="/about" class="px-8 py-4 border-2 border-white text-white rounded-lg text-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors">
+                    Learn More
+                </a>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 scroll-indicator">
+            <i class="fas fa-chevron-down text-white text-2xl"></i>
       </div>
     </section>
 
-    <section class="py-12 bg-white">
-      <div
-        class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center"
-      >
-        <div>
-          <h3 class="text-teal-700 text-xl font-semibold">Բնակչություն</h3>
-          <p class="text-gray-600">~80,000</p>
+    <!-- Stats Section with CountUp -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16 text-gradient">Rockville at a Glance</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center countup-container">
+                    <div class="text-5xl font-bold text-blue-600 mb-2" id="population">0</div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Population</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Thriving Community</p>
+                </div>
+                <div class="text-center countup-container">
+                    <div class="text-5xl font-bold text-green-600 mb-2" id="area">0</div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Square Miles</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Beautiful Landscape</p>
+                </div>
+                <div class="text-center countup-container">
+                    <div class="text-5xl font-bold text-purple-600 mb-2" id="founded">0</div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Founded</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Rich History</p>
+                </div>
+                <div class="text-center countup-container">
+                    <div class="text-5xl font-bold text-orange-600 mb-2" id="elevation">0</div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Elevation (ft)</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Scenic Views</p>
+                </div>
+            </div>
         </div>
-        <div>
-          <h3 class="text-teal-700 text-xl font-semibold">Բարձրություն</h3>
-          <p class="text-gray-600">1,350 մ</p>
-        </div>
-        <div>
-          <h3 class="text-teal-700 text-xl font-semibold">Մակերես</h3>
-          <p class="text-gray-600">32 km²</p>
-        </div>
-        <div>
-          <h3 class="text-teal-700 text-xl font-semibold">Հիմնադրվել է</h3>
-          <p class="text-gray-600">1828 թ․</p>
-        </div>
-      </div>
     </section>
 
-    <section class="py-12 bg-white">
-      <h2 class="text-3xl font-bold text-center mb-8 text-teal-800">
-        Մեր Քաղաքը
-      </h2>
-      <div class="relative w-full max-w-4xl mx-auto overflow-hidden">
-        <div
-          id="carousel"
-          class="flex transition-transform duration-700 ease-in-out"
-        >
-          <!-- Slide 1 -->
+    <!-- Image Carousel -->
+    <section class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16 text-gradient">Discover Rockville</h2>
+            <div class="relative overflow-hidden rounded-2xl shadow-2xl">
+                <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
+                    <div class="min-w-full relative">
+                        <img src="https://arma-metromd.org/images/gallery/Home_Page_Slider_M_Series_1920_X_500/SliderImage1.jpg" 
+                             alt="Rockville Town Square" class="w-full h-96 object-cover">
+                        <div class="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-store mr-2"></i>
+                            <span>Rockville Town Square</span>
+                        </div>
+                    </div>
+                    <div class="min-w-full relative">
+                        <img src="https://lh3.googleusercontent.com/p/AF1QipNNgZrpkX0yl8SqkM9d3lU2IH8foTodmO_WCeM5=s1360-w1360-h1020-rw" 
+                             alt="Rockville National Park Trust" class="w-full h-96 object-cover">
+                        <div class="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-landmark mr-2"></i>
+                            <span>National Park Trust</span>
+                        </div>
+                    </div>
           <div class="min-w-full relative">
-            <img
-              src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcQq003UYhOdFraAfKAqxuMkgC0ytzQSoR5GTyudGCLE0q-dAQ3lwJ76CY1yeA4db3JLnCjCYV1eRtkwAhnMxvIg1V-hRxRZ1a4_Kd5DbQ"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
+                        <img src="https://lh3.googleusercontent.com/p/AF1QipPbugyYOXSr0QsZ0QrtapOLeJjIyxAlDJdbGPLR=s1360-w1360-h1020-rw" 
+                             alt="Movement Rockville" class="w-full h-96 object-cover">
+                        <div class="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-tree mr-2"></i>
+                            <span>Movement Rockville</span>
+                        </div>
           </div>
-
-          <!-- Slide 2 -->
           <div class="min-w-full relative">
-            <img
-              src="https://visitdebedcanyon.com/wp-content/uploads/2020/10/vanadzor-fine-arts-museum-in-armenia.jpg"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
-            <div
-              class="absolute bottom-4 left-4 bg-teal-700/70 text-white px-3 py-1 rounded flex items-center space-x-2"
-            >
-              <img
-                src="https://i.pinimg.com/736x/01/ce/4c/01ce4c107d847ef4fe43cf3556f75211.jpg"
-                class="w-5 h-5"
-              />
-              <span>Vanadzor Fine Arts Museum</span>
+                        <img src="https://apos-grimmparker-prod.s3.us-east-1.amazonaws.com/attachments/aduok08hf2hol5jz7ay7i1ul-october2010-newwebsite.jpg" 
+                             alt="Rockville Library" class="w-full h-96 object-cover">
+                        <div class="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-book mr-2"></i>
+                            <span>Rockville Library</span>
+                        </div>
             </div>
           </div>
 
-          <!-- Slide 3 -->
-          <div class="min-w-full relative">
-            <img
-              src="https://avatars.mds.yandex.net/get-altay/406255/2a000001863c2a25da067bc89337e3ad5c3d/orig"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
-            <div
-              class="absolute bottom-4 left-4 bg-teal-700/70 text-white px-3 py-1 rounded flex items-center space-x-2"
-            >
-              <img
-                src="https://i.pinimg.com/736x/01/ce/4c/01ce4c107d847ef4fe43cf3556f75211.jpg"
-                class="w-5 h-5"
-              />
-              <span>Boo Mountain Bike Park</span>
+                <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+          </div>
+    </section>
+
+    <!-- Flip Cards Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16 text-gradient">Explore & Engage</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Report Issues Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Report Issues</h3>
+                            <p class="text-lg">Help improve our city by reporting problems you encounter</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-clipboard-check text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Quick & Easy</h3>
+                            <p class="text-lg">Submit reports with photos and get updates on progress</p>
+                            <a href="/report-issue" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Report Now
+                            </a>
+                        </div>
             </div>
           </div>
 
-          <!-- Slide 4 -->
-          <div class="min-w-full relative">
-            <img
-              src="https://visitdebedcanyon.com/wp-content/uploads/2020/10/3.-House-Museum-of-Stepan.jpg"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
-            <div
-              class="absolute bottom-4 left-4 bg-teal-700/70 text-white px-3 py-1 rounded flex items-center space-x-2"
-            >
-              <img
-                src="https://i.pinimg.com/736x/01/ce/4c/01ce4c107d847ef4fe43cf3556f75211.jpg"
-                class="w-5 h-5"
-              />
-              <span>Stepan Zoryan's House Museum</span>
-            </div>
+                <!-- News Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-newspaper text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Latest News</h3>
+                            <p class="text-lg">Stay informed about what's happening in Rockville</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-broadcast-tower text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Real-time Updates</h3>
+                            <p class="text-lg">Get the latest news and announcements from local sources</p>
+                            <a href="/news" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Read News
+                            </a>
+                        </div>
+                    </div>
           </div>
 
-          <!-- Slide 5 -->
-          <div class="min-w-full relative">
-            <img
-              src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcQmvg1Awz0IuBz9a26yKRrjKk7vagyrbGc-96NaehmXWA_24ZWCW8j1v-cqFuLjjO2wPA1dgNZXaqhDV00f2gWvr066FCYUIhUyflx65g"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
+                <!-- Events Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Community Events</h3>
+                            <p class="text-lg">Discover and create events in our vibrant community</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-users text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Connect & Share</h3>
+                            <p class="text-lg">Join events or create your own to bring people together</p>
+                            <a href="/view_events" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                View Events
+                            </a>
+                        </div>
+                    </div>
           </div>
 
-          <!-- Slide 6 -->
-          <div class="min-w-full relative">
-            <img
-              src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSFc-5ouAK-tYQb_S2uZElcCGQwvKqfiHckmioIvZo80eVs4B_FxUl2t9RS8RFvB0LfaUnC_IsRqRdtRNOJ4VALwCI7ZcuP649b3-95Xg"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
-          </div>
-
-          <!-- Slide 7 -->
-          <div class="min-w-full relative">
-            <img
-              src="https://vanadzorbotanical.weebly.com/uploads/2/1/8/9/21898366/2194173_orig.jpg"
-              class="w-full object-cover rounded-xl shadow-md"
-            />
-            <div
-              class="absolute bottom-4 left-4 bg-teal-700/70 text-white px-3 py-1 rounded flex items-center space-x-2"
-            >
-              <img
-                src="https://i.pinimg.com/736x/01/ce/4c/01ce4c107d847ef4fe43cf3556f75211.jpg"
-                class="w-5 h-5"
-              />
-              <span>Vanadzor Botanical Garden</span>
+                <!-- Statistics Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-chart-bar text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">City Statistics</h3>
+                            <p class="text-lg">Track the progress of reported issues and improvements</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-tasks text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Progress Tracking</h3>
+                            <p class="text-lg">See how many issues have been resolved and what's being worked on</p>
+                            <a href="/city-statistics" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                View Stats
+                            </a>
             </div>
           </div>
         </div>
 
-        <!-- Manual Buttons -->
-        <button
-          onclick="prevSlide()"
-          class="absolute left-2 top-1/2 -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full shadow hover:bg-teal-800"
-        >
-          ❮
-        </button>
-        <button
-          onclick="nextSlide()"
-          class="absolute right-2 top-1/2 -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full shadow hover:bg-teal-800"
-        >
-          ❯
-        </button>
+                <!-- Issues Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-list-alt text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">View Issues</h3>
+                            <p class="text-lg">See what others have reported and their current status</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-eye text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Transparency</h3>
+                            <p class="text-lg">Browse all reported issues and see how the city is responding</p>
+                            <a href="/issues" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Browse Issues
+                            </a>
+                        </div>
+                    </div>
       </div>
+
+                <!-- Create Event Card -->
+                <div class="flip-card h-80">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-plus-circle text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Create Event</h3>
+                            <p class="text-lg">Organize community events and bring people together</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-handshake text-4xl mb-4"></i>
+                            <h3 class="text-2xl font-bold mb-4">Community Building</h3>
+                            <p class="text-lg">Create events that strengthen our community bonds</p>
+                            <a href="/create_event" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Create Event
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-city text-white text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold">Rockville, Maryland</h3>
+            </div>
+            <p class="text-gray-400 mb-4">
+                Building a better community together through technology and civic engagement.
+            </p>
+            <p class="text-gray-500">
+                © <span id="year"></span> Rockville City Portal. All rights reserved.
+            </p>
+        </div>
+    </footer>
 
       <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.classList.toggle('dark', currentTheme === 'dark');
+        
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+
+
+
+        // Carousel functionality
         let currentIndex = 0;
-        const carousel = document.getElementById("carousel");
+        const carousel = document.getElementById('carousel');
         const totalSlides = carousel.children.length;
 
         function updateSlide() {
@@ -283,357 +536,354 @@
           updateSlide();
         }
 
-        // Auto scroll
-        setInterval(nextSlide, 5000); // every 5 seconds
-      </script>
-    </section>
+        // Auto scroll carousel
+        setInterval(nextSlide, 5000);
 
-    <!-- Features Section -->
-    <section id="features" class="py-20" style="background-color: var(--white)">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <h2 class="text-3xl font-bold mb-12" style="color: var(--teal-dark)">
-          Ուսումնասիրեք Վանաձորը և օգնեք բարելավել այն
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-          <!-- Card Template -->
-          <!-- You can reuse this div structure for all the cards -->
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/report-issue'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Հաղորդել խնդրի մասին
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Հաղորդեք ցանկացած խնդիր և մենք կզբաղվենք դրանով
-            </p>
-          </div>
+                // Profile dropdown functionality
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Custom countup animation function
+            const animateCountUp = (elementId, startValue, endValue, duration = 2000, decimals = 0) => {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                
+                const startTime = performance.now();
+                const valueRange = endValue - startValue;
+                
+                const updateValue = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smooth animation
+                    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                    const currentValue = startValue + (valueRange * easeOutQuart);
+                    
+                    // Format the number
+                    let formattedValue;
+                    if (decimals > 0) {
+                        formattedValue = currentValue.toFixed(decimals);
+                    } else {
+                        formattedValue = Math.floor(currentValue).toLocaleString();
+                    }
+                    
+                    element.textContent = formattedValue;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateValue);
+                    }
+                };
+                
+                requestAnimationFrame(updateValue);
+            };
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/news'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Վերջին լուրերը
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Եղեք տեղեկացված Վանաձորի մասին վերջին նորություններին
-            </p>
-          </div>
+            // CountUp animations setup
+            const setupCountUp = () => {
+                console.log('Setting up CountUp animations...');
+                
+                // Track which animations have been triggered
+                const triggeredAnimations = new Set();
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/for_tourists'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Տուրիստական ուղեցույց
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Պարզեք, թե ուր գնալ Վանաձորում որպես զբոսաշրջիկ:
-            </p>
-          </div>
+                // Function to start animation for a specific element
+                const startAnimation = (elementId, endValue, decimals = 0) => {
+                    if (triggeredAnimations.has(elementId)) return;
+                    
+                    console.log('Starting animation for:', elementId, 'to', endValue);
+                    triggeredAnimations.add(elementId);
+                    
+                    try {
+                        animateCountUp(elementId, 0, endValue, 2500, decimals);
+                    } catch (error) {
+                        console.error('Error starting animation for:', elementId, error);
+                        const element = document.getElementById(elementId);
+                        if (element) {
+                            if (decimals > 0) {
+                                element.textContent = endValue.toFixed(decimals);
+                            } else {
+                                element.textContent = endValue.toLocaleString();
+                            }
+                        }
+                    }
+                };
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/city-statistics'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Քաղաքի խնդիրների վիճակագրություն
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Տեղեկացեք, թե ինչ խնդիրներ են արդեն լուծվել։
-            </p>
-          </div>
+                // Create intersection observer
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const target = entry.target;
+                            console.log('Element in view:', target.id);
+                            
+                            switch(target.id) {
+                                case 'population':
+                                    startAnimation('population', 68417, 0);
+                                    break;
+                                case 'area':
+                                    startAnimation('area', 13.6, 1);
+                                    break;
+                                case 'founded':
+                                    startAnimation('founded', 1803, 0);
+                                    break;
+                                case 'elevation':
+                                    startAnimation('elevation', 450, 0);
+                                    break;
+                            }
+                        }
+                    });
+                }, {
+                    threshold: 0.3,
+                    rootMargin: '0px 0px -50px 0px'
+                });
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/issues'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Խնդիրների հաղորդագրությունները
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Ծանոթացեք այն խնդիրներին, որոնց մասին մյուսները հայտնել են
-              Վանաձորում:
-            </p>
-          </div>
+                // Observe all countup elements
+                const elements = ['population', 'area', 'founded', 'elevation'];
+                elements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        observer.observe(element);
+                        console.log('Observing element:', id);
+                    } else {
+                        console.error('Element not found:', id);
+                    }
+                });
+            };
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/create_event'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Ստեղծել միջոցառում
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Ստեղծեք Ձեր միջոցառումները մեր կայքում և կիսվեք այլ մարդկանց հետ
-              Վանաձորում:
-            </p>
-          </div>
+            // Setup CountUp with a longer delay to ensure library is loaded
+            setTimeout(setupCountUp, 500);
+            
+            // Add manual trigger for testing (remove this in production)
+            window.triggerCountUp = () => {
+                console.log('Manual trigger called');
+                animateCountUp('population', 0, 68417, 2500, 0);
+                animateCountUp('area', 0, 13.6, 2500, 1);
+                animateCountUp('founded', 0, 1801, 2500, 0);
+                animateCountUp('elevation', 0, 450, 2500, 0);
+            };
 
-          <div
-            class="p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 cursor-pointer"
-            style="
-              background: linear-gradient(
-                to bottom,
-                var(--light-gray),
-                var(--medium-gray)
-              );
-            "
-            onclick="window.location.href='/view_events'"
-          >
-            <h3
-              class="text-xl font-semibold mb-4"
-              style="color: var(--teal-deep)"
-            >
-              Դիտել միջոցառումները
-            </h3>
-            <p style="color: var(--dark-gray)">
-              Տեղեկացեք Վանաձորում տեղի ունեցող առաջիկա միջոցառումների մասին:
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+            // Profile functionality
+            const token = Cookies.get('access_token');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            const profileContent = document.getElementById('profile-content');
+            const toggleProfile = document.getElementById('toggle-profile');
 
-    <section style="background-color: var(--white)" class="py-12">
-      <footer
-        style="background-color: var(--teal-dark); color: var(--white)"
-        class="py-12"
-      >
-        <div class="max-w-7xl mx-auto px-6 text-center">
-          <p>
-            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-            reserved. This code is proprietary and confidential. Unauthorized
-            copying, redistribution, modification, or use is strictly
-            prohibited.
-          </p>
-          <script>
-            document.getElementById("year").textContent =
-              new Date().getFullYear();
-          </script>
-        </div>
-      </footer>
-    </section>
+            // Debug: Check if elements are found
+            console.log('Profile dropdown found:', !!profileDropdown);
+            console.log('Toggle profile found:', !!toggleProfile);
+            console.log('Profile content found:', !!profileContent);
 
-    <div
-      id="profile-panel"
-      style="
-        position: fixed;
-        top: 80px;
-        right: 100px;
-        width: 350px;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        display: none;
-      "
-    >
-      <div id="profile-content">
-        <!-- Will be filled by JavaScript -->
-      </div>
-    </div>
+            if (token) {
+                loginBtn?.classList.add('hidden');
+                logoutBtn?.classList.remove('hidden');
 
-    <!-- {% if user %}
-    <div
-      id="profile-panel"
-      style="
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        width: 260px;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        display: none;
-      "
-    >
-      <p style="font-weight: bold; color: #333">👤 {{ user.email }}</p>
-      <p style="margin-top: 4px; font-size: 14px; color: #666">
-        You are logged in
-      </p>
-      <a
-        href="/profile/full"
-        style="
-          display: inline-block;
-          margin-top: 12px;
-          padding: 8px 12px;
-          background-color: #006d77;
-          color: white;
-          border-radius: 8px;
-          text-decoration: none;
-        "
-      >
-        Go to Profile
-      </a>
-    </div>
-    {% endif %} -->
+                try {
+                    const res = await fetch('/me', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const data = await res.json();
 
-    <script>
-      document.addEventListener("DOMContentLoaded", async function () {
-        const token = Cookies.get("access_token");
-        const loginBtn = document.getElementById("login-btn");
-        const logoutBtn = document.getElementById("logout-btn");
-        const profilePanel = document.getElementById("profile-panel");
-        const profileContent = document.getElementById("profile-content");
-        const toggleProfile = document.getElementById("toggle-profile");
+                    profileContent.innerHTML = `
+                        <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 dark:text-white text-sm">${data.email}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Logged in</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mt-3">
+                            <a href="/profile/full" class="flex items-center space-x-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                <i class="fas fa-user-circle text-gray-500"></i>
+                                <span class="text-sm">Full Profile</span>
+                            </a>
+                            <form action="/auth/logout" method="POST" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <button type="submit" class="flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors w-full">
+                                    <i class="fas fa-sign-out-alt text-red-500"></i>
+                                    <span class="text-sm">Sign out</span>
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                } catch (err) {
+                    console.error('Failed to fetch profile:', err);
+                }
+            } else {
+                loginBtn?.classList.remove('hidden');
+                logoutBtn?.classList.add('hidden');
 
-        // Update login/logout button visibility
+                profileContent.innerHTML = `
+                    <div class="text-center py-2">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Not logged in</p>
+                        <div class="space-y-2">
+                            <a href="/auth/login" class="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Sign in</span>
+                            </a>
+                            <a href="/auth/register" class="flex items-center justify-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Create account</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            logoutBtn?.addEventListener('click', async () => {
+                try {
+                    const response = await fetch('/auth/logout', { method: 'POST' });
+                    Cookies.remove('access_token');
+                    window.location.href = response.redirected ? response.url : '/';
+                } catch (err) {
+                    console.error('Logout failed:', err);
+                    alert('Something went wrong while logging out.');
+                }
+            });
+        });
+
+        // Update year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Simple profile dropdown toggle function with animations
+        function toggleProfileDropdown() {
+            console.log('toggleProfileDropdown called');
+            const dropdown = document.getElementById('profile-dropdown');
+            const profileContent = document.getElementById('profile-content');
+            
+            console.log('dropdown found:', !!dropdown);
+            console.log('profileContent found:', !!profileContent);
+            
+            if (dropdown && profileContent) {
+                const currentDisplay = dropdown.style.display;
+                const isVisible = currentDisplay === 'block';
+                console.log('current display:', currentDisplay, 'isVisible:', isVisible);
+                
+                if (!isVisible) {
+                    // Show dropdown with animation
+                    console.log('Loading profile content...');
+                    loadProfileContent();
+                    
+                    // Set initial state for animation
+                    dropdown.style.opacity = '0';
+                    dropdown.style.transform = 'translateY(-10px) scale(0.95)';
+                    dropdown.style.display = 'block';
+                    
+                    // Trigger animation
+                    requestAnimationFrame(() => {
+                        dropdown.style.opacity = '1';
+                        dropdown.style.transform = 'translateY(0) scale(1)';
+                    });
+                } else {
+                    // Hide dropdown with animation
+                    dropdown.style.opacity = '0';
+                    dropdown.style.transform = 'translateY(-10px) scale(0.95)';
+                    
+                    // Hide after animation completes
+                    setTimeout(() => {
+                        dropdown.style.display = 'none';
+                    }, 200);
+                }
+                console.log('Profile dropdown toggled:', dropdown.style.display);
+            } else {
+                console.log('Missing elements - dropdown:', !!dropdown, 'content:', !!profileContent);
+            }
+        }
+
+        // Load profile content based on login status
+        async function loadProfileContent() {
+            console.log('loadProfileContent called');
+            const profileContent = document.getElementById('profile-content');
+            const token = Cookies.get('access_token');
+            
+            console.log('profileContent found:', !!profileContent);
+            console.log('token found:', !!token);
+            
         if (token) {
-          loginBtn?.classList.add("hidden");
-          logoutBtn?.classList.remove("hidden");
-
+                // User is logged in
           try {
-            const res = await fetch("/me", {
+                    const res = await fetch('/me', {
               headers: { Authorization: `Bearer ${token}` },
             });
             const data = await res.json();
-            console.log("User data:", data); // ← Add this
 
             profileContent.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-  <img src="https://img.freepik.com/premium-vector/user-profile-person-avatar-identity-login-icon-vector_1277826-985.jpg?w=360"
-       alt="Profile"
-       style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
-  <span style="font-weight: bold; color: #333">${data.email}</span>
+                        <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-700">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 dark:text-white text-sm">${data.email}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Logged in</p>
+                            </div>
 </div>
-    <p style="margin-top: 4px; font-size: 14px; color: #666">You are logged in</p>
-    <a
-      href="/profile/full"
-      style="display: inline-block; margin-top: 12px; padding: 8px 12px; background-color: #006d77; color: white; border-radius: 8px; text-decoration: none;"
-    >Go to Profile</a>
-    <form action="/auth/logout" method="POST" style="margin-top: 8px;">
-  <button
-    type="submit"
-    style="
-      padding: 8px 12px;
-      background-color: #83c5be;
-      color: black;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-    "
-  >
-    Logout
+                        <div class="space-y-2 mt-3">
+                            <a href="/profile/full" class="flex items-center space-x-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                <i class="fas fa-user-circle text-gray-500"></i>
+                                <span class="text-sm">Full Profile</span>
+                            </a>
+                            <form action="/auth/logout" method="POST" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <button type="submit" class="flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors w-full">
+                                    <i class="fas fa-sign-out-alt text-red-500"></i>
+                                    <span class="text-sm">Sign out</span>
   </button>
 </form>
+                        </div>
   `;
           } catch (err) {
-            console.error("Failed to fetch profile:", err);
+                    console.error('Failed to fetch profile:', err);
+                    // Show error state
+                    profileContent.innerHTML = `
+                        <div class="text-center py-4">
+                            <p class="text-red-600 text-sm">Error loading profile</p>
+                            <a href="/auth/login" class="text-blue-600 hover:underline text-sm">Try logging in again</a>
+                        </div>
+                    `;
           }
         } else {
-          loginBtn?.classList.remove("hidden");
-          logoutBtn?.classList.add("hidden");
-
+                // User is not logged in
+                console.log('User not logged in, showing login options');
           profileContent.innerHTML = `
-      <p style="font-weight: bold; color: #333">Not logged in</p>
-      <a
-        href="/auth/login"
-        style="display: inline-block; margin-top: 12px; padding: 8px 12px; background-color: #006d77; color: white; border-radius: 8px; text-decoration: none;"
-      >Login</a>
-      <a
-        href="/auth/register"
-        style="display: inline-block; margin-top: 8px; padding: 8px 12px; background-color: #83c5be; color: black; border-radius: 8px; text-decoration: none;"
-      >Register</a>
-    `;
+                    <div class="text-center py-2">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Not logged in</p>
+                        <div class="space-y-2">
+                            <a href="/auth/login" class="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Sign in</span>
+                            </a>
+                            <a href="/auth/register" class="flex items-center justify-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Create account</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                console.log('Content set for non-logged in user');
+            }
         }
 
-        logoutBtn?.addEventListener("click", async () => {
-          try {
-            const response = await fetch("/auth/logout", { method: "POST" });
-            Cookies.remove("access_token");
-            window.location.href = response.redirected ? response.url : "/";
-          } catch (err) {
-            console.error("Logout failed:", err);
-            alert("Something went wrong while logging out.");
-          }
+        // Close dropdown when clicking outside with animation
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('profile-dropdown');
+            const button = document.getElementById('toggle-profile');
+            if (dropdown && dropdown.style.display === 'block') {
+                if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+                    // Animate out
+                    dropdown.style.opacity = '0';
+                    dropdown.style.transform = 'translateY(-10px) scale(0.95)';
+                    
+                    // Hide after animation completes
+                    setTimeout(() => {
+                        dropdown.style.display = 'none';
+                    }, 200);
+                    console.log('Dropdown closed by clicking outside');
+                }
+            }
         });
 
-        toggleProfile?.addEventListener("click", (e) => {
-          e.preventDefault();
-          if (profilePanel) {
-            profilePanel.style.display =
-              profilePanel.style.display === "none" ? "block" : "none";
-          }
-        });
-
-        // Hide the profile panel when clicking outside
-        document.addEventListener("click", (e) => {
-          if (
-            profilePanel &&
-            !profilePanel.contains(e.target) &&
-            !toggleProfile.contains(e.target)
-          ) {
-            profilePanel.style.display = "none";
-          }
-        });
-      });
     </script>
   </body>
 </html>
