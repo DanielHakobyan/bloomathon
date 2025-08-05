@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Issue Tracker | Admin Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #6366f1;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #1f2937;
+        --light: #f9fafb;
+        --gray: #e5e7eb;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc;
+        color: var(--dark);
+        min-height: 100vh;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: white;
+        border-right: 1px solid var(--gray);
+        padding: 2rem 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .sidebar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 2rem;
+        padding-left: 1rem;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+
+      .nav-item.active {
+        background-color: #eef2ff;
+        color: var(--primary);
+        font-weight: 500;
+      }
+
+      .nav-item:hover:not(.active) {
+        background-color: #f8fafc;
+        color: var(--dark);
+      }
+
+      .main-content {
+        padding: 2rem 3rem;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+      }
+
+      .events-container {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .events-header {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr;
+        padding: 1rem 1.5rem;
+        background-color: #f9fafb;
+        border-bottom: 1px solid var(--gray);
+        font-weight: 500;
+        color: #64748b;
+      }
+
+      .event-card {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--gray);
+        transition: background 0.2s;
+      }
+
+      .event-card:last-child {
+        border-bottom: none;
+      }
+
+      .event-card:hover {
+        background-color: #f9fafb;
+      }
+
+      .event-title {
+        font-weight: 500;
+        color: var(--dark);
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .status-pending {
+        background-color: #fffbeb;
+        color: var(--warning);
+      }
+
+      .status-completed {
+        background-color: #ecfdf5;
+        color: var(--success);
+      }
+
+      .status-canceled {
+        background-color: #fef2f2;
+        color: var(--danger);
+      }
+
+      .action-form {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .select-input {
+        padding: 0.5rem;
+        border: 1px solid var(--gray);
+        border-radius: 0.375rem;
+        font-family: inherit;
+        font-size: 0.875rem;
+        background-color: white;
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #4f46e5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-title">IssueTracker</div>
+        <nav>
+          <a href="/admin/issues" class="nav-item">Issues</a>
+          <a href="#" class="nav-item active">Events</a>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div class="header">
+          <h1 class="page-title">Manage Issues</h1>
+          <div class="user-profile">
+            <div class="avatar">AD</div>
+            <span>Admin</span>
+          </div>
+        </div>
+
+        <div class="events-container">
+          <div class="events-header">
+            <div>Event</div>
+            <div>Status</div>
+            <div>Actions</div>
+          </div>
+
+          {% for event in events %}
+          <div class="event-card">
+            <div class="event-title">{{ event.title }}</div>
+            <div>
+              <span class="status-badge status-{{ event.status }}">
+                {{ event.status|capitalize }}
+              </span>
+            </div>
+            <div class="action-form">
+              <form
+                action="/admin/events/{{ event._id }}/update"
+                method="post"
+                class="action-form"
+              >
+                <select class="select-input" name="status">
+                  <option value="completed">Completed</option>
+                  <option value="canceled">Canceled</option>
+                </select>
+                <button class="btn btn-primary" type="submit">Update</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </main>
+    </div>
+    <div class="footer">
+      <p>
+        Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+        reserved. This code is proprietary and confidential. Unauthorized
+        copying, redistribution, modification, or use is strictly prohibited.
+      </p>
+    </div>
+  </body>
+</html>

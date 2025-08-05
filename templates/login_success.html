@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Success</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background-color: #354152;
+        color: #ffffff;
+        font: 300 1rem/1.5 "Helvetica Neue", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        text-align: center;
+        background-color: #354152;
+        padding: 3rem 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 0 250px #341ab3;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      .success-icon {
+        font-size: 5rem;
+        color: #8ceabb;
+        margin-bottom: 1.5rem;
+        animation: bounce 1s ease infinite alternate;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 100;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+
+      p {
+        color: #cbd5e1;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        font-size: 1rem;
+      }
+
+      .btn {
+        background-image: linear-gradient(160deg, #8ceabb 0%, #378f7b 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 999px;
+        font-size: 1rem;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(140, 234, 187, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(140, 234, 187, 0.4);
+      }
+
+      @keyframes bounce {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-10px);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 2rem 1.5rem;
+          margin: 0 1rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="success-icon">✓</div>
+      <h1>Login Successful</h1>
+      <p>Welcome back! You've successfully logged in to your account.</p>
+      <a href="/" class="btn">Go to Dashboard</a>
+    </div>
+  </body>
+</html>

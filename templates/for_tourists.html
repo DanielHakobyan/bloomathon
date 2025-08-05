@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Վանաձոր | Տեսարժան Վայրեր և Սննդի Կետեր</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #3b7dd8;
+        --secondary-color: #5d9cec;
+        --accent-color: #4a89dc;
+        --light-color: #ecf0f1;
+        --dark-color: #2c3e50;
+        --text-color: #333;
+        --text-light: #7f8c8d;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--text-color);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .parallax-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url("https://api.armenia.travel/storage/Arevatsag-highres-original-on-external-drive--2-min-min.webp")
+            no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        color: white;
+        text-align: center;
+        padding: 150px 20px 100px;
+        position: relative;
+      }
+
+      .header-overlay {
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeIn 1.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      header h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      header p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      nav {
+        background-color: var(--primary-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      nav ul {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        padding: 15px 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      nav ul li a:hover {
+        color: var(--secondary-color);
+        transform: translateY(-3px);
+      }
+
+      section {
+        padding: 80px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .dark-section {
+        background-color: #f5f5f5;
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .section-title h2 {
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        position: relative;
+        display: inline-block;
+      }
+
+      .section-title h2::after {
+        content: "";
+        position: absolute;
+        width: 50px;
+        height: 3px;
+        background-color: var(--secondary-color);
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .section-title p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .card-img {
+        height: 200px;
+        overflow: hidden;
+      }
+
+      .card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .card:hover img {
+        transform: scale(1.1);
+      }
+
+      .card-content {
+        padding: 20px;
+      }
+
+      .card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+
+      .card p {
+        color: var(--text-light);
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: var(--secondary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .btn:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-2px);
+      }
+
+      .map-container {
+        height: 500px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .map-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      footer {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      footer p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+
+      #backToTop {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 99;
+      }
+
+      #backToTop.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #backToTop:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-3px);
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        header h1 {
+          font-size: 2rem;
+        }
+
+        .card-container {
+          grid-template-columns: 1fr;
+        }
+
+        .map-container {
+          height: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="parallax-header">
+      <div class="header-overlay">
+        <h1>Բացահայտեք Վանաձորի Գեղեցկությունը</h1>
+        <p>Ուսումնասիրեք քաղաքի լավագույն տեսարժան վայրերն ու սննդի կետերը</p>
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#sights"
+              ><i class="fas fa-landmark"></i> Տեսարժան վայրեր</a
+            >
+          </li>
+          <li>
+            <a href="#food"><i class="fas fa-utensils"></i> Սննդի կետեր</a>
+          </li>
+          <li>
+            <a href="#map"><i class="fas fa-map-marked-alt"></i> Քարտեզ</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <section id="sights">
+      <div class="section-title">
+        <h2>Տեսարժան Վայրեր</h2>
+        <p>Բացահայտեք Վանաձորի մշակութային և բնական հարստությունը</p>
+      </div>
+      <div class="card-container" id="sights-container"></div>
+    </section>
+
+    <section id="food" class="dark-section">
+      <div class="section-title">
+        <h2>Սննդի Կետեր</h2>
+        <p>Վայելեք տեղական և միջազգային խոհանոցի համեղությունները</p>
+      </div>
+      <div class="card-container" id="food-container"></div>
+    </section>
+
+    <section id="map">
+      <div class="section-title">
+        <h2>Քարտեզ</h2>
+        <p>Գտեք ձեր հետաքրքրող վայրերը Վանաձորում</p>
+      </div>
+      <div class="map-container">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d19423.2155718417!2d44.4808476!3d40.8126897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4041bbfec6a0a967%3A0xa7ede9200db78178!2sVanadzor%2C%20Armenia!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s"
+          allowfullscreen=""
+          loading="lazy"
+        ></iframe>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-content">
+        <p>
+          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
+          reserved. This code is proprietary and confidential. Unauthorized
+          copying, redistribution, modification, or use is strictly prohibited.
+        </p>
+      </div>
+    </footer>
+
+    <button id="backToTop" title="Go to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+      const sightsData = [
+        {
+          title: "Սուրբ Գրիգոր Նարեկացի եկեղեցի",
+          description:
+            "Սուրբ Գրիգոր Նարեկացի եկեղեցին Վանաձորի կարևոր կրոնական կառույցներից մեկն է։ Այն հայտնի է իր գեղեցիկ ճարտարապետությամբ և հոգևոր մթնոլորտով։ Եկեղեցին կառուցվել է 2002 թվականին և նվիրված է հայ մեծ բանաստեղծ Գրիգոր Նարեկացուն։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHaIwWUJKjda0dHKm8wxQBuodWgbOThGz-Fw&s",
+          link: "https://hy.wikipedia.org/wiki/%D5%8D%D5%B8%D6%82%D6%80%D5%A2_%D4%B3%D6%80%D5%AB%D5%A3%D5%B8%D6%80_%D5%86%D5%A1%D6%80%D5%A5%D5%AF%D5%A1%D6%81%D5%AB_%D5%A5%D5%AF%D5%A5%D5%B2%D5%A5%D6%81%D5%AB_(%D5%8E%D5%A1%D5%B6%D5%A1%D5%B1%D5%B8%D6%80)",
+        },
+        {
+          title: "Պատկերասրահ",
+          description:
+            "Վանաձորի պատկերասրահը ներկայացնում է հայ և միջազգային արվեստի գործեր։ Այստեղ կարելի է տեսնել նկարներ, քանդակներ և այլ արվեստի գործեր։ Պատկերասրահը նաև կազմակերպում է ցուցահանդեսներ և մշակութային միջոցառումներ։",
+          image:
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Vanadzor_Fine_Art_Museum.jpg/300px-Vanadzor_Fine_Art_Museum.jpg",
+          link: "https://myarmenia.si.edu/en/guide/experience/tour-vanadzor-fine-arts-museum/index.html",
+        },
+        {
+          title: "Հրապարակ",
+          description:
+            "Հրապարակը Վանաձորի մշակութային կյանքի կենտրոնն է։ Այստեղ անցկացվում են համերգներ, թատերական ներկայացումներ և այլ մշակութային միջոցառումներ։ Հրապարակը գտնվում է բացօթյա և ունի հիանալի տեսարան դեպի շրջակա բնությունը։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSawAeBda63p_lU_nXlhvxFVDLEuK_ZqHReIHpuX_BVG1ae9KXmeWs6aCUynbNvTzm0hdo&usqp=CAU",
+          link: "https://hy.wikipedia.org/wiki/%D5%80%D5%A1%D5%B5%D6%84%D5%AB_%D5%B0%D6%80%D5%A1%D5%BA%D5%A1%D6%80%D5%A1%D5%AF",
+        },
+        {
+          title: "Բուսաբանական այգի",
+          description:
+            "Վանաձորի բուսաբանական այգին հիանալի վայր է բնության սիրահարների համար։ Այստեղ կարելի է տեսնել բազմաթիվ բույսեր, ծաղիկներ և ծառեր։ Այգին իդեալական վայր է զբոսանքների և հանգստի համար։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn0ellsc3AW-m0R_pTH1kT7F7PeWpvUOy_gg&s",
+          link: "https://botany.am/en/the-vanadzor-botanical-garden/",
+        },
+        {
+          title: "Լճեր",
+          description:
+            "Վանաձորի շրջակայքում կան մի քանի գեղեցիկ լճեր, որոնք հիանալի վայրեր են բնության սիրահարների համար։ Այստեղ կարելի է զբաղվել ձկնորսությամբ, նավարկությամբ կամ պարզապես վայելել բնության գեղեցկությունը։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZL8C-8fSnGZMwxGqv-MEk0DeX9RTes3IrSGnQ_1ZJLhUp-8kuHg32bcczdEm9Uo2kQ1U&usqp=CAU",
+          link: "https://www.google.com/maps/place/3+Lakes/@40.8023306,44.4999558,675m/data=!3m2!1e3!4b1!4m6!3m5!1s0x4041bbfec6a0a967:0xa7ede9200db78178!8m2!3d40.8016449!4d44.4998992!16s%2Fg%2F1tjv1_2b?entry=ttu&g_ep=EgoyMDI1MDMxOS4yIKXMDSoASAFQAw%3D%3D",
+        },
+      ];
+
+      const foodData = [
+        {
+          title: "ԿՖՍ",
+          description:
+            "ԿՖՍ-ը հայտնի է իր համեղ և արագ պատրաստվող ուտեստներով, ինչպիսիք են թխվածքաբլիթները, կարտոֆիլը և տարբեր տեսակի սենդվիչները։ Հարմար վայր է ընտանեկան հանդիպումների և ընկերների հետ ժամանակ անցկացնելու համար։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR04zadOW6ThrfZTu0ORD5gT1Ne2MqnaRUrFQ&s",
+          link: "https://www.kfcarmenia.com/menu#featured",
+        },
+        {
+          title: "Տաշիր Պիցցա",
+          description:
+            "Տաշիր Պիցցան առաջարկում է տարբեր տեսակի պիցցաներ, որոնք պատրաստվում են թարմ բաղադրիչներից։ Այստեղ կարելի է վայելել նաև պաստան, սալաթներ և այլ իտալական ուտեստներ։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDEu7q77fvr4SbKo_w9gjVLNVRt2rouemIQA&s",
+          link: "https://tashirpizza.am/",
+        },
+        {
+          title: "Dolce Box",
+          description:
+            "Dolce Box-ը հայտնի է իր քաղցրավենիքներով և դեսերտներով։ Այստեղ կարելի է գտնել տորթեր, մուսեր, մակարոններ և այլ քաղցր ուտեստներ, որոնք պատրաստվում են բարձրորակ բաղադրիչներից։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsWbVeEXK3V7ei5x8ayBCnjX6iTFJQtdLLQQ&s",
+          link: "https://www.instagram.com/dolcebox_arm/?hl=en",
+        },
+        {
+          title: "Jaaz",
+          description:
+            "Jaaz-ը առաջարկում է համեղ և բազմազան ուտեստներ, այդ թվում՝ բուրգերներ, սենդվիչներ և սալաթներ։ Այստեղ կարելի է վայելել նաև թարմ հյութեր և սուրճ։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk_RoZQaEEmF3OOAVNPTRJYD4CIrFWBHGuEA&s",
+          link: "https://www.instagram.com/jazzcafe.vanadzor/?hl=en",
+        },
+        {
+          title: "Panorama",
+          description:
+            "Panorama-ն հայտնի է իր բարձրակարգ սպասարկմամբ, յուրահատուկ ոճով և բազմազան ճաշացանկով։",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUEoYDw8-Cr7kod_ovooJYT5u4IM1bRVGGo5ahaP-ZAZXGc2J4MeV97l4xp0RwVRI8DuA&usqp=CAU",
+          link: "https://www.instagram.com/panorama_vanadzor/?hl=en",
+        },
+      ];
+
+      function createCard(item) {
+        return `
+                <div class="card">
+                    <div class="card-img">
+                        <img src="${item.image}" alt="${item.title}">
+                    </div>
+                    <div class="card-content">
+                        <h3>${item.title}</h3>
+                        <p>${item.description}</p>
+                        <a href="${item.link}" class="btn" target="_blank">Ավելին</a>
+                    </div>
+                </div>
+            `;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const sightsContainer = document.getElementById("sights-container");
+        const foodContainer = document.getElementById("food-container");
+
+        sightsData.forEach((item) => {
+          sightsContainer.innerHTML += createCard(item);
+        });
+
+        foodData.forEach((item) => {
+          foodContainer.innerHTML += createCard(item);
+        });
+
+        const backToTopBtn = document.getElementById("backToTop");
+        window.addEventListener("scroll", () => {
+          if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add("show");
+          } else {
+            backToTopBtn.classList.remove("show");
+          }
+        });
+
+        backToTopBtn.addEventListener("click", () => {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        });
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+      });
+    </script>
+  </body>
+</html>

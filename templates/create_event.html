@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Վանաձորի Քաղաքապետարան | Միջոցառումների գրանցում</title>
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --success-color: #2ecc71;
+        --border-color: #3e8edf;
+        --teal-deep: #006d77;
+        --mint-ice: #edf6f9;
+        --pure-white: #fafafa;
+        --mint-medium: #83c5be;
+        --teal-dark: #005b63;
+        --white: #ffffff;
+        --light-gray: #f0f0f0;
+        --medium-gray: #ccc;
+        --dark-gray: #333;
+        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f5f7fa;
+        color: var(--text-color);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        background: #006d771e;
+        z-index: -1;
+        animation: float 15s infinite linear;
+      }
+      /* ✨ Enhanced ambient lighting */
+      .bg-glow {
+        position: fixed;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(131, 197, 190, 0.2),
+          transparent 70%
+        );
+        box-shadow: 0 0 100px 40px rgba(131, 197, 190, 0.15);
+        z-index: -2;
+        animation: glowFloat 20s ease-in-out infinite alternate;
+      }
+
+      .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -50px;
+        left: -50px;
+        animation-delay: 0s;
+      }
+
+      .circle-2 {
+        width: 200px;
+        height: 200px;
+        bottom: 100px;
+        right: -50px;
+        animation-delay: 3s;
+      }
+
+      .circle-3 {
+        width: 150px;
+        height: 150px;
+        top: 30%;
+        right: 20%;
+        animation-delay: 6s;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+          transform: translate(20px, 20px) rotate(5deg);
+        }
+        50% {
+          transform: translate(0, 40px) rotate(0deg);
+        }
+        75% {
+          transform: translate(-20px, 20px) rotate(-5deg);
+        }
+        100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+
+      .official-header {
+        background-color: var(--teal-deep);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .official-header .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .official-logo {
+        height: 150px;
+      }
+
+      .official-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .official-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-top: 0.3rem;
+      }
+
+      .form-container {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(68, 231, 217, 0.635),
+          0 0 30px rgba(131, 197, 190, 0.2); /* Glow effect */
+        margin-bottom: 2rem;
+        border: 1px solid var(--medium-gray);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .form-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--teal-deep),
+          var(--mint-medium)
+        );
+      }
+      .form-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15),
+          0 0 40px rgba(0, 255, 229, 0.82);
+      }
+
+      .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        color: var(--teal-deep);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--teal-deep);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .section-title i {
+        color: var(--teal-deep);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--teal-deep);
+      }
+
+      .input-container {
+        position: relative;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--teal-deep);
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background-color: var(--light-gray);
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--teal-deep);
+        box-shadow: 0 0 0 3px rgba(26, 62, 114, 0.1);
+        background-color: white;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+        padding: 15px;
+      }
+
+      #osm-map {
+        height: 300px;
+        border-radius: 6px;
+        margin: 1rem 0;
+        border: 1px solid var(--border-color);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        font-size: 1rem;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      .btn-primary {
+        background-color: var(--teal-deep);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #122a54;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background-color: white;
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
+      }
+
+      .btn-secondary:hover {
+        background-color: #f0f4f9;
+      }
+
+      .btn i {
+        margin-right: 8px;
+      }
+
+      .location-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .file-upload {
+        margin-top: 1rem;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-label {
+        display: inline-block;
+        padding: 12px 20px;
+        background-color: var(--secondary-color);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        width: 100%;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      .file-label:hover {
+        border-color: var(--teal-deep);
+        background-color: #e9ecef;
+      }
+
+      .file-label i {
+        margin-right: 8px;
+        color: var(--teal-deep);
+      }
+
+      .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .preview-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+      }
+
+      .preview-item img,
+      .preview-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .remove-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .submit-btn {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        background-color: var(--success-color);
+        color: white;
+        font-weight: 500;
+        border: none;
+      }
+
+      .submit-btn:hover {
+        background-color: #218838;
+        transform: translateY(-1px);
+      }
+
+      .back-btn {
+        background-color: transparent;
+        color: var(--teal-deep);
+        border: 1px solid var(--teal-deep);
+      }
+
+      .back-btn:hover {
+        background-color: #f0f4f9;
+      }
+
+      .footer-content {
+        text-align: center;
+        margin-top: 3rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .required-field::after {
+        content: " *";
+        color: #dc3545;
+      }
+      .divider {
+        border-top: 1px dashed rgba(0, 255, 229, 0.82);
+        width: 100%;
+        margin: 2rem 0;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 0 0.5rem;
+          margin: 1rem auto;
+        }
+
+        .official-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
+          padding: 1rem;
+        }
+
+        .form-container {
+          padding: 1.5rem;
+        }
+
+        .location-buttons {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+          margin-right: 0;
+        }
+
+        .form-actions {
+          flex-direction: column-reverse;
+          gap: 1rem;
+        }
+      }
+      .footer-content {
+        position: relative;
+        text-align: center;
+        margin-top: 3rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+        padding: 4rem 0; /* Increase padding to make it larger */
+      }
+
+      .footer-content ::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 50vh; /* Adjust height so at least half of it is seen */
+        background: url("https://img.freepik.com/premium-vector/vanadzor-armenia-daytime-cityscape-urban-architecture-buildings-skyline_1310786-50531.jpg")
+          no-repeat center/cover;
+        opacity: 0.4; /* More visible */
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+
+    <div class="container">
+      <header class="official-header">
+        <div class="logo-container">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
+            alt="Վանաձորի Քաղաքապետարանի զինանշան"
+            class="official-logo"
+          />
+          <div>
+            <h1 class="official-title">Վանաձորի Քաղաքապետարան</h1>
+            <p class="official-subtitle">Միջոցառումների գրանցման համակարգ</p>
+          </div>
+        </div>
+      </header>
+      <div class="divider"></div>
+      <form
+        id="eventForm"
+        class="form-container"
+        action="/event/"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-info-circle"></i> Հիմնական տեղեկություն
+          </h2>
+
+          <div class="form-group">
+            <label for="title" class="required-field"
+              ><i class="fas fa-heading"></i> Միջոցառման անվանում</label
+            >
+            <div class="input-container">
+              <i class="fas fa-heading input-icon"></i>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Մուտքագրեք միջոցառման անվանումը"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="required-field"
+              ><i class="fas fa-align-left"></i> Մանրամասն նկարագրություն</label
+            >
+            <textarea
+              id="description"
+              name="description"
+              placeholder="Միջոցառման մանրամասն նկարագրություն, ծրագիր, մասնակիցներ և այլ տեղեկություններ"
+              required
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-calendar-alt"></i> Ժամանակ և տևողություն
+          </h2>
+
+          <div class="form-group">
+            <label for="datetime" class="required-field"
+              ><i class="far fa-clock"></i> Միջոցառման ամսաթիվ և ժամ</label
+            >
+            <div class="input-container">
+              <i class="far fa-calendar-alt input-icon"></i>
+              <input
+                type="datetime-local"
+                id="datetime"
+                name="datetime"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="duration" class="required-field"
+              ><i class="fas fa-hourglass-half"></i> Տևողություն</label
+            >
+            <div class="input-container">
+              <i class="fas fa-clock input-icon"></i>
+              <input
+                type="text"
+                id="duration"
+                name="duration"
+                placeholder="hh:mm"
+                pattern="[0-9]{1,2}:[0-9]{2}"
+                required
+              />
+            </div>
+            <small class="text-muted">Օրինակ՝ 02:30 (2 ժամ 30 րոպե)</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-map-marker-alt"></i> Տեղադրություն
+          </h2>
+
+          <div class="form-group">
+            <label class="required-field">Տեղադրության նշում</label>
+            <div class="location-buttons">
+              <button type="button" id="useMyLocation" class="btn btn-primary">
+                <i class="fas fa-location-arrow"></i> Օգտագործել իմ
+                տեղադրությունը
+              </button>
+              <button type="button" id="selectOnMap" class="btn btn-secondary">
+                <i class="fas fa-map-marked-alt"></i> Նշել քարտեզի վրա
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="location" class="required-field"
+              ><i class="fas fa-globe-europe"></i> Կոորդինատներ</label
+            >
+            <div class="input-container">
+              <i class="fas fa-map-pin input-icon"></i>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                placeholder="Կոորդինատներ"
+                readonly
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="location-description"
+              ><i class="fas fa-info-circle"></i> Տարածքի նկարագրություն</label
+            >
+            <div class="input-container">
+              <i class="fas fa-road input-icon"></i>
+              <input
+                type="text"
+                id="location-description"
+                name="location_description"
+                placeholder="Փողոցի անվանում, շենքի նկարագրություն և այլն"
+              />
+            </div>
+          </div>
+
+          <div id="osm-map"></div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-images"></i> Մեդիա նյութեր
+          </h2>
+
+          <div class="form-group">
+            <label><i class="fas fa-camera"></i> Նկարներ</label>
+            <div class="file-upload">
+              <input
+                type="file"
+                id="photo"
+                name="photo"
+                accept="image/*"
+                class="file-input"
+                multiple
+              />
+              <label for="photo" class="file-label">
+                <i class="fas fa-upload"></i> Ընտրել նկարներ
+              </label>
+              <div class="preview-container" id="photo-preview"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-video"></i> Տեսանյութ</label>
+            <div class="file-upload">
+              <input
+                type="file"
+                id="video"
+                name="video"
+                accept="video/*"
+                class="file-input"
+              />
+              <label for="video" class="file-label">
+                <i class="fas fa-upload"></i> Ընտրել տեսանյութ
+              </label>
+              <div class="preview-container" id="video-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="/" class="btn back-btn">
+            <i class="fas fa-arrow-left"></i> Վերադառնալ
+          </a>
+          <button type="submit" class="btn submit-btn">
+            <i class="fas fa-check-circle"></i> Գրանցել միջոցառումը
+          </button>
+        </div>
+      </form>
+
+      <footer>
+        <div class="footer-content">
+          <p>
+            &copy; <span id="year"></span> Built with Python(FastAPI) and
+            MongoDB
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // Initialize map
+      const map = L.map("osm-map").setView([40.8128, 44.4884], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      const officialIcon = L.icon({
+        iconUrl:
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+      });
+
+      let marker;
+
+      // Add marker on click
+      map.on("click", function (e) {
+        if (marker) {
+          map.removeLayer(marker);
+        }
+        marker = L.marker(e.latlng, { icon: officialIcon }).addTo(map);
+        document.getElementById("location").value = `${e.latlng.lat.toFixed(
+          6
+        )}, ${e.latlng.lng.toFixed(6)}`;
+      });
+
+      // Use current location
+      document
+        .getElementById("useMyLocation")
+        .addEventListener("click", function () {
+          if (navigator.geolocation) {
+            this.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Որոնում...';
+
+            navigator.geolocation.getCurrentPosition(
+              function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                if (marker) {
+                  map.removeLayer(marker);
+                }
+
+                map.setView([lat, lng], 16);
+                marker = L.marker([lat, lng], { icon: officialIcon }).addTo(
+                  map
+                );
+                document.getElementById("location").value = `${lat.toFixed(
+                  6
+                )}, ${lng.toFixed(6)}`;
+
+                document.getElementById("useMyLocation").innerHTML =
+                  '<i class="fas fa-location-arrow"></i> Օգտագործել իմ տեղադրությունը';
+              },
+              function (error) {
+                alert("Տեղադրությունը չի կարող որոշվել: " + error.message);
+                document.getElementById("useMyLocation").innerHTML =
+                  '<i class="fas fa-location-arrow"></i> Օգտագործել իմ տեղադրությունը';
+              }
+            );
+          } else {
+            alert("Geolocation is not supported by this browser.");
+          }
+        });
+
+      // Select on map button
+      document
+        .getElementById("selectOnMap")
+        .addEventListener("click", function () {
+          alert("Խնդրում ենք սեղմել քարտեզի վրա՝ տեղադրությունը նշելու համար");
+        });
+
+      // File preview functionality
+      document.getElementById("photo").addEventListener("change", function (e) {
+        const previewContainer = document.getElementById("photo-preview");
+        previewContainer.innerHTML = "";
+
+        for (let file of e.target.files) {
+          const reader = new FileReader();
+
+          reader.onload = function (event) {
+            const previewItem = document.createElement("div");
+            previewItem.className = "preview-item";
+
+            const img = document.createElement("img");
+            img.src = event.target.result;
+
+            const removeBtn = document.createElement("div");
+            removeBtn.className = "remove-btn";
+            removeBtn.innerHTML = "×";
+            removeBtn.addEventListener("click", function () {
+              previewItem.remove();
+            });
+
+            previewItem.appendChild(img);
+            previewItem.appendChild(removeBtn);
+            previewContainer.appendChild(previewItem);
+          };
+
+          reader.readAsDataURL(file);
+        }
+      });
+
+      document.getElementById("video").addEventListener("change", function (e) {
+        const previewContainer = document.getElementById("video-preview");
+        previewContainer.innerHTML = "";
+
+        if (e.target.files.length > 0) {
+          const file = e.target.files[0];
+          const url = URL.createObjectURL(file);
+
+          const previewItem = document.createElement("div");
+          previewItem.className = "preview-item";
+
+          const video = document.createElement("video");
+          video.src = url;
+          video.controls = true;
+
+          const removeBtn = document.createElement("div");
+          removeBtn.className = "remove-btn";
+          removeBtn.innerHTML = "×";
+          removeBtn.addEventListener("click", function () {
+            previewItem.remove();
+            document.getElementById("video").value = "";
+          });
+
+          previewItem.appendChild(video);
+          previewItem.appendChild(removeBtn);
+          previewContainer.appendChild(previewItem);
+        }
+      });
+
+      // Set current year in footer
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

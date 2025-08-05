@@ -1,0 +1,451 @@
+import os
+import asyncio
+from fastapi import FastAPI, Request, HTTPException, File, UploadFile, Form, Depends
+from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
+from bson import ObjectId
+from dotenv import load_dotenv
+import auth
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+from news_scraper import fetch_news
+from fastapi.responses import RedirectResponse
+from datetime import datetime
+import httpx
+
+load_dotenv()
+
+app = FastAPI()
+app.include_router(auth.router, prefix="/auth")
+
+MONGO_URI = os.getenv("MONGO_URI")
+DB_NAME = os.getenv("DB_NAME")
+
+client = AsyncIOMotorClient(MONGO_URI)
+db = client[DB_NAME]
+fs_bucket = AsyncIOMotorGridFSBucket(db)
+
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+news_collection = db.news 
+users_collection = db.get_collection("users")
+issues_collection = db.get_collection("issues")
+events_collection = db.get_collection("events")
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+# Dependency to get the DB session
+def get_db():
+    return db
+
+async def run_fetch_news():
+    await fetch_news(db)  
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(run_fetch_news, trigger=IntervalTrigger(days=1))  
+scheduler.start()
+
+def str_to_objectid(id: str) -> ObjectId:
+    try:
+        return ObjectId(id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
+    
+
+@app.get("/me")
+def get_current_user(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    return {"email": current_user.get("email")}
+
+@app.get("/", response_class=HTMLResponse)
+async def homepage(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact_page(request: Request):
+    return templates.TemplateResponse("contact.html", {"request": request})
+
+@app.get("/report-issue", response_class=HTMLResponse)
+async def report_issue_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if not current_user.get("is_verified", False):
+        raise HTTPException(status_code=403, detail="Verify email first.")
+    return templates.TemplateResponse("report_issue.html", {"request": request})
+
+@app.post("/report/")
+async def report_issue(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    location: str = Form(...),
+    location_description: str = Form(...),
+    photo: UploadFile = File(None),
+    video: UploadFile = File(None),
+    current_user: dict = Depends(auth.get_current_user)
+):
+    location_parts = location.split(",")
+    lat, lng = (float(location_parts[0].replace("Lat:", "").strip()), 
+                float(location_parts[1].replace("Lng:", "").strip())) if len(location_parts) == 2 else (None, None)
+
+    issue_data = {
+        "title": title,
+        "description": description,
+        "location": location,
+        "location_description": location_description,
+        "latitude": lat,
+        "longitude": lng,
+        "reported_by": current_user["email"],
+        "photo": None,
+        "video": None,
+        "status": "pending",
+    }
+
+    if photo and photo.filename:
+        issue_data["photo"] = str(await upload_to_gridfs(photo))
+    if video and video.filename:
+        issue_data["video"] = str(await upload_to_gridfs(video))
+
+    result = await db.issues.insert_one(issue_data)
+    return {"message": "Issue reported!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
+
+async def upload_to_gridfs(file: UploadFile):
+    file_id = await fs_bucket.upload_from_stream(file.filename, await file.read())
+    return file_id
+
+@app.get("/issues/", response_class=HTMLResponse)
+async def get_issues(request: Request):
+    issues = await db.issues.find().to_list(100)
+    for issue in issues:
+        issue["_id"] = str(issue["_id"])
+        issue["photo"] = f"/files/{issue['photo']}" if issue.get('photo') else None
+        issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
+    return templates.TemplateResponse("view_issues.html", {"request": request, "issues": issues})
+
+@app.get("/admin/issues", response_class=HTMLResponse)
+async def admin_issues_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    issues = await db.issues.find().to_list()
+    for issue in issues:
+        issue["_id"] = str(issue["_id"])
+    return templates.TemplateResponse("admin_issues.html", {"request": request, "issues": issues})
+
+@app.post("/admin/issues/{issue_id}/update")
+async def update_issue_status(issue_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    if not ObjectId.is_valid(issue_id):
+        raise HTTPException(status_code=400, detail="Invalid issue ID format")
+
+    if status not in ["resolved", "canceled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    result = await db.issues.update_one(
+        {"_id": ObjectId(issue_id)}, {"$set": {"status": status}}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Issue not found or already updated")
+
+    return RedirectResponse(url="/admin/issues", status_code=303)
+
+
+@app.get("/admin/events", response_class=HTMLResponse)
+async def admin_events_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    events = await db.events.find().to_list()
+    for event in events:
+        event["_id"] = str(event["_id"])
+    return templates.TemplateResponse("admin_events.html", {"request": request, "events": events})
+
+@app.post("/admin/events/{event_id}/update")
+async def update_events_status(event_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    if not ObjectId.is_valid(event_id):
+        raise HTTPException(status_code=400, detail="Invalid event ID format")
+
+    if status not in ["completed", "canceled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    result = await db.events.update_one(
+        {"_id": ObjectId(event_id)}, {"$set": {"status": status}}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found or already updated")
+
+    return RedirectResponse(url="/admin/events", status_code=303)
+
+@app.get("/city-statistics", response_class=HTMLResponse)
+async def city_statistics(request: Request):
+    total_issues = await db.issues.count_documents({})
+    resolved_issues_count = await db.issues.count_documents({"status": "resolved"})
+    resolved_issues = await db.issues.find({"status": "resolved"}).to_list()
+
+    for issue in resolved_issues:
+        issue["_id"] = str(issue["_id"])
+        issue["photo"] = f"/files/{issue['photo']}" if issue.get("photo") else None
+        issue["video"] = f"/files/{issue['video']}" if issue.get("video") else None
+
+        # Convert created_at to a human-readable format
+        if "created_at" in issue and isinstance(issue["created_at"], datetime):
+            issue["created_at"] = issue["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+
+    return templates.TemplateResponse(
+        "city_statistics.html",
+        {
+            "request": request,
+            "total_issues": total_issues,
+            "resolved_issues_count": resolved_issues_count,
+            "resolved_issues": resolved_issues,
+        }
+    )
+
+
+@app.get("/files/{file_id}")
+async def get_file(file_id: str):
+    try:
+        return StreamingResponse(await fs_bucket.open_download_stream(ObjectId(file_id)), media_type="application/octet-stream")
+    except:
+        raise HTTPException(404, "File not found")
+
+@app.get("/transport", response_class=HTMLResponse)
+async def transport_page(request: Request):
+    return templates.TemplateResponse("transport.html", {"request": request})
+
+@app.get("/news", response_class=HTMLResponse)
+async def get_news(request: Request):
+    try:
+        news_list = await news_collection.find({}, {"_id": 0}).to_list(100)
+        return templates.TemplateResponse("news.html", {"request": request, "news": news_list})
+    except Exception as e:
+        raise HTTPException(500, "Failed to fetch news")
+
+@app.get("/city", response_class=HTMLResponse)
+async def city_page(request: Request):
+    return templates.TemplateResponse("city.html", {"request": request})
+
+@app.get("/for_tourists", response_class=HTMLResponse)
+async def for_tourists_page(request: Request):
+    return templates.TemplateResponse("for_tourists.html", {"request": request})
+
+# Fetch news articles
+@app.get("/news/articles")
+async def get_news_articles():
+    articles = await db.news.find().to_list(20)
+    for article in articles:
+        article["_id"] = str(article["_id"])
+        article["image_url"] = f"/news/image/{article['image_id']}" if "image_id" in article else None
+    return articles
+
+@app.get("/news/image/{image_id}")
+async def get_news_image(image_id: str):
+    try:
+        return StreamingResponse(await fs_bucket.open_download_stream(ObjectId(image_id)), media_type="image/jpeg")
+    except:
+        raise HTTPException(404, "Image not found")
+    
+
+@app.get("/view_events/", response_class=HTMLResponse)
+async def get_events(request: Request):
+    events = await db.events.find().to_list(100)
+    for event in events:
+        event["_id"] = str(event["_id"])
+        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
+        event["video"] = f"/files/{event['video']}" if event.get('video') else None
+    return templates.TemplateResponse("view_events.html", {"request": request, "events": events})
+
+@app.get("/create_event", response_class=HTMLResponse)
+async def create_event_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    if not current_user.get("is_verified", False):
+        raise HTTPException(status_code=403, detail="Verify email first.")
+    return templates.TemplateResponse("create_event.html", {"request": request})
+@app.post("/event")
+async def report_issue(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    datetime: str = Form(...),
+    duration: str = Form(...),
+    location: str = Form(...),
+    location_description: str = Form(...),
+    photo: UploadFile = File(None),
+    video: UploadFile = File(None),
+    current_user: dict = Depends(auth.get_current_user)
+):
+    location_parts = location.split(",")
+    lat, lng = (float(location_parts[0].replace("Lat:", "").strip()), 
+                float(location_parts[1].replace("Lng:", "").strip())) if len(location_parts) == 2 else (None, None)
+
+    event_data = {
+        "title": title,
+        "description": description,
+        "datetime": datetime,
+        "duration": duration,
+        "location": location,
+        "location_description": location_description,
+        "latitude": lat,
+        "longitude": lng,
+        "reported_by": current_user["email"],
+        "photo": None,
+        "video": None,
+        "status": "pending",
+    }
+
+    if photo and photo.filename:
+        event_data["photo"] = str(await upload_to_gridfs(photo))
+    if video and video.filename:
+        event_data["video"] = str(await upload_to_gridfs(video))
+
+    result = await db.events.insert_one(event_data)
+    return {"message": "Event submitted successfully!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
+
+# @app.get("/profile", response_class=HTMLResponse)
+# async def profile_panel(request: Request, current_user: dict = Depends(auth.get_current_user)):
+#     return templates.TemplateResponse("profile.html", {"request": request, "user": current_user})
+
+
+@app.get("/profile/full", response_class=HTMLResponse)
+async def full_profile(request: Request, current_user: dict = Depends(auth.get_current_user)):
+    user_email = current_user["email"]
+
+    # Filter only issues reported by this user
+    issues = await issues_collection.find({"reported_by": user_email}).to_list(100)
+    events = await events_collection.find({"reported_by": user_email}).to_list(100)
+
+    for issue in issues:
+        issue["_id"] = str(issue["_id"])
+        issue["photo"] = f"/files/{issue['photo']}" if issue.get('photo') else None
+        issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
+        # Ensure 'created_at' is in the correct format for display
+        if isinstance(issue.get("created_at"), datetime):
+            issue["created_at"] = issue["created_at"].strftime("%Y-%m-%d") # Adjust format as needed
+
+    for event in events:
+        event["_id"] = str(event["_id"])
+        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
+        event["video"] = f"/files/{event['video']}" if event.get('video') else None
+        # Ensure 'date' is present and formatted correctly
+        # If your event datetime is stored differently, adjust accordingly
+        if isinstance(event.get("datetime"), str): # Assuming datetime is stored as string
+            event["date"] = event["datetime"].split(" ")[0] # Extract date part
+        elif isinstance(event.get("datetime"), datetime):
+            event["date"] = event["datetime"].strftime("%Y-%m-%d") # Format datetime object
+        elif "date" not in event:
+            event["date"] = "N/A" # Provide a default if no date
+
+    print("Issues fetched:", issues) # For debugging
+    print("Events fetched:", events)   # For debugging
+
+    return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues, "events": events})    
+
+@app.post("/profile/issues/{issue_id}/edit")
+async def edit_issue(issue_id: str, 
+                     title: str = Form(...), 
+                     description: str = Form(...),
+                     location_description: str = Form(...),
+                     current_user: dict = Depends(auth.get_current_user)):
+    issue = await db.issues.find_one({"_id": ObjectId(issue_id)})
+    if not issue or issue["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.issues.update_one(
+        {"_id": ObjectId(issue_id)},
+        {"$set": {"title": title, "description": description, "location_description": location_description}}
+    )
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/issues/{issue_id}/delete")
+async def delete_issue(issue_id: str, current_user: dict = Depends(auth.get_current_user)):
+    issue = await db.issues.find_one({"_id": ObjectId(issue_id)})
+    if not issue or issue["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.issues.delete_one({"_id": ObjectId(issue_id)})
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/events/{event_id}/edit")
+async def edit_event(event_id: str, 
+                     title: str = Form(...), 
+                     description: str = Form(...),
+                     location_description: str = Form(...),
+                     current_user: dict = Depends(auth.get_current_user)):
+    event = await db.events.find_one({"_id": ObjectId(event_id)})
+    if not event or event["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.events.update_one(
+        {"_id": ObjectId(event_id)},
+        {"$set": {"title": title, "description": description, "location_description": location_description}}
+    )
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+
+@app.post("/profile/events/{event_id}/delete")
+async def delete_event(event_id: str, current_user: dict = Depends(auth.get_current_user)):
+    event = await db.events.find_one({"_id": ObjectId(event_id)})
+    if not event or event["reported_by"] != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    await db.events.delete_one({"_id": ObjectId(event_id)})
+    return RedirectResponse(url="/profile/full", status_code=303)
+
+@app.post("/ai/suggest")
+async def ai_suggest(description: str = Form(...)):
+    prompt = f"""Citizen reported the following issue: "{description}"
+Suggest one or more actionable steps that city officials can take to resolve it."""
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant for municipal problem solving."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+            response.raise_for_status()
+            suggestion = response.json()["choices"][0]["message"]["content"]
+            return {"suggestion": suggestion.strip()}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+
+
+
+@app.on_event("startup")
+async def startup():
+    if await db.news.count_documents({}) == 0:
+        await fetch_news(db)
+
+@app.on_event("shutdown")
+def shutdown_scheduler():
+    scheduler.shutdown()
+
+async def shutdown():
+    client.close()

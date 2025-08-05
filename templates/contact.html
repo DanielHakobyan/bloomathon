@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Rockville City</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
+      }
+
+      body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--accent-gold) 100%);
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .text-gradient {
+        background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+      }
+
+      .contact-icon {
+        transition: all 0.3s ease;
+      }
+
+      .contact-card:hover .contact-icon {
+        transform: scale(1.1) rotate(5deg);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
+        
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+          <a href="/about" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+          <a href="/contact" class="text-blue-600 dark:text-blue-400 font-semibold">Contact</a>
+          <a href="/news" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">News</a>
+        </nav>
+
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+
+          <!-- Auth Buttons -->
+          <a id="login-btn" href="/auth/login" class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Login
+          </a>
+          <button id="logout-btn" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-16 hero-gradient overflow-hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+             alt="Rockville City Hall" class="w-full h-full object-cover opacity-30">
+      </div>
+      
+      <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-float">
+          Contact <span class="text-yellow-400">Rockville</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-gray-200">
+          Get in touch with city services, departments, and officials
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Contact Info -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">City Hall & Main Offices</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Rockville City Hall is your central point of contact for all city services and information
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <!-- City Hall Address -->
+          <div class="bg-white dark:bg-gray-700 rounded-2xl p-8 card-hover shadow-lg border border-gray-200 dark:border-gray-600">
+            <div class="contact-icon text-4xl text-blue-600 mb-6">
+              <i class="fas fa-building"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">City Hall</h3>
+            <div class="space-y-3 text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-map-marker-alt text-blue-500 mr-3"></i>111 Maryland Avenue</p>
+              <p class="ml-6">Rockville, MD 20850</p>
+              <p><i class="fas fa-clock text-green-500 mr-3"></i>Mon-Fri: 8:30 AM - 5:00 PM</p>
+              <p><i class="fas fa-phone text-red-500 mr-3"></i>(240) 314-5000</p>
+              <p><i class="fas fa-envelope text-purple-500 mr-3"></i>info@rockvillemd.gov</p>
+            </div>
+          </div>
+
+          <!-- Emergency Services -->
+          <div class="bg-white dark:bg-gray-700 rounded-2xl p-8 card-hover shadow-lg border border-gray-200 dark:border-gray-600">
+            <div class="contact-icon text-4xl text-red-600 mb-6">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Emergency Services</h3>
+            <div class="space-y-3 text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-red-500 mr-3"></i>Emergency: 911</p>
+              <p><i class="fas fa-phone text-orange-500 mr-3"></i>Police Non-Emergency: (240) 314-8900</p>
+              <p><i class="fas fa-phone text-blue-500 mr-3"></i>Fire Department: (240) 314-8900</p>
+              <p><i class="fas fa-ambulance text-red-500 mr-3"></i>Medical Emergency: 911</p>
+            </div>
+          </div>
+
+          <!-- Customer Service -->
+          <div class="bg-white dark:bg-gray-700 rounded-2xl p-8 card-hover shadow-lg border border-gray-200 dark:border-gray-600">
+            <div class="contact-icon text-4xl text-green-600 mb-6">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Customer Service</h3>
+            <div class="space-y-3 text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-green-500 mr-3"></i>Main Line: (240) 314-5000</p>
+              <p><i class="fas fa-envelope text-green-500 mr-3"></i>service@rockvillemd.gov</p>
+              <p><i class="fas fa-clock text-green-500 mr-3"></i>Mon-Fri: 8:30 AM - 5:00 PM</p>
+              <p><i class="fas fa-comments text-green-500 mr-3"></i>Online Chat Available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Department Contacts -->
+    <section class="py-20 bg-gray-100 dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">City Departments</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Connect directly with the department you need. Our staff is here to help with your questions and concerns.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Planning & Development -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-blue-600 mb-4">
+              <i class="fas fa-drafting-compass"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Planning & Development</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-blue-500 mr-2"></i>(240) 314-8200</p>
+              <p><i class="fas fa-envelope text-blue-500 mr-2"></i>planning@rockvillemd.gov</p>
+              <p class="text-xs">Building permits, zoning, development review</p>
+            </div>
+          </div>
+
+          <!-- Public Works -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-green-600 mb-4">
+              <i class="fas fa-tools"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Public Works</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-green-500 mr-2"></i>(240) 314-8500</p>
+              <p><i class="fas fa-envelope text-green-500 mr-2"></i>publicworks@rockvillemd.gov</p>
+              <p class="text-xs">Roads, utilities, maintenance, trash collection</p>
+            </div>
+          </div>
+
+          <!-- Parks & Recreation -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-purple-600 mb-4">
+              <i class="fas fa-tree"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Parks & Recreation</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-purple-500 mr-2"></i>(240) 314-8600</p>
+              <p><i class="fas fa-envelope text-purple-500 mr-2"></i>parks@rockvillemd.gov</p>
+              <p class="text-xs">Parks, programs, facilities, events</p>
+            </div>
+          </div>
+
+          <!-- Police Department -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-blue-600 mb-4">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Police Department</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-blue-500 mr-2"></i>(240) 314-8900</p>
+              <p><i class="fas fa-envelope text-blue-500 mr-2"></i>police@rockvillemd.gov</p>
+              <p class="text-xs">Non-emergency police services</p>
+            </div>
+          </div>
+
+          <!-- Finance -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-green-600 mb-4">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Finance</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-green-500 mr-2"></i>(240) 314-8400</p>
+              <p><i class="fas fa-envelope text-green-500 mr-2"></i>finance@rockvillemd.gov</p>
+              <p class="text-xs">Taxes, billing, payments, budget</p>
+            </div>
+          </div>
+
+          <!-- Human Resources -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-orange-600 mb-4">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Human Resources</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-orange-500 mr-2"></i>(240) 314-8300</p>
+              <p><i class="fas fa-envelope text-orange-500 mr-2"></i>hr@rockvillemd.gov</p>
+              <p class="text-xs">Employment, benefits, personnel</p>
+            </div>
+          </div>
+
+          <!-- Information Technology -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-purple-600 mb-4">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Information Technology</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-purple-500 mr-2"></i>(240) 314-8700</p>
+              <p><i class="fas fa-envelope text-purple-500 mr-2"></i>it@rockvillemd.gov</p>
+              <p class="text-xs">Technology support, digital services</p>
+            </div>
+          </div>
+
+          <!-- Legal Department -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-red-600 mb-4">
+              <i class="fas fa-balance-scale"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Legal Department</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-red-500 mr-2"></i>(240) 314-8800</p>
+              <p><i class="fas fa-envelope text-red-500 mr-2"></i>legal@rockvillemd.gov</p>
+              <p class="text-xs">Legal matters, ordinances, contracts</p>
+            </div>
+          </div>
+
+          <!-- Communications -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 card-hover shadow-lg">
+            <div class="contact-icon text-3xl text-blue-600 mb-4">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Communications</h3>
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <p><i class="fas fa-phone text-blue-500 mr-2"></i>(240) 314-8100</p>
+              <p><i class="fas fa-envelope text-blue-500 mr-2"></i>communications@rockvillemd.gov</p>
+              <p class="text-xs">Media relations, public information</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Additional Contact Methods -->
+    <section class="py-20 bg-gray-100 dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold mb-6 text-gradient">Other Ways to Connect</h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Stay connected with Rockville through social media, newsletters, and community events
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <a href="https://www.linkedin.com/company/city-of-rockville/" target="_blank" rel="noopener noreferrer" class="block group">
+              <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-700 transition-colors">
+                <i class="fab fa-linkedin-in text-white text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">LinkedIn</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">City of Rockville</p>
+            </a>
+          </div>
+
+          <div class="text-center">
+            <a href="https://x.com/Rockville411" target="_blank" rel="noopener noreferrer" class="block group">
+              <div class="w-16 h-16 bg-black dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-gray-700 transition-colors">
+                <i class="fab fa-x-twitter text-white text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors">X (Twitter)</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">@Rockville411</p>
+            </a>
+          </div>
+
+          <div class="text-center">
+            <a href="https://www.youtube.com/@cityofrockville/featured" target="_blank" rel="noopener noreferrer" class="block group">
+              <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-700 transition-colors">
+                <i class="fab fa-youtube text-white text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">YouTube</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">City of Rockville</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-city text-white text-xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 mb-4">
+          Building a better community together through technology and civic engagement.
+        </p>
+        <p class="text-gray-500">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const html = document.documentElement;
+      
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      html.classList.toggle('dark', currentTheme === 'dark');
+      
+      darkModeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+      });
+
+      // Profile functionality
+      document.addEventListener('DOMContentLoaded', async function () {
+        const token = Cookies.get('access_token');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (token) {
+          loginBtn?.classList.add('hidden');
+          logoutBtn?.classList.remove('hidden');
+
+          logoutBtn?.addEventListener('click', async () => {
+            try {
+              const response = await fetch('/auth/logout', { method: 'POST' });
+              Cookies.remove('access_token');
+              window.location.href = response.redirected ? response.url : '/';
+            } catch (err) {
+              console.error('Logout failed:', err);
+              alert('Something went wrong while logging out.');
+            }
+          });
+        } else {
+          loginBtn?.classList.remove('hidden');
+          logoutBtn?.classList.add('hidden');
+        }
+      });
+
+      // Update year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
