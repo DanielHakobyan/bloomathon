@@ -672,7 +672,6 @@
           </div>
 
           <!-- Location Section -->
-          Κ
           <div class="form-section">
             <h3 class="text-2xl font-bold text-gradient mb-6 flex items-center">
               <i class="fas fa-map-marker-alt mr-3"></i>
@@ -988,7 +987,6 @@
         .getElementById("selectOnMap")
         .addEventListener("click", function () {
           alert("Click anywhere on the map to select the issue location");
-          // Optionally scroll to map
           document
             .getElementById("osm-map")
             .scrollIntoView({ behavior: "smooth" });
@@ -1022,8 +1020,6 @@
           uploadArea.classList.remove("dragover");
           const files = e.dataTransfer.files;
           handleFiles(files, preview, multiple);
-
-          // Update input files
           input.files = files;
         });
       }
@@ -1072,7 +1068,7 @@
       setupFileUpload("photo", "photo-preview", true);
       setupFileUpload("video", "video-preview", false);
 
-      // AI Suggestions functionality
+      // AI Suggestions functionality - FIXED to use real API
       document
         .getElementById("ai-suggest-btn")
         .addEventListener("click", async function () {
@@ -1093,37 +1089,40 @@
           btn.disabled = true;
 
           try {
-            // Simulate AI API call (replace with actual implementation)
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            // Use the combined title and description for better AI context
+            const issueText = title ? `${title}: ${description}` : description;
 
-            // Mock suggestions based on input
-            let suggestions = "";
-            const input = (title + " " + description).toLowerCase();
+            const formData = new FormData();
+            formData.append("description", issueText);
 
-            if (input.includes("pothole") || input.includes("road")) {
-              suggestions =
-                "Suggested category: Road Maintenance\nPriority: Medium\nEstimated resolution time: 5-10 business days\n\nTips for better reporting:\n• Include exact street address\n• Note if it affects traffic flow\n• Mention approximate size of the pothole";
-            } else if (input.includes("light") || input.includes("street")) {
-              suggestions =
-                "Suggested category: Street Lighting\nPriority: High (safety concern)\nEstimated resolution time: 2-5 business days\n\nTips for better reporting:\n• Include pole number if visible\n• Note if multiple lights are affected\n• Mention if it creates safety hazards";
-            } else if (input.includes("tree") || input.includes("branch")) {
-              suggestions =
-                "Suggested category: Parks & Recreation\nPriority: Varies based on safety risk\nEstimated resolution time: 3-7 business days\n\nTips for better reporting:\n• Assess if it poses immediate danger\n• Include approximate tree size\n• Note proximity to power lines or structures";
-            } else {
-              suggestions =
-                "Suggested category: General Maintenance\nPriority: Medium\nEstimated resolution time: 5-15 business days\n\nTips for better reporting:\n• Be as specific as possible about the location\n• Include photos if available\n• Describe how it affects the community";
+            const response = await fetch("/ai/suggest", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+
+            if (data.error) {
+              throw new Error(data.error);
+            }
+
+            const suggestion = data.suggestion;
 
             // Update description with suggestions
             const currentDesc = document.getElementById("description").value;
+            const aiSuggestionText = `\n\n=== AI Suggestions ===\n${suggestion}`;
+
             if (currentDesc && !currentDesc.includes("AI Suggestions:")) {
               document.getElementById("description").value =
-                currentDesc + "\n\n=== AI Suggestions ===\n" + suggestions;
+                currentDesc + aiSuggestionText;
             } else if (!currentDesc) {
-              document.getElementById("description").value =
-                "=== AI Suggestions ===\n" +
-                suggestions +
-                "\n\n[Please add your detailed description above]";
+              document.getElementById(
+                "description"
+              ).value = `=== AI Suggestions ===\n${suggestion}\n\n[Please add your detailed description above]`;
             }
 
             // Flash the textarea to show it was updated
@@ -1133,6 +1132,7 @@
               textarea.style.background = "";
             }, 1000);
           } catch (error) {
+            console.error("AI suggestion error:", error);
             alert(
               "Sorry, AI suggestions are not available right now. Please try again later."
             );
@@ -1142,10 +1142,10 @@
           }
         });
 
-      // Form submission with validation
+      // Form submission with real backend integration - FIXED
       document
         .getElementById("issueForm")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
 
           const title = document.getElementById("title").value.trim();
@@ -1175,27 +1175,48 @@
             '<div class="loading-spinner mr-2"></div> Submitting Report...';
           submitBtn.disabled = true;
 
-          // Simulate form submission (replace with actual form submission)
-          setTimeout(() => {
-            alert(
-              "Thank you! Your issue report has been submitted successfully. You will receive a confirmation email shortly."
-            );
+          try {
+            // Create FormData from the form
+            const formData = new FormData(this);
 
-            // Reset form
-            this.reset();
-            document.getElementById("photo-preview").innerHTML = "";
-            document.getElementById("video-preview").innerHTML = "";
-            document.getElementById("location-display").style.display = "none";
-            if (marker) {
-              map.removeLayer(marker);
+            const response = await fetch("/report/", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
             }
 
+            const data = await response.json();
+
+            if (data.message) {
+              // Reset form on success
+              this.reset();
+              document.getElementById("photo-preview").innerHTML = "";
+              document.getElementById("video-preview").innerHTML = "";
+              document.getElementById("location-display").style.display =
+                "none";
+              if (marker) {
+                map.removeLayer(marker);
+              }
+
+              alert(
+                "Thank you! Your issue report has been submitted successfully. You will receive a confirmation email shortly."
+              );
+
+              // Optionally redirect to issues page
+              window.location.href = "/issues/";
+            } else {
+              throw new Error(data.error || "Unknown error occurred");
+            }
+          } catch (error) {
+            console.error("Form submission error:", error);
+            alert("Error submitting report: " + error.message);
+          } finally {
             submitBtn.innerHTML = originalHtml;
             submitBtn.disabled = false;
-
-            // Optionally redirect to confirmation page
-            // window.location.href = '/report-confirmation';
-          }, 2000);
+          }
         });
 
       // Smooth scroll for map selection

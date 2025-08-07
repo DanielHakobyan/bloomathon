@@ -27,6 +27,7 @@ client = AsyncIOMotorClient(MONGO_URI)
 db = client[DB_NAME]
 fs_bucket = AsyncIOMotorGridFSBucket(db)
 
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -110,7 +111,7 @@ async def report_issue(
     if video and video.filename:
         issue_data["video"] = str(await upload_to_gridfs(video))
 
-    result = await db.issues.insert_one(issue_data)
+    result = await issues_collection.insert_one(issue_data)
     return {"message": "Issue reported!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
 
 async def upload_to_gridfs(file: UploadFile):

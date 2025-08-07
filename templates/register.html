@@ -1,150 +1,699 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <title>Register</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
-      html,
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
+      }
+
       body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
+        );
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .register-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .dark .register-card {
+        background: rgba(31, 41, 55, 0.95);
+        border: 1px solid rgba(75, 85, 99, 0.3);
+      }
+
+      .register-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-group input {
+        transition: all 0.3s ease;
+      }
+
+      .input-group input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent-gold), #fbbf24);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+      }
+
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
         height: 100%;
-        margin: 0;
-        background-color: #354152;
-        color: #ffffff;
-        font: 300 1rem/1.5 "Helvetica Neue", sans-serif;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
       }
 
-      body.align {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .btn-primary:hover::before {
+        left: 100%;
       }
 
-      .container {
+      .city-logo {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      /* Password strength indicator */
+      .password-strength {
+        height: 4px;
+        border-radius: 2px;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .strength-weak {
+        background-color: #ef4444;
+        width: 25%;
+      }
+      .strength-fair {
+        background-color: #f97316;
+        width: 50%;
+      }
+      .strength-good {
+        background-color: #eab308;
+        width: 75%;
+      }
+      .strength-strong {
+        background-color: #22c55e;
         width: 100%;
-        max-width: 600px;
       }
 
-      .card {
-        width: 100%;
-        padding: 3rem 2rem;
-        background: #354152;
-        box-shadow: 0 0 250px #341ab3;
-        border-radius: 1rem;
-        text-align: center;
+      /* Floating labels effect */
+      .floating-label {
+        position: relative;
       }
 
-      .site__logo {
-        margin-bottom: 2rem;
-        max-width: 30%;
-        height: auto;
+      .floating-label input:focus + label,
+      .floating-label input:not(:placeholder-shown) + label {
+        transform: translateY(-25px) scale(0.9);
+        color: var(--primary-blue);
       }
 
-      h2 {
-        font-size: 2.75rem;
-        font-weight: 100;
-        margin: 0 0 1rem;
-        text-transform: uppercase;
-      }
-
-      a,
-      button {
-        color: #7e8ba3;
-        background: none;
-        border: none;
-        font: inherit;
-        cursor: pointer;
-        text-decoration: underline;
-        padding: 0;
-      }
-
-      .form__field {
-        margin-bottom: 1rem;
-      }
-
-      input {
-        font: inherit;
-        padding: 0.5rem 1rem;
-        border: 1px solid #242c37;
-        border-radius: 999px;
-        background-color: transparent;
-        text-align: center;
-        width: 100%;
-        outline: none;
-        color: #fff;
-      }
-
-      input::placeholder {
-        color: #ffffff;
-      }
-
-      input[type="email"] {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M256.017 273.436l-205.17-170.029h410.904l-205.734 170.029zm-.034 55.462l-205.983-170.654v250.349h412v-249.94l-206.017 170.245z"/></svg>');
-        background-repeat: no-repeat;
-        background-size: 1.5rem;
-        background-position: 1rem 50%;
-        padding-left: 3rem;
-      }
-
-      input[type="password"] {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M195.334 223.333h-50v-62.666c0-61.022 49.645-110.667 110.666-110.667 61.022 0 110.667 49.645 110.667 110.667v62.666h-50v-62.666c0-33.452-27.215-60.667-60.667-60.667-33.451 0-60.666 27.215-60.666 60.667v62.666zm208.666 30v208.667h-296v-208.667h296zm-121 87.667c0-14.912-12.088-27-27-27s-27 12.088-27 27c0 7.811 3.317 14.844 8.619 19.773 4.385 4.075 6.881 9.8 6.881 15.785v22.942h23v-22.941c0-5.989 2.494-11.708 6.881-15.785 5.302-4.93 8.619-11.963 8.619-19.774z"/></svg>');
-        background-repeat: no-repeat;
-        background-size: 1.5rem;
-        background-position: 1rem 50%;
-        padding-left: 3rem;
-      }
-
-      input[type="submit"] {
-        background-image: linear-gradient(160deg, #8ceabb 0%, #378f7b 100%);
-        color: white;
-        margin-top: 1.5rem;
-        margin-bottom: 2rem;
-        cursor: pointer;
+      .floating-label label {
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        background: var(--white);
+        padding: 0 4px;
       }
     </style>
   </head>
-  <body class="align">
-    <div class="container">
-      <div class="card" id="registerCard">
+
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center city-logo"
+          >
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-8">
+          <a
+            href="/"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a
+            href="/about"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >About</a
+          >
+          <a
+            href="/contact"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Contact</a
+          >
+          <a
+            href="/news"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >News</a
+          >
+        </nav>
+
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button
+            id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+
+          <a
+            href="/auth/login"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+          >
+            Sign In
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Background Hero Section -->
+    <section class="fixed inset-0 hero-gradient overflow-hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div class="absolute inset-0">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
-          alt="Logo"
-          class="site__logo"
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          alt="Rockville City"
+          class="w-full h-full object-cover opacity-20"
         />
-        <h2>Sign Up</h2>
-        <form action="/auth/register" method="POST" class="form">
-          <div class="form__field">
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              required
-            />
+      </div>
+    </section>
+
+    <!-- Register Form -->
+    <main
+      class="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12"
+    >
+      <div class="w-full max-w-md">
+        <!-- Register Card -->
+        <div class="register-card rounded-2xl p-8 shadow-2xl">
+          <!-- Logo and Title -->
+          <div class="text-center mb-8">
+            <div
+              class="w-20 h-20 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 city-logo"
+            >
+              <i class="fas fa-city text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gradient mb-2">
+              Join Rockville
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+              Create your Rockville City Portal account
+            </p>
           </div>
-          <div class="form__field">
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••••••"
-              required
-            />
+
+          <!-- Register Form -->
+          <form action="/auth/register" method="POST" class="space-y-6">
+            <!-- Email Field -->
+            <div class="input-group">
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-envelope text-blue-500 mr-2"></i>
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                placeholder="you@example.com"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 outline-none"
+              />
+              <div id="email-validation" class="mt-1 text-sm hidden">
+                <span class="text-red-500"
+                  ><i class="fas fa-times-circle mr-1"></i>Please enter a valid
+                  email address</span
+                >
+              </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-group">
+              <label
+                for="password"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-lock text-blue-500 mr-2"></i>
+                Password
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  required
+                  placeholder="Create a strong password"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 outline-none pr-12"
+                />
+                <button
+                  type="button"
+                  onclick="togglePassword()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <i class="fas fa-eye" id="password-toggle"></i>
+                </button>
+              </div>
+              <!-- Password Strength Indicator -->
+              <div class="mt-2">
+                <div
+                  class="password-strength bg-gray-200 dark:bg-gray-600"
+                  id="password-strength"
+                ></div>
+                <p
+                  id="password-text"
+                  class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                >
+                  Password strength will appear here
+                </p>
+              </div>
+            </div>
+
+            <!-- Password Requirements -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h4
+                class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Password Requirements:
+              </h4>
+              <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li id="req-length" class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-2 w-3"></i>
+                  At least 8 characters long
+                </li>
+                <li id="req-uppercase" class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-2 w-3"></i>
+                  Contains uppercase letter
+                </li>
+                <li id="req-lowercase" class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-2 w-3"></i>
+                  Contains lowercase letter
+                </li>
+                <li id="req-number" class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-2 w-3"></i>
+                  Contains number
+                </li>
+              </ul>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full btn-primary text-gray-900 font-semibold py-3 px-6 rounded-lg text-lg relative overflow-hidden"
+            >
+              <i class="fas fa-user-plus mr-2"></i>
+              Create Account
+            </button>
+          </form>
+
+          <!-- Footer Links -->
+          <div class="mt-8 text-center space-y-4">
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                Already have an account?
+              </p>
+              <a
+                href="/auth/login"
+                class="inline-flex items-center px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+              >
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Sign In
+              </a>
+            </div>
+
+            <div class="pt-4">
+              <a
+                href="/"
+                class="inline-flex items-center text-yellow-600 dark:text-yellow-400 hover:underline font-medium"
+              >
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Home
+              </a>
+            </div>
           </div>
-          <div class="form__field">
-            <input type="submit" value="Sign Up" />
+        </div>
+
+        <!-- Benefits Info -->
+        <div class="mt-8">
+          <div
+            class="bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 rounded-lg p-6 backdrop-blur"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+            >
+              <i class="fas fa-star text-yellow-500 mr-2"></i>
+              Why Join Rockville City Portal?
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-exclamation-triangle text-blue-500 mt-1"></i>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Report Issues
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    Quickly report problems in your community
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-calendar text-green-500 mt-1"></i>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Community Events
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    Stay updated on local events and activities
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-newspaper text-purple-500 mt-1"></i>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Latest News
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    Get the latest updates from your city
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-chart-line text-orange-500 mt-1"></i>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Track Progress
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    Monitor the status of reported issues
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </form>
-        <p>
-          Already have an account?
-          <a href="/auth/login">Log in</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="relative z-10 bg-gray-900 bg-opacity-90 backdrop-blur text-white py-8"
+    >
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-3"
+          >
+            <i class="fas fa-city text-white"></i>
+          </div>
+          <h3 class="text-lg font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 text-sm mb-4">
+          Building a better community together through technology and civic
+          engagement.
         </p>
-        <p>
-          <a href="/" style="color: #8ceabb">Go to Home</a>
+        <p class="text-gray-500 text-xs">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
         </p>
       </div>
-    </div>
+    </footer>
+
+    <script>
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
+
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem("theme") || "light";
+      html.classList.toggle("dark", currentTheme === "dark");
+
+      darkModeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        const theme = html.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", theme);
+      });
+
+      // Password toggle functionality
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("password-toggle");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.className = "fas fa-eye-slash";
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.className = "fas fa-eye";
+        }
+      }
+
+      // Password strength checker
+      function checkPasswordStrength(password) {
+        let score = 0;
+        const requirements = {
+          length: password.length >= 8,
+          uppercase: /[A-Z]/.test(password),
+          lowercase: /[a-z]/.test(password),
+          number: /[0-9]/.test(password),
+        };
+
+        // Update requirement indicators
+        document.getElementById("req-length").querySelector("i").className =
+          requirements.length
+            ? "fas fa-check text-green-500 mr-2 w-3"
+            : "fas fa-times text-red-500 mr-2 w-3";
+        document.getElementById("req-uppercase").querySelector("i").className =
+          requirements.uppercase
+            ? "fas fa-check text-green-500 mr-2 w-3"
+            : "fas fa-times text-red-500 mr-2 w-3";
+        document.getElementById("req-lowercase").querySelector("i").className =
+          requirements.lowercase
+            ? "fas fa-check text-green-500 mr-2 w-3"
+            : "fas fa-times text-red-500 mr-2 w-3";
+        document.getElementById("req-number").querySelector("i").className =
+          requirements.number
+            ? "fas fa-check text-green-500 mr-2 w-3"
+            : "fas fa-times text-red-500 mr-2 w-3";
+
+        // Calculate score
+        Object.values(requirements).forEach((met) => met && score++);
+
+        const strengthBar = document.getElementById("password-strength");
+        const strengthText = document.getElementById("password-text");
+
+        if (password.length === 0) {
+          strengthBar.className =
+            "password-strength bg-gray-200 dark:bg-gray-600";
+          strengthText.textContent = "Password strength will appear here";
+          return;
+        }
+
+        if (score <= 1) {
+          strengthBar.className = "password-strength strength-weak";
+          strengthText.textContent = "Weak password";
+          strengthText.className = "text-xs text-red-500 mt-1";
+        } else if (score === 2) {
+          strengthBar.className = "password-strength strength-fair";
+          strengthText.textContent = "Fair password";
+          strengthText.className = "text-xs text-orange-500 mt-1";
+        } else if (score === 3) {
+          strengthBar.className = "password-strength strength-good";
+          strengthText.textContent = "Good password";
+          strengthText.className = "text-xs text-yellow-500 mt-1";
+        } else {
+          strengthBar.className = "password-strength strength-strong";
+          strengthText.textContent = "Strong password";
+          strengthText.className = "text-xs text-green-500 mt-1";
+        }
+      }
+
+      // Email validation
+      function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+
+      // Update year in footer
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Form enhancement
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const passwordInput = document.getElementById("password");
+        const emailInput = document.getElementById("email");
+        const emailValidation = document.getElementById("email-validation");
+
+        // Password strength checking
+        passwordInput.addEventListener("input", function () {
+          checkPasswordStrength(this.value);
+        });
+
+        // Email validation
+        emailInput.addEventListener("blur", function () {
+          if (this.value && !validateEmail(this.value)) {
+            emailValidation.classList.remove("hidden");
+            this.classList.add("border-red-500");
+          } else {
+            emailValidation.classList.add("hidden");
+            this.classList.remove("border-red-500");
+          }
+        });
+
+        // Form submission enhancement
+        form.addEventListener("submit", function (e) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+
+          // Validate email before submitting
+          if (!validateEmail(emailInput.value)) {
+            e.preventDefault();
+            emailValidation.classList.remove("hidden");
+            emailInput.classList.add("border-red-500");
+            emailInput.focus();
+            return;
+          }
+
+          // Check password strength
+          const password = passwordInput.value;
+          const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+          };
+
+          const score = Object.values(requirements).filter(Boolean).length;
+          if (score < 3) {
+            e.preventDefault();
+            alert(
+              "Please create a stronger password that meets at least 3 of the requirements."
+            );
+            passwordInput.focus();
+            return;
+          }
+
+          submitBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Account...';
+          submitBtn.disabled = true;
+
+          // Re-enable button after 10 seconds in case of network issues
+          setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+          }, 10000);
+        });
+      });
+    </script>
   </body>
 </html>

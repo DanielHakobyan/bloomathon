@@ -1,188 +1,417 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Վանաձոր | Լուծված Խնդիրներ</title>
+    <title>Rockville | City Statistics</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
     <style>
       :root {
-        --teal-deep: #006d77;
-        --mint-ice: #edf6f9;
-        --pure-white: #fafafa;
-        --mint-medium: #83c5be;
-        --teal-dark: #005b63;
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #e0e7ff;
         --white: #ffffff;
-        --light-gray: #f0f0f0;
-        --medium-gray: #ccc;
-        --dark-gray: #333;
-        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08),
+          0 2px 4px -2px rgb(0 0 0 / 0.08);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07),
+          0 4px 6px -4px rgb(0 0 0 / 0.07);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
       }
 
       body {
-        font-family: "Open Sans", sans-serif;
-        background-color: var(--mint-ice);
-        color: var(--dark-gray);
-        scroll-behavior: smooth;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      .glass-wrapper {
-        background: rgba(255, 255, 255, 0.85);
+      /* This class will now be ADDED by JavaScript on scroll */
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(10px);
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: var(--shadow);
+        border-bottom: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
       }
 
-      .card {
-        background-color: var(--white);
-        border-left: 4px solid var(--mint-medium);
-        box-shadow: var(--shadow);
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-hover {
         transition: all 0.3s ease;
+        border: 1px solid var(--gray-200);
       }
 
-      .card:hover {
+      .card-hover:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--gray-300);
       }
 
-      .status-resolved {
-        border-left-color: #10b981;
+      .dark .glass-effect {
+        background: rgba(17, 24, 39, 0.6);
+        border-bottom: 1px solid var(--gray-700);
       }
 
-      .badge-resolved {
-        background-color: #d1fae5;
-        color: #065f46;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.25rem 0.6rem;
-        border-radius: 9999px;
-      }
-      .custom-colored-shadow {
-        box-shadow: 0 8px 20px #065f46; /* var(--mint-medium) with transparency */
-      }
-      .custom-bg-color{
-        background-color: var(--medium-gray);
+      .dark .card-hover {
+        border: 1px solid var(--gray-700);
       }
 
+      .dark .card-hover:hover {
+        border-color: var(--gray-600);
+      }
+
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
+        );
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
     </style>
   </head>
-  <body class="pt-20">
-    <nav class="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-start items-center">
-      <h1 class="text-xl font-bold text-[color:var(--teal-deep)]">
-        Վանաձոր • Խնդիրների վիճակագրություն
-      </h1>
-    </nav>
-    
-    
-    <!-- Header -->
-
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="glass-wrapper mt-6">
-        <div class="text-center mb-10">
-          <div class="flex items-center justify-center gap-4 mb-10">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
-              alt="Վանաձորի Քաղաքապետարանի զինանշան"
-              class="w-20 h-auto md:w-24 rounded shadow"
-            />
-            <div>
-              <h2 class="text-3xl font-bold text-[color:var(--teal-deep)] leading-tight">
-                Վանաձորում Լուծված Խնդիրներ
-              </h2>
-              <p class="text-md text-gray-600 mt-1">
-                Քաղաքացիների կողմից հաղորդված լուծված խնդիրների ցանկ
-              </p>
-            </div>
-          </div>
-          
-
-        <!-- Stats Section -->
-        <div class="custom-bg-color p-6 rounded-lg mb-10 custom-colored-shadow" data-aos="fade-up">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">
-            Վիճակագրություն
-          </h3>
-          <div class="text-gray-600 space-y-1">
-            <p>Ընդհանուր խնդիրներ: <strong>{{ total_issues }}</strong></p>
-            <p>
-              Լուծված խնդիրներ: <strong>{{ resolved_issues_count }}</strong>
-            </p>
-          </div>
-        </div>
-
-        <!-- Resolved Issues -->
-        <div id="resolvedIssues" class="space-y-8">
-          {% for issue in resolved_issues %}
-          <div
-            class="card p-6 rounded-lg status-resolved"
-            data-aos="fade-up"
-            data-aos-delay="{{ (loop.index0 + 100) }}"
-          >
-            <div
-              class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
-            >
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                  <h3 class="text-xl font-semibold text-gray-800">
-                    {{ issue.title }}
-                  </h3>
-                  <span class="badge-resolved">Լուծված</span>
-                </div>
-                <p class="text-gray-600">{{ issue.description }}</p>
-                <p class="text-sm text-gray-500 mt-2">
-                  📍 Վայրը: {{ issue.location }} | 📅 Ամսաթիվ: {{
-                  issue.created_at }}
-                </p>
-              </div>
-            </div>
-
-            {% if issue.photo and issue.photo != "None" %}
-            <div class="mt-4">
-              <img
-                src="{{ issue.photo }}"
-                class="w-full max-w-sm rounded mt-2 shadow"
-              />
-            </div>
-            {% endif %} {% if issue.video and issue.video != "None" %}
-            <div class="mt-4">
-              <video controls class="w-full max-w-sm mt-2 rounded shadow">
-                <source src="{{ issue.video }}" type="video/mp4" />
-              </video>
-            </div>
-            {% endif %}
-          </div>
-          {% else %}
-          <div class="text-center py-12">
-            <h3 class="text-xl font-medium text-gray-800">
-              Լուծված խնդիրներ չեն գտնվել
-            </h3>
-          </div>
-          {% endfor %}
-        </div>
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300"
+  >
+    <div class="relative overflow-hidden py-28 hero-gradient">
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          alt="Rockville City"
+          class="w-full h-full object-cover opacity-30"
+        />
       </div>
 
-      <!-- Footer -->
-      <footer class="mt-10 py-10 text-center text-sm text-gray-500">
-        <p>
-          Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-          reserved. This code is proprietary and confidential. Unauthorized
-          copying, redistribution, modification, or use is strictly prohibited.
-        </p>
-        <script>
-          document.getElementById("year").textContent =
-            new Date().getFullYear();
-        </script>
-      </footer>
+      <header
+        id="page-header"
+        class="fixed w-full top-0 left-0 z-50 glass-effect"
+      >
+        <div
+          class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+        >
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-city text-white text-lg"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white">Rockville</h1>
+          </div>
+          <nav class="hidden md:flex items-center space-x-8 text-white">
+            <a class="hover:text-gray-200 transition-colors" href="/">Home</a>
+            <a class="hover:text-gray-200 transition-colors" href="/about"
+              >About</a
+            >
+            <a class="hover:text-gray-200 transition-colors" href="/contact"
+              >Contact</a
+            >
+            <a class="hover:text-gray-200 transition-colors" href="/issues"
+              >Issues</a
+            >
+            <a class="hover:text-gray-200 transition-colors" href="/news"
+              >News</a
+            >
+            <a href="/city-statistics" class="font-semibold text-gray-200"
+              >Statistics</a
+            >
+          </nav>
+          <div class="flex items-center space-x-4">
+            <button
+              class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              id="dark-mode-toggle"
+            >
+              <i class="fas fa-moon text-gray-600 dark:hidden"></i>
+              <i class="fas fa-sun text-gray-300 hidden dark:block"></i>
+            </button>
+            <a
+              class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              href="/auth/login"
+              id="login-btn"
+            >
+              Login
+            </a>
+            <button
+              class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              id="logout-btn"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        class="relative z-10 pt-28 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
+        <div class="text-center mb-16 text-white">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4 animate-float">
+            City <span style="color: var(--accent-gold)">Statistics</span>
+          </h2>
+
+          <p class="text-lg text-gray-200 max-w-3xl mx-auto">
+            An overview of community engagement and issue resolution in
+            Rockville.
+          </p>
+        </div>
+      </div>
     </div>
 
+    <main class="-mt-8 pb-16 relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div
+            class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md card-hover text-center"
+          >
+            <div
+              class="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i
+                class="fas fa-bullhorn text-3xl text-blue-600 dark:text-blue-400"
+              ></i>
+            </div>
+            <p class="text-4xl font-bold text-gray-800 dark:text-white">
+              {{ total_issues }}
+            </p>
+            <h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400">
+              Total Issues Reported
+            </h3>
+          </div>
+          <div
+            class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md card-hover text-center"
+          >
+            <div
+              class="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i
+                class="fas fa-check-circle text-3xl text-green-600 dark:text-green-400"
+              ></i>
+            </div>
+            <p class="text-4xl font-bold text-gray-800 dark:text-white">
+              {{ resolved_issues_count }}
+            </p>
+            <h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400">
+              Issues Resolved
+            </h3>
+          </div>
+        </div>
+
+        <div class="text-center mb-10">
+          <h3 class="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+            Recently Resolved Issues
+          </h3>
+          <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+            Check out the latest issues that have been successfully resolved by
+            the city.
+          </p>
+        </div>
+
+        <div>
+          <div class="space-y-6" id="resolvedIssues">
+            {% for issue in resolved_issues %}
+            <div
+              class="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 card-hover shadow-md"
+            >
+              <div
+                class="flex flex-col md:flex-row justify-between gap-6 items-start"
+              >
+                <div class="flex-1">
+                  <div class="flex items-center gap-4 mb-3">
+                    <h4 class="text-xl font-bold text-gray-800 dark:text-white">
+                      {{ issue.title }}
+                    </h4>
+                    <span
+                      class="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                      >Resolved</span
+                    >
+                  </div>
+                  <p class="text-gray-600 dark:text-gray-400 mb-5">
+                    {{ issue.description }}
+                  </p>
+                  <div
+                    class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-map-marker-alt text-blue-500"></i>
+                      <span>{{ issue.location }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-calendar-alt text-green-500"></i>
+                      <span>{{ issue.created_at }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% if issue.photo and issue.photo != "None" or issue.video and
+              issue.video != "None" %}
+              <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {% if issue.photo and issue.photo != "None" %}
+                <div>
+                  <img
+                    class="w-full h-auto rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+                    src="{{ issue.photo }}"
+                    alt="Issue Photo"
+                  />
+                </div>
+                {% endif %} {% if issue.video and issue.video != "None" %}
+                <div>
+                  <video
+                    class="w-full h-auto rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+                    controls
+                  >
+                    <source src="{{ issue.video }}" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% else %}
+            <div
+              class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl shadow-md"
+            >
+              <div
+                class="w-20 h-20 bg-blue-50 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-6"
+              >
+                <i
+                  class="fas fa-check-double text-3xl text-blue-500 dark:text-blue-400"
+                ></i>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                No Resolved Issues Yet
+              </h3>
+              <p class="text-gray-500 dark:text-gray-400">
+                Check back later to see a list of completed tasks.
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-6">
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-city text-white text-xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Rockville, Maryland</h3>
+        </div>
+        <p class="text-gray-400 mb-4">
+          Building a better community together through technology and civic
+          engagement.
+        </p>
+        <p class="text-gray-500">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
     <script>
-      AOS.init({ once: true, duration: 600, easing: "ease-in-out" });
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- Header Scroll Effect ---
+        const header = document.getElementById("page-header");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 20) {
+            // Activates glass effect after scrolling 20px
+            header.classList.add("glass-effect");
+          } else {
+            header.classList.remove("glass-effect");
+          }
+        });
+
+        // --- Dark mode toggle ---
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem("theme") || "light";
+        html.classList.toggle("dark", currentTheme === "dark");
+        darkModeToggle.addEventListener("click", () => {
+          html.classList.toggle("dark");
+          const theme = html.classList.contains("dark") ? "dark" : "light";
+          localStorage.setItem("theme", theme);
+        });
+
+        // --- Auth buttons visibility ---
+        const token = Cookies.get("access_token");
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        if (token) {
+          loginBtn?.classList.add("hidden");
+          logoutBtn?.classList.remove("hidden");
+        } else {
+          loginBtn?.classList.remove("hidden");
+          logoutBtn?.classList.add("hidden");
+        }
+
+        logoutBtn?.addEventListener("click", async () => {
+          try {
+            await fetch("/auth/logout", { method: "POST" });
+            Cookies.remove("access_token");
+            window.location.href = "/";
+          } catch (err) {
+            console.error("Logout failed:", err);
+          }
+        });
+
+        // --- Update footer year ---
+        document.getElementById("year").textContent = new Date().getFullYear();
+      });
     </script>
   </body>
 </html>

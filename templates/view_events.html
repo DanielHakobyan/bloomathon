@@ -1,123 +1,147 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Վանաձոր | Սպասվող Իրադարձություններ</title>
+    <title>Rockville | View Events</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --teal-deep: #006d77;
-        --mint-ice: #edf6f9;
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
         --white: #ffffff;
-        --light-gray: #f0f0f0;
-        --dark-gray: #333;
-        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
       }
 
       body {
         font-family: "Open Sans", sans-serif;
-        background-color: var(--mint-ice);
-        color: var(--dark-gray);
-        scroll-behavior: smooth;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      body::before {
-        content: "";
-        position: fixed;
-        top: -100px;
-        left: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(
-          circle,
-          rgba(0, 111, 96, 0.2) 0%,
-          transparent 70%
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
         );
-        z-index: -1;
-        animation: float 8s ease-in-out infinite;
-      }
-      body::after {
-        content: "";
-        position: fixed;
-        bottom: -100px;
-        right: -100px;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(
-          circle,
-          rgba(0, 91, 99, 0.2) 0%,
-          transparent 70%
-        );
-        z-index: -1;
-        animation: float 10s ease-in-out infinite reverse;
       }
 
-      .navbar {
-        backdrop-filter: blur(12px);
-        background-color: rgba(255, 255, 255, 0.7);
-        box-shadow: var(--shadow);
-      }
-
-      .glass-wrapper {
-        background: rgba(255, 255, 255, 0.85);
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
       }
 
       .event-card {
         transition: all 0.3s ease;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-md);
         overflow: hidden;
         position: relative;
-        background: white;
+        background: var(--gray-300);
       }
 
       .event-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-xl);
       }
 
-      .event-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
+      .status-pending {
+        border-left: 4px solid #f59e0b;
       }
-
-      .status-pending::before {
-        background-color: #f59e0b;
+      .status-resolved {
+        border-left: 4px solid #10b981;
       }
-
-      .status-resolved::before {
-        background-color: #10b981;
-      }
-
-      .status-canceled::before {
-        background-color: #ef4444;
+      .status-canceled {
+        border-left: 4px solid #ef4444;
       }
 
       .badge-pending {
         background-color: #fef3c7;
         color: #b45309;
       }
-
       .badge-resolved {
         background-color: #d1fae5;
         color: #065f46;
       }
-
       .badge-canceled {
         background-color: #fee2e2;
         color: #991b1b;
@@ -127,192 +151,328 @@
         position: fixed;
         bottom: 30px;
         right: 30px;
-        background-color: var(--teal-deep);
-        color: white;
-        padding: 10px 14px;
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 12px;
         border-radius: 50%;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-md);
         cursor: pointer;
         display: none;
-        z-index: 50;
-        transition: background 0.3s ease;
+        transition: background-color 0.3s;
       }
 
       #backToTop:hover {
-        background-color: var(--teal-dark);
+        background-color: var(--secondary-blue);
       }
     </style>
   </head>
-  <body class="pt-20">
-    <!-- Navbar -->
-    <nav
-      class="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center"
-    >
-      <h1 class="text-xl font-bold text-[color:var(--teal-deep)]">
-        Վանաձոր • Սպասվող Իրադարձություններ
-      </h1>
-      <div class="space-x-2">
-        <select
-          id="filterStatus"
-          class="text-sm px-3 py-1 rounded border border-gray-300 bg-white"
-        >
-          <option value="all">Բոլորը</option>
-          <option value="pending">Սպասում է</option>
-          <option value="resolved">Լուծված</option>
-          <option value="canceled">Մերժված</option>
-        </select>
-      </div>
-    </nav>
 
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="glass-wrapper mt-6">
-        <div class="text-center mb-10">
-          <h2 class="text-3xl font-bold text-[color:var(--teal-deep)] mb-2">
-            Սպասվող Իրադարձություններ
-          </h2>
-          <p class="text-md text-gray-600">
-            Տեսեք Վանաձորում սպասվող իրադարձությունների ցանկը։
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <div id="app">
+      <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+        <div
+          class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+        >
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-city text-white text-lg"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+          </div>
+
+          <nav class="hidden md:flex items-center space-x-8">
+            <a
+              href="/"
+              class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >Home</a
+            >
+            <a
+              href="/about"
+              class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >About</a
+            >
+            <a
+              href="/contact"
+              class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >Contact</a
+            >
+            <a
+              href="/news"
+              class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >News</a
+            >
+          </nav>
+
+          <div class="flex items-center space-x-4">
+            <button
+              id="dark-mode-toggle"
+              class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              <i class="fas fa-moon dark:hidden"></i>
+              <i class="fas fa-sun hidden dark:block"></i>
+            </button>
+            <a
+              id="login-btn"
+              href="/auth/login"
+              class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >Login</a
+            >
+            <button
+              id="logout-btn"
+              class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="relative pt-24 pb-16 hero-gradient overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+            alt="Rockville City"
+            class="w-full h-full object-cover opacity-30"
+          />
+        </div>
+        <div
+          class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto"
+        >
+          <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-float">
+            Upcoming <span class="text-yellow-400">Events</span>
+          </h1>
+          <p class="text-xl md:text-2xl mb-8 text-gray-200">
+            Discover what's happening in Rockville, Maryland.
           </p>
         </div>
+      </section>
 
-        <div id="eventsContainer" class="space-y-6">
-          {% for event in events %}
+      <main
+        class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+      >
+        <div class="max-w-7xl mx-auto px-6">
           <div
-            class="event-card status-{{ event.status|lower|replace(' ', '-') }} event"
-            data-status="{{ event.status|lower|replace(' ', '-') }}"
-            data-aos="fade-up"
+            class="mb-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
           >
-            <div class="p-5">
-              <div class="flex flex-col md:flex-row justify-between gap-4">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h2 class="text-xl font-semibold text-gray-800">
-                      {{ event.title }}
-                    </h2>
-                    <span
-                      class="px-3 py-1 rounded-full text-xs font-medium badge-{{ event.status|lower|replace(' ', '-') }}"
-                    >
-                      {{ event.status }}
-                    </span>
-                  </div>
-
-                  <p class="text-gray-600 mb-4">{{ event.description }}</p>
-
-                  <div class="flex flex-wrap gap-4 text-sm">
-                    <div class="flex items-center text-gray-500">
-                      📍 {{ event.location }}
-                    </div>
-                    <div class="flex items-center text-gray-500">
-                      📅 {{ event.datetime }}
-                    </div>
-                    {% if event.duration %}
-                    <div class="flex items-center text-gray-500">
-                      🕒 {{ event.duration }}
-                    </div>
-                    {% endif %}
-                  </div>
-                </div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+              Events
+            </h2>
+            <div class="flex items-center space-x-4">
+              <span class="text-lg font-medium text-gray-700 dark:text-gray-300"
+                >Filter by Status:</span
+              >
+              <div class="flex space-x-2">
+                <button
+                  class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
+                  onclick="filterEvents('all')"
+                  data-filter="all"
+                >
+                  All
+                </button>
+                <button
+                  class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
+                  onclick="filterEvents('pending')"
+                  data-filter="pending"
+                >
+                  Pending
+                </button>
+                <button
+                  class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
+                  onclick="filterEvents('resolved')"
+                  data-filter="resolved"
+                >
+                  Resolved
+                </button>
+                <button
+                  class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
+                  onclick="filterEvents('canceled')"
+                  data-filter="canceled"
+                >
+                  Canceled
+                </button>
               </div>
-
-              {% if event.photo and event.photo != "None" %}
-              <div class="mt-4">
-                <img
-                  src="{{ event.photo }}"
-                  class="w-full max-w-xs rounded shadow"
-                />
-              </div>
-              {% endif %} {% if event.video and event.video != "None" %}
-              <div class="mt-4">
-                <video controls class="w-full max-w-xs mt-2 rounded shadow">
-                  <source src="{{ event.video }}" type="video/mp4" />
-                </video>
-              </div>
-              {% endif %}
             </div>
           </div>
-          {% else %}
-          <div class="text-center py-20 empty-state">
-            <h3 class="text-xl font-medium text-[color:var(--dark-gray)]">
-              Իրադարձություններ չեն գտնվել
-            </h3>
-            <p class="mt-2 text-gray-600">
-              Դեռևս ոչ մի իրադարձություն չի ներկայացվել։
-            </p>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <footer
-        style="background-color: var(--teal-dark); color: var(--white)"
-        class="py-12"
-      >
-        <div class="max-w-7xl mx-auto px-6 text-center">
-          <p>
-            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-            reserved. This code is proprietary and confidential. Unauthorized
-            copying, redistribution, modification, or use is strictly
-            prohibited.
-          </p>
-          <script>
-            document.getElementById("year").textContent =
-              new Date().getFullYear();
-          </script>
-        </div>
-      </footer>
-    </div>
 
-    <!-- Back to Top -->
-    <div
-      id="backToTop"
-      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-4 h-6"
+          <div
+            id="eventsContainer"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            data-aos="fade-up"
+          >
+            {% for event in events %}
+            <div
+              class="event-card status-{{ event.status|lower|replace(' ', '-') }} event"
+              data-status="{{ event.status|lower|replace(' ', '-') }}"
+              data-aos="fade-up"
+            >
+              <div class="p-5">
+                <div class="flex flex-col md:flex-row justify-between gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h2 class="text-xl font-semibold text-gray-800">
+                        {{ event.title }}
+                      </h2>
+                      <span
+                        class="px-3 py-1 rounded-full text-xs font-medium badge-{{ event.status|lower|replace(' ', '-') }}"
+                      >
+                        {{ event.status }}
+                      </span>
+                    </div>
+
+                    <p class="text-gray-600 mb-4">{{ event.description }}</p>
+
+                    <div class="flex flex-wrap gap-4 text-sm">
+                      <div class="flex items-center text-gray-500">
+                        📍 {{ event.location }}
+                      </div>
+                      <div class="flex items-center text-gray-500">
+                        📅 {{ event.datetime }}
+                      </div>
+                      {% if event.duration %}
+                      <div class="flex items-center text-gray-500">
+                        🕒 {{ event.duration }}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                {% if event.photo and event.photo != "None" %}
+                <div class="mt-4">
+                  <img
+                    src="{{ event.photo }}"
+                    class="w-full max-w-xs rounded shadow"
+                  />
+                </div>
+                {% endif %} {% if event.video and event.video != "None" %}
+                <div class="mt-4">
+                  <video controls class="w-full max-w-xs mt-2 rounded shadow">
+                    <source src="{{ event.video }}" type="video/mp4" />
+                  </video>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% else %}
+            <div class="text-center py-20 empty-state">
+              <h3 class="text-xl font-medium text-gray-800">No events found</h3>
+              <p class="mt-2 text-gray-600">
+                No events have been submitted yet.
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </main>
+
+      <button
+        id="backToTop"
+        aria-label="Back to top"
+        class="focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4.5 15.75l7.5-7.5 7.5 7.5"
-        />
-      </svg>
+        <i class="fas fa-arrow-up"></i>
+      </button>
+
+      <router-view class="p-4"></router-view>
     </div>
 
     <script>
-      function applyFilter() {
-        const val = document.getElementById("filterStatus").value;
-        const eventCards = document.querySelectorAll(".event");
+      AOS.init({ duration: 800, once: true });
 
-        eventCards.forEach((event) => {
-          event.style.display =
-            val === "all" || event.dataset.status === val ? "block" : "none";
+      const filterButtons = document.querySelectorAll("[data-filter]");
+      const eventList = document.getElementById("eventsContainer");
+
+      const filterEvents = (status) => {
+        const events = eventList.querySelectorAll(".event");
+        events.forEach((event) => {
+          if (
+            status === "all" ||
+            event.getAttribute("data-status") === status
+          ) {
+            event.classList.remove("hidden");
+          } else {
+            event.classList.add("hidden");
+          }
         });
 
-        // Refresh AOS to re-trigger animations on visible elements
-        setTimeout(() => {
-          AOS.refreshHard();
-        }, 100);
+        filterButtons.forEach((button) => {
+          if (button.getAttribute("data-filter") === status) {
+            button.classList.add("bg-blue-600", "text-white");
+            button.classList.remove(
+              "bg-gray-200",
+              "text-gray-700",
+              "dark:bg-gray-700",
+              "dark:text-gray-300"
+            );
+            button.classList.remove(
+              "hover:bg-gray-300",
+              "dark:hover:bg-gray-600"
+            );
+          } else {
+            button.classList.remove("bg-blue-600", "text-white");
+            button.classList.add(
+              "bg-gray-200",
+              "text-gray-700",
+              "dark:bg-gray-700",
+              "dark:text-gray-300"
+            );
+            button.classList.add("hover:bg-gray-300", "dark:hover:bg-gray-600");
+          }
+        });
+      };
+
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          filterEvents(button.getAttribute("data-filter"));
+        });
+      });
+
+      // Initialize the filter to 'all' on page load
+      window.addEventListener("load", () => {
+        filterEvents("all");
+      });
+
+      // Dark mode toggle logic
+      const toggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
+
+      const setDarkMode = (isDark) => {
+        if (isDark) {
+          html.classList.add("dark");
+          Cookies.set("theme", "dark", { expires: 365 });
+        } else {
+          html.classList.remove("dark");
+          Cookies.set("theme", "light", { expires: 365 });
+        }
+      };
+
+      const currentTheme = Cookies.get("theme");
+      if (currentTheme) {
+        setDarkMode(currentTheme === "dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setDarkMode(true);
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const filterSelect = document.getElementById("filterStatus");
-        filterSelect.addEventListener("change", applyFilter);
-
-        AOS.init({
-          once: false, // allow animations to re-trigger when filtered
-          duration: 600,
-          easing: "ease-in-out",
-        });
-
-        applyFilter(); // Run filter on initial load
+      toggle.addEventListener("click", () => {
+        setDarkMode(!html.classList.contains("dark"));
       });
-      const backToTop = document.getElementById("backToTop");
+
+      // Back to top logic
+      const backToTopButton = document.getElementById("backToTop");
       window.addEventListener("scroll", () => {
-        backToTop.style.display = window.scrollY > 300 ? "block" : "none";
+        if (window.pageYOffset > 300) {
+          backToTopButton.style.display = "block";
+        } else {
+          backToTopButton.style.display = "none";
+        }
+      });
+      backToTopButton.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     </script>
   </body>

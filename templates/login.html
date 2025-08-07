@@ -1,187 +1,525 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <title>Register</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
-      html,
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
+      }
+
       body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
+        );
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .dark .login-card {
+        background: rgba(31, 41, 55, 0.95);
+        border: 1px solid rgba(75, 85, 99, 0.3);
+      }
+
+      .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-group input {
+        transition: all 0.3s ease;
+      }
+
+      .input-group input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--secondary-blue)
+        );
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+      }
+
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
         height: 100%;
-        margin: 0;
-        background-color: #354152;
-        color: #ffffff;
-        font: 300 1rem/1.5 "Helvetica Neue", sans-serif;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
       }
 
-      body.align {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .btn-primary:hover::before {
+        left: 100%;
       }
 
-      .container {
-        width: 100%;
-        max-width: 600px;
-        perspective: 1000px;
+      .city-logo {
+        animation: pulse 2s infinite;
       }
 
-      .card {
-        width: 100%;
-        padding: 3rem 2rem;
-        background: #354152;
-        box-shadow: 0 0 250px #341ab3;
-        border-radius: 1rem;
-        text-align: center;
-        transition: transform 0.6s ease-in-out;
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8;
+        }
       }
 
-      .card.exit {
-        transform: rotateY(90deg);
-        opacity: 0;
+      /* Custom scrollbar for better aesthetics */
+      ::-webkit-scrollbar {
+        width: 8px;
       }
 
-      .site__logo {
-        margin-bottom: 2rem;
-        max-width: 30%;
-        height: auto;
+      ::-webkit-scrollbar-track {
+        background: var(--gray-100);
       }
 
-      h2 {
-        font-size: 2.75rem;
-        font-weight: 100;
-        margin: 0 0 1rem;
-        text-transform: uppercase;
+      ::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 4px;
       }
 
-      a,
-      button.flip-btn {
-        color: #7e8ba3;
-        background: none;
-        border: none;
-        font: inherit;
-        cursor: pointer;
-        text-decoration: underline;
-        padding: 0;
-      }
-
-      .form__field {
-        margin-bottom: 1rem;
-      }
-
-      input {
-        font: inherit;
-        padding: 0.5rem 1rem;
-        border: 1px solid #242c37;
-        border-radius: 999px;
-        background-color: transparent;
-        text-align: center;
-        width: 100%;
-        outline: none;
-        color: #fff;
-      }
-
-      input::placeholder {
-        color: #ffffff;
-      }
-
-      input[type="email"] {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M256.017 273.436l-205.17-170.029h410.904l-205.734 170.029zm-.034 55.462l-205.983-170.654v250.349h412v-249.94l-206.017 170.245z"/></svg>');
-        background-repeat: no-repeat;
-        background-size: 1.5rem;
-        background-position: 1rem 50%;
-        padding-left: 3rem;
-      }
-
-      input[type="password"] {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#242c37"><path d="M195.334 223.333h-50v-62.666c0-61.022 49.645-110.667 110.666-110.667 61.022 0 110.667 49.645 110.667 110.667v62.666h-50v-62.666c0-33.452-27.215-60.667-60.667-60.667-33.451 0-60.666 27.215-60.666 60.667v62.666zm208.666 30v208.667h-296v-208.667h296zm-121 87.667c0-14.912-12.088-27-27-27s-27 12.088-27 27c0 7.811 3.317 14.844 8.619 19.773 4.385 4.075 6.881 9.8 6.881 15.785v22.942h23v-22.941c0-5.989 2.494-11.708 6.881-15.785 5.302-4.93 8.619-11.963 8.619-19.774z"/></svg>');
-        background-repeat: no-repeat;
-        background-size: 1.5rem;
-        background-position: 1rem 50%;
-        padding-left: 3rem;
-      }
-
-      input[type="submit"] {
-        background-image: linear-gradient(160deg, #8ceabb 0%, #378f7b 100%);
-        color: white;
-        margin-top: 1.5rem;
-        margin-bottom: 2rem;
-        cursor: pointer;
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--dark-blue);
       }
     </style>
   </head>
-  <body class="align">
-    <div class="container">
-      <div class="card" id="loginCard">
+
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center city-logo"
+          >
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-8">
+          <a
+            href="/"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a
+            href="/about"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >About</a
+          >
+          <a
+            href="/contact"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Contact</a
+          >
+          <a
+            href="/news"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >News</a
+          >
+        </nav>
+
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button
+            id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+
+          <a
+            href="/auth/register"
+            class="px-4 py-2 bg-yellow-500 text-gray-900 rounded-lg hover:bg-yellow-400 transition-colors font-semibold"
+          >
+            Register
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Background Hero Section -->
+    <section class="fixed inset-0 hero-gradient overflow-hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div class="absolute inset-0">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
-          alt="Logo"
-          class="site__logo"
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          alt="Rockville City"
+          class="w-full h-full object-cover opacity-20"
         />
-        <h2>Login</h2>
-        <form action="/auth/login" method="POST" class="form">
-          <div class="form__field">
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              required
-            />
+      </div>
+    </section>
+
+    <!-- Login Form -->
+    <main
+      class="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12"
+    >
+      <div class="w-full max-w-md">
+        <!-- Login Card -->
+        <div class="login-card rounded-2xl p-8 shadow-2xl">
+          <!-- Logo and Title -->
+          <div class="text-center mb-8">
+            <div
+              class="w-20 h-20 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 city-logo"
+            >
+              <i class="fas fa-city text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gradient mb-2">Welcome Back</h1>
+            <p class="text-gray-600 dark:text-gray-400">
+              Sign in to your Rockville City Portal account
+            </p>
           </div>
-          <div class="form__field">
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••••••"
-              required
-            />
+
+          <!-- Login Form -->
+          <form action="/auth/login" method="POST" class="space-y-6">
+            <!-- Email Field -->
+            <div class="input-group">
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-envelope text-blue-500 mr-2"></i>
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                placeholder="you@example.com"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 outline-none"
+              />
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-group">
+              <label
+                for="password"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-lock text-blue-500 mr-2"></i>
+                Password
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  required
+                  placeholder="••••••••••••"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 outline-none pr-12"
+                />
+                <button
+                  type="button"
+                  onclick="togglePassword()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <i class="fas fa-eye" id="password-toggle"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full btn-primary text-white font-semibold py-3 px-6 rounded-lg text-lg relative overflow-hidden"
+            >
+              <i class="fas fa-sign-in-alt mr-2"></i>
+              Sign In to Rockville Portal
+            </button>
+          </form>
+
+          <!-- Footer Links -->
+          <div class="mt-8 text-center space-y-4">
+            <div class="flex items-center justify-center space-x-4 text-sm">
+              <a
+                href="/auth/forgot-password"
+                class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+              >
+                <i class="fas fa-key mr-1"></i>
+                Forgot Password?
+              </a>
+            </div>
+
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                Don't have an account?
+              </p>
+              <a
+                href="/auth/register"
+                class="inline-flex items-center px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+              >
+                <i class="fas fa-user-plus mr-2"></i>
+                Create Account
+              </a>
+            </div>
+
+            <div class="pt-4">
+              <a
+                href="/"
+                class="inline-flex items-center text-yellow-600 dark:text-yellow-400 hover:underline font-medium"
+              >
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Home
+              </a>
+            </div>
           </div>
-          <div class="form__field">
-            <input type="submit" value="Log In" />
+        </div>
+
+        <!-- Additional Info -->
+        <div class="mt-8 text-center">
+          <div
+            class="bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 rounded-lg p-6 backdrop-blur"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-3"
+            >
+              <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+              New to Rockville City Portal?
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+              Join our community platform to report issues, discover events, and
+              stay connected with your city.
+            </p>
+            <div
+              class="flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <span class="flex items-center">
+                <i class="fas fa-shield-alt text-green-500 mr-1"></i>
+                Secure
+              </span>
+              <span class="flex items-center">
+                <i class="fas fa-clock text-blue-500 mr-1"></i>
+                24/7 Access
+              </span>
+              <span class="flex items-center">
+                <i class="fas fa-users text-purple-500 mr-1"></i>
+                Community
+              </span>
+            </div>
           </div>
-        </form>
-        <p>
-          Don't have an account?
-          <a href="/auth/register">Register</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="relative z-10 bg-gray-900 bg-opacity-90 backdrop-blur text-white py-8"
+    >
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-3"
+          >
+            <i class="fas fa-city text-white"></i>
+          </div>
+          <h3 class="text-lg font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 text-sm mb-4">
+          Building a better community together through technology and civic
+          engagement.
         </p>
-        <p>
-          <a href="/" style="color: #8ceabb">Go to Home</a>
+        <p class="text-gray-500 text-xs">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
         </p>
       </div>
-      <footer
-        style="background-color: var(--teal-dark); color: var(--white)"
-        class="py-12"
-      >
-        <div class="max-w-7xl mx-auto px-6 text-center">
-          <p>
-            Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-            reserved. This code is proprietary and confidential. Unauthorized
-            copying, redistribution, modification, or use is strictly
-            prohibited.
-          </p>
-          <script>
-            document.getElementById("year").textContent =
-              new Date().getFullYear();
-          </script>
-        </div>
-      </footer>
-    </div>
+    </footer>
 
     <script>
-      const goToLoginBtn = document.getElementById("goToRegister");
-      const loginCard = document.getElementById("loginCard");
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
 
-      goToRegisterBtn.addEventListener("click", () => {
-        loginCard.classList.add("exit");
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem("theme") || "light";
+      html.classList.toggle("dark", currentTheme === "dark");
 
-        // Wait for the animation to finish before redirecting
-        setTimeout(() => {
-          window.location.href = "/auth/register";
-        }, 600); // Match the CSS transition time
+      darkModeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        const theme = html.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", theme);
+      });
+
+      // Password toggle functionality
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("password-toggle");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.className = "fas fa-eye-slash";
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.className = "fas fa-eye";
+        }
+      }
+
+      // Update year in footer
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Form enhancement - add subtle animations
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const inputs = form.querySelectorAll("input");
+
+        // Add focus/blur animations
+        inputs.forEach((input) => {
+          input.addEventListener("focus", function () {
+            this.parentElement.classList.add("focused");
+          });
+
+          input.addEventListener("blur", function () {
+            if (!this.value) {
+              this.parentElement.classList.remove("focused");
+            }
+          });
+        });
+
+        // Form submission enhancement
+        form.addEventListener("submit", function (e) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+
+          submitBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Signing In...';
+          submitBtn.disabled = true;
+
+          // Re-enable button after 5 seconds in case of network issues
+          setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+          }, 5000);
+        });
+      });
+
+      // Add keyboard navigation enhancement
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && e.target.tagName === "INPUT") {
+          const form = e.target.closest("form");
+          const inputs = Array.from(form.querySelectorAll("input"));
+          const currentIndex = inputs.indexOf(e.target);
+
+          if (currentIndex < inputs.length - 1) {
+            e.preventDefault();
+            inputs[currentIndex + 1].focus();
+          }
+        }
       });
     </script>
   </body>

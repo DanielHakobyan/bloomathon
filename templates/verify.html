@@ -1,124 +1,330 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Verification</title>
+    <title>Rockville | Email Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
-      html,
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
+      }
+
       body {
-        height: 100%;
-        margin: 0;
-        background-color: #354152;
-        color: #ffffff;
-        font: 300 1rem/1.5 "Helvetica Neue", sans-serif;
+        font-family: "Open Sans", sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      body.align {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
+        );
       }
 
-      .card {
-        background-color: #354152;
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .status-pending {
+        border-left: 4px solid #f59e0b;
+      }
+      .status-resolved {
+        border-left: 4px solid #10b981;
+      }
+      .status-canceled {
+        border-left: 4px solid #ef4444;
+      }
+
+      .badge-pending {
+        background-color: #fef3c7;
+        color: #b45309;
+      }
+      .badge-resolved {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .badge-canceled {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+
+      #backToTop {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 12px;
+        border-radius: 50%;
+        box-shadow: var(--shadow-md);
+        cursor: pointer;
+        display: none;
+        transition: background-color 0.3s;
+      }
+
+      #backToTop:hover {
+        background-color: var(--secondary-blue);
+      }
+
+      .verification-card {
+        background-color: var(--white);
         padding: 3rem 2rem;
-        box-shadow: 0 0 250px #341ab3;
+        box-shadow: var(--shadow-lg);
         border-radius: 1rem;
         text-align: center;
         width: 100%;
         max-width: 500px;
+        margin: auto;
       }
 
-      h1 {
-        font-size: 2.5rem;
-        font-weight: 100;
-        margin-bottom: 2rem;
-        text-transform: uppercase;
+      .dark .verification-card {
+        background-color: var(--gray-800);
+        color: var(--gray-100);
       }
 
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+      .verification-card input {
+        border-color: var(--gray-300);
+        background-color: var(--gray-100);
+        color: var(--gray-900);
       }
 
-      label {
-        text-align: left;
-        font-size: 0.9rem;
-        color: #ccc;
-      }
-
-      input[type="text"] {
-        padding: 0.5rem 1rem;
-        border: 1px solid #242c37;
-        border-radius: 999px;
-        background-color: transparent;
-        color: #fff;
-        text-align: center;
-        outline: none;
-      }
-
-      button[type="submit"] {
-        background-image: linear-gradient(160deg, #8ceabb 0%, #378f7b 100%);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        padding: 0.75rem;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background 0.3s ease;
-      }
-
-      button[type="submit"]:hover {
-        filter: brightness(1.1);
-      }
-
-      .home-link {
-        margin-top: 1.5rem;
-        color: #8ceabb;
-        text-decoration: underline;
-        display: inline-block;
+      .dark .verification-card input {
+        border-color: var(--gray-600);
+        background-color: var(--gray-700);
+        color: var(--gray-100);
       }
     </style>
   </head>
-  <body class="align">
-    <div class="card">
-      <h1>Email Verification</h1>
-      <form action="/auth/verify-email" method="POST">
-        <input type="hidden" name="email" value="{{ email }}" />
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 flex flex-col min-h-screen"
+  >
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center"
+          >
+            <i class="fas fa-city text-white text-lg"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+        </div>
 
-        <label for="verification_code">Verification Code:</label>
-        <input
-          type="text"
-          id="verification_code"
-          name="verification_code"
-          required
-        />
+        <nav class="hidden md:flex items-center space-x-8">
+          <a
+            href="/"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a
+            href="/about"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >About</a
+          >
+          <a
+            href="/contact"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Contact</a
+          >
+          <a
+            href="/view_events"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Events</a
+          >
+        </nav>
 
-        <button type="submit">Verify Email</button>
-      </form>
-      <a class="home-link" href="/">Go to Home</a>
-    </div>
+        <div class="flex items-center space-x-4">
+          <button
+            id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+          <a
+            id="login-btn"
+            href="/auth/login"
+            class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >Login</a
+          >
+          <button
+            id="logout-btn"
+            class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center pt-24 pb-12">
+      <div class="verification-card">
+        <h1 class="text-3xl font-bold text-gradient dark:text-gradient mb-6">
+          Email Verification
+        </h1>
+        <p class="text-gray-900 dark:text-gray-900 mb-6">
+          Please check your email for the verification code.
+        </p>
+        <form action="/auth/verify-email" method="POST" class="space-y-4">
+          <input type="hidden" name="email" value="{{ email }}" />
+
+          <label
+            for="verification_code"
+            class="block text-left text-sm font-medium text-gradient dark:text-gradient"
+          >
+            Verification Code:
+          </label>
+          <input
+            type="text"
+            id="verification_code"
+            name="verification_code"
+            required
+            class="mt-1 block w-full px-4 py-2 rounded-lg border focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+
+          <button
+            type="submit"
+            class="w-full px-4 py-2 mt-4 text-white font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+          >
+            Verify Email
+          </button>
+        </form>
+        <a
+          class="mt-4 inline-block text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          href="/"
+        >
+          Go to Home
+        </a>
+      </div>
+    </main>
+
     <footer
-      style="background-color: var(--teal-dark); color: var(--white)"
-      class="py-12"
+      class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-6 transition-colors duration-300 mt-auto"
     >
-      <div class="max-w-7xl mx-auto px-6 text-center">
+      <div class="max-w-7xl mx-auto px-6 text-center text-sm">
         <p>
           Copyright © <span id="year"></span> Daniel Hakobyan. All rights
           reserved. This code is proprietary and confidential. Unauthorized
           copying, redistribution, modification, or use is strictly prohibited.
         </p>
-        <script>
-          document.getElementById("year").textContent =
-            new Date().getFullYear();
-        </script>
       </div>
     </footer>
+
+    <script>
+      AOS.init({ duration: 800, once: true });
+
+      // Dark mode toggle logic
+      const toggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
+
+      const setDarkMode = (isDark) => {
+        if (isDark) {
+          html.classList.add("dark");
+          Cookies.set("theme", "dark", { expires: 365 });
+        } else {
+          html.classList.remove("dark");
+          Cookies.set("theme", "light", { expires: 365 });
+        }
+      };
+
+      const currentTheme = Cookies.get("theme");
+      if (currentTheme) {
+        setDarkMode(currentTheme === "dark");
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setDarkMode(true);
+      }
+
+      toggle.addEventListener("click", () => {
+        setDarkMode(!html.classList.contains("dark"));
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>

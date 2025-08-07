@@ -1,711 +1,687 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Վանաձորի Քաղաքապետարան | Միջոցառումների գրանցում</title>
+    <title>Create Event - Rockville City Portal</title>
     <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cookie handling -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <!-- Font Awesome -->
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
       rel="stylesheet"
     />
     <style>
       :root {
-        --success-color: #2ecc71;
-        --border-color: #3e8edf;
-        --teal-deep: #006d77;
-        --mint-ice: #edf6f9;
-        --pure-white: #fafafa;
-        --mint-medium: #83c5be;
-        --teal-dark: #005b63;
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+        --dark-blue: #1e3a8a;
+        --light-blue: #dbeafe;
         --white: #ffffff;
-        --light-gray: #f0f0f0;
-        --medium-gray: #ccc;
-        --dark-gray: #333;
-        --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-600: #4b5563;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --success-color: #10b981;
       }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+        --dark-blue: #1e40af;
+        --light-blue: #1e3a8a;
+        --white: #111827;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-600: #9ca3af;
+        --gray-800: #e5e7eb;
+        --gray-900: #f9fafb;
       }
 
       body {
-        font-family: "Roboto", sans-serif;
-        background-color: #f5f7fa;
-        color: var(--text-color);
-        min-height: 100vh;
-        line-height: 1.6;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      .bg-circle {
-        position: fixed;
-        border-radius: 50%;
-        background: #006d771e;
-        z-index: -1;
-        animation: float 15s infinite linear;
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
-      /* ✨ Enhanced ambient lighting */
-      .bg-glow {
-        position: fixed;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle,
-          rgba(131, 197, 190, 0.2),
-          transparent 70%
+
+      .text-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-gold)
         );
-        box-shadow: 0 0 100px 40px rgba(131, 197, 190, 0.15);
-        z-index: -2;
-        animation: glowFloat 20s ease-in-out infinite alternate;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
-      .circle-1 {
-        width: 300px;
-        height: 300px;
-        top: -50px;
-        left: -50px;
-        animation-delay: 0s;
-      }
-
-      .circle-2 {
-        width: 200px;
-        height: 200px;
-        bottom: 100px;
-        right: -50px;
-        animation-delay: 3s;
-      }
-
-      .circle-3 {
-        width: 150px;
-        height: 150px;
-        top: 30%;
-        right: 20%;
-        animation-delay: 6s;
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
       }
 
       @keyframes float {
-        0% {
-          transform: translate(0, 0) rotate(0deg);
-        }
-        25% {
-          transform: translate(20px, 20px) rotate(5deg);
+        0%,
+        100% {
+          transform: translateY(0px);
         }
         50% {
-          transform: translate(0, 40px) rotate(0deg);
+          transform: translateY(-10px);
         }
-        75% {
-          transform: translate(-20px, 20px) rotate(-5deg);
-        }
-        100% {
-          transform: translate(0, 0) rotate(0deg);
-        }
-      }
-
-      .container {
-        max-width: 900px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-      }
-
-      .official-header {
-        background-color: var(--teal-deep);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 8px 8px 0 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .official-header .logo-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .official-logo {
-        height: 150px;
-      }
-
-      .official-title {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin: 0;
-      }
-
-      .official-subtitle {
-        font-size: 1rem;
-        opacity: 0.9;
-        margin-top: 0.3rem;
-      }
-
-      .form-container {
-        background: var(--white);
-        border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 20px 50px rgba(68, 231, 217, 0.635),
-          0 0 30px rgba(131, 197, 190, 0.2); /* Glow effect */
-        margin-bottom: 2rem;
-        border: 1px solid var(--medium-gray);
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-      }
-
-      .form-container::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(
-          90deg,
-          var(--teal-deep),
-          var(--mint-medium)
-        );
-      }
-      .form-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15),
-          0 0 40px rgba(0, 255, 229, 0.82);
       }
 
       .form-section {
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border-color);
+        transition: all 0.3s ease;
       }
 
-      .form-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
+      .form-section:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
       }
 
-      .section-title {
-        font-size: 1.25rem;
-        color: var(--teal-deep);
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--teal-deep);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .section-title i {
-        color: var(--teal-deep);
-      }
-
-      .form-group {
-        margin-bottom: 1.5rem;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--teal-deep);
-      }
-
-      .input-container {
-        position: relative;
-      }
-
-      .input-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--teal-deep);
-      }
-
-      input,
-      textarea,
-      select {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid var(--medium-gray);
-        border-radius: 6px;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-        background-color: var(--light-gray);
-      }
-
-      input:focus,
-      textarea:focus,
-      select:focus {
-        outline: none;
-        border-color: var(--teal-deep);
-        box-shadow: 0 0 0 3px rgba(26, 62, 114, 0.1);
-        background-color: white;
-      }
-
-      textarea {
-        min-height: 120px;
-        resize: vertical;
-        padding: 15px;
+      .input-focus:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
       }
 
       #osm-map {
-        height: 300px;
-        border-radius: 6px;
-        margin: 1rem 0;
-        border: 1px solid var(--border-color);
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: 500;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: none;
-        font-size: 1rem;
-        margin-right: 10px;
-        margin-bottom: 10px;
-      }
-
-      .btn-primary {
-        background-color: var(--teal-deep);
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background-color: #122a54;
-        transform: translateY(-1px);
-      }
-
-      .btn-secondary {
-        background-color: white;
-        color: var(--teal-deep);
-        border: 1px solid var(--teal-deep);
-      }
-
-      .btn-secondary:hover {
-        background-color: #f0f4f9;
-      }
-
-      .btn i {
-        margin-right: 8px;
-      }
-
-      .location-buttons {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-      }
-
-      .file-upload {
-        margin-top: 1rem;
-      }
-
-      .file-input {
-        display: none;
-      }
-
-      .file-label {
-        display: inline-block;
-        padding: 12px 20px;
-        background-color: var(--secondary-color);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: center;
-        width: 100%;
-        color: var(--text-color);
-        font-weight: 500;
-      }
-
-      .file-label:hover {
-        border-color: var(--teal-deep);
-        background-color: #e9ecef;
-      }
-
-      .file-label i {
-        margin-right: 8px;
-        color: var(--teal-deep);
-      }
-
-      .preview-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 15px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
       }
 
       .preview-item {
-        position: relative;
-        width: 100px;
-        height: 100px;
-        border-radius: 6px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
       }
 
-      .preview-item img,
-      .preview-item video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      .preview-item:hover {
+        transform: scale(1.05);
       }
 
-      .remove-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--secondary-blue)
+        );
+        transition: all 0.3s ease;
       }
 
-      .form-actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .submit-btn {
-        padding: 12px 24px;
-        font-size: 1.1rem;
-        background-color: var(--success-color);
-        color: white;
-        font-weight: 500;
-        border: none;
-      }
-
-      .submit-btn:hover {
-        background-color: #218838;
-        transform: translateY(-1px);
-      }
-
-      .back-btn {
-        background-color: transparent;
-        color: var(--teal-deep);
-        border: 1px solid var(--teal-deep);
-      }
-
-      .back-btn:hover {
-        background-color: #f0f4f9;
-      }
-
-      .footer-content {
-        text-align: center;
-        margin-top: 3rem;
-        color: #6c757d;
-        font-size: 0.9rem;
+      .btn-primary:hover {
+        background: linear-gradient(
+          135deg,
+          var(--dark-blue),
+          var(--primary-blue)
+        );
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
       }
 
       .required-field::after {
         content: " *";
-        color: #dc3545;
-      }
-      .divider {
-        border-top: 1px dashed rgba(0, 255, 229, 0.82);
-        width: 100%;
-        margin: 2rem 0;
+        color: #ef4444;
+        font-weight: bold;
       }
 
-      @media (max-width: 768px) {
-        .container {
-          padding: 0 0.5rem;
-          margin: 1rem auto;
-        }
-
-        .official-header {
-          flex-direction: column;
-          text-align: center;
-          gap: 1rem;
-          padding: 1rem;
-        }
-
-        .form-container {
-          padding: 1.5rem;
-        }
-
-        .location-buttons {
-          flex-direction: column;
-        }
-
-        .btn {
-          width: 100%;
-          margin-right: 0;
-        }
-
-        .form-actions {
-          flex-direction: column-reverse;
-          gap: 1rem;
-        }
-      }
-      .footer-content {
-        position: relative;
-        text-align: center;
-        margin-top: 3rem;
-        color: #6c757d;
-        font-size: 0.9rem;
-        padding: 4rem 0; /* Increase padding to make it larger */
-      }
-
-      .footer-content ::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 50vh; /* Adjust height so at least half of it is seen */
-        background: url("https://img.freepik.com/premium-vector/vanadzor-armenia-daytime-cityscape-urban-architecture-buildings-skyline_1310786-50531.jpg")
-          no-repeat center/cover;
-        opacity: 0.4; /* More visible */
-        z-index: -1;
+      .hero-pattern {
+        background-image: radial-gradient(
+            circle at 25px 25px,
+            rgba(59, 130, 246, 0.2) 2px,
+            transparent 0
+          ),
+          radial-gradient(
+            circle at 75px 75px,
+            rgba(245, 158, 11, 0.2) 2px,
+            transparent 0
+          );
+        background-size: 100px 100px;
       }
     </style>
   </head>
-  <body>
-    <div class="bg-circle circle-1"></div>
-    <div class="bg-circle circle-2"></div>
-    <div class="bg-circle circle-3"></div>
 
-    <div class="container">
-      <header class="official-header">
-        <div class="logo-container">
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjbRMkEENZ3zBHKyUQ44DjvVSfESy90zs_JA&s"
-            alt="Վանաձորի Քաղաքապետարանի զինանշան"
-            class="official-logo"
-          />
-          <div>
-            <h1 class="official-title">Վանաձորի Քաղաքապետարան</h1>
-            <p class="official-subtitle">Միջոցառումների գրանցման համակարգ</p>
-          </div>
-        </div>
-      </header>
-      <div class="divider"></div>
-      <form
-        id="eventForm"
-        class="form-container"
-        action="/event/"
-        method="POST"
-        enctype="multipart/form-data"
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen"
+  >
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
-        <div class="form-section">
-          <h2 class="section-title">
-            <i class="fas fa-info-circle"></i> Հիմնական տեղեկություն
-          </h2>
-
-          <div class="form-group">
-            <label for="title" class="required-field"
-              ><i class="fas fa-heading"></i> Միջոցառման անվանում</label
-            >
-            <div class="input-container">
-              <i class="fas fa-heading input-icon"></i>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                placeholder="Մուտքագրեք միջոցառման անվանումը"
-                required
-              />
-            </div>
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center"
+          >
+            <i class="fas fa-city text-white text-lg"></i>
           </div>
-
-          <div class="form-group">
-            <label for="description" class="required-field"
-              ><i class="fas fa-align-left"></i> Մանրամասն նկարագրություն</label
-            >
-            <textarea
-              id="description"
-              name="description"
-              placeholder="Միջոցառման մանրամասն նկարագրություն, ծրագիր, մասնակիցներ և այլ տեղեկություններ"
-              required
-            ></textarea>
-          </div>
+          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
         </div>
 
-        <div class="form-section">
-          <h2 class="section-title">
-            <i class="fas fa-calendar-alt"></i> Ժամանակ և տևողություն
-          </h2>
+        <nav class="hidden md:flex items-center space-x-8">
+          <a
+            href="/"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a
+            href="/about"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >About</a
+          >
+          <a
+            href="/contact"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Contact</a
+          >
+          <a
+            href="/news"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >News</a
+          >
+        </nav>
 
-          <div class="form-group">
-            <label for="datetime" class="required-field"
-              ><i class="far fa-clock"></i> Միջոցառման ամսաթիվ և ժամ</label
-            >
-            <div class="input-container">
-              <i class="far fa-calendar-alt input-icon"></i>
-              <input
-                type="datetime-local"
-                id="datetime"
-                name="datetime"
-                required
-              />
-            </div>
-          </div>
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button
+            id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
 
-          <div class="form-group">
-            <label for="duration" class="required-field"
-              ><i class="fas fa-hourglass-half"></i> Տևողություն</label
-            >
-            <div class="input-container">
-              <i class="fas fa-clock input-icon"></i>
-              <input
-                type="text"
-                id="duration"
-                name="duration"
-                placeholder="hh:mm"
-                pattern="[0-9]{1,2}:[0-9]{2}"
-                required
-              />
-            </div>
-            <small class="text-muted">Օրինակ՝ 02:30 (2 ժամ 30 րոպե)</small>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h2 class="section-title">
-            <i class="fas fa-map-marker-alt"></i> Տեղադրություն
-          </h2>
-
-          <div class="form-group">
-            <label class="required-field">Տեղադրության նշում</label>
-            <div class="location-buttons">
-              <button type="button" id="useMyLocation" class="btn btn-primary">
-                <i class="fas fa-location-arrow"></i> Օգտագործել իմ
-                տեղադրությունը
-              </button>
-              <button type="button" id="selectOnMap" class="btn btn-secondary">
-                <i class="fas fa-map-marked-alt"></i> Նշել քարտեզի վրա
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="location" class="required-field"
-              ><i class="fas fa-globe-europe"></i> Կոորդինատներ</label
-            >
-            <div class="input-container">
-              <i class="fas fa-map-pin input-icon"></i>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                placeholder="Կոորդինատներ"
-                readonly
-                required
-              />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="location-description"
-              ><i class="fas fa-info-circle"></i> Տարածքի նկարագրություն</label
-            >
-            <div class="input-container">
-              <i class="fas fa-road input-icon"></i>
-              <input
-                type="text"
-                id="location-description"
-                name="location_description"
-                placeholder="Փողոցի անվանում, շենքի նկարագրություն և այլն"
-              />
-            </div>
-          </div>
-
-          <div id="osm-map"></div>
-        </div>
-
-        <div class="form-section">
-          <h2 class="section-title">
-            <i class="fas fa-images"></i> Մեդիա նյութեր
-          </h2>
-
-          <div class="form-group">
-            <label><i class="fas fa-camera"></i> Նկարներ</label>
-            <div class="file-upload">
-              <input
-                type="file"
-                id="photo"
-                name="photo"
-                accept="image/*"
-                class="file-input"
-                multiple
-              />
-              <label for="photo" class="file-label">
-                <i class="fas fa-upload"></i> Ընտրել նկարներ
-              </label>
-              <div class="preview-container" id="photo-preview"></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label><i class="fas fa-video"></i> Տեսանյութ</label>
-            <div class="file-upload">
-              <input
-                type="file"
-                id="video"
-                name="video"
-                accept="video/*"
-                class="file-input"
-              />
-              <label for="video" class="file-label">
-                <i class="fas fa-upload"></i> Ընտրել տեսանյութ
-              </label>
-              <div class="preview-container" id="video-preview"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <a href="/" class="btn back-btn">
-            <i class="fas fa-arrow-left"></i> Վերադառնալ
+          <!-- Auth Buttons -->
+          <a
+            id="login-btn"
+            href="/auth/login"
+            class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Login
           </a>
-          <button type="submit" class="btn submit-btn">
-            <i class="fas fa-check-circle"></i> Գրանցել միջոցառումը
+          <button
+            id="logout-btn"
+            class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Logout
           </button>
         </div>
-      </form>
+      </div>
+    </header>
 
-      <footer>
-        <div class="footer-content">
-          <p>
-            &copy; <span id="year"></span> Built with Python(FastAPI) and
-            MongoDB
-          </p>
+    <!-- Hero Section -->
+    <section
+      class="relative pt-24 pb-12 bg-gradient-to-br from-blue-600 via-purple-600 to-yellow-500 overflow-hidden hero-pattern"
+    >
+      <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+      <div class="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+        <div class="animate-float">
+          <i class="fas fa-calendar-plus text-6xl mb-6 text-yellow-300"></i>
         </div>
-      </footer>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          Create Community <span class="text-yellow-300">Event</span>
+        </h1>
+        <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+          Bring the Rockville community together by organizing events that
+          matter
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <!-- Form Container -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden"
+      >
+        <!-- Form Header -->
+        <div
+          class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white"
+        >
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-calendar-alt text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold">Event Registration</h2>
+              <p class="text-blue-100">
+                Fill out the details for your community event
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Content -->
+        <form
+          id="eventForm"
+          action="/event/"
+          method="POST"
+          enctype="multipart/form-data"
+          class="p-8 space-y-8"
+        >
+          <!-- Basic Information Section -->
+          <div class="form-section bg-gray-50 dark:bg-gray-700 rounded-2xl p-6">
+            <div class="flex items-center mb-6">
+              <div
+                class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3"
+              >
+                <i class="fas fa-info-circle text-white text-sm"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                Basic Information
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="lg:col-span-2">
+                <label
+                  for="title"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 required-field"
+                >
+                  Event Title
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <i class="fas fa-heading text-gray-400"></i>
+                  </div>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Enter your event title"
+                    required
+                    class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
+                  />
+                </div>
+              </div>
+
+              <div class="lg:col-span-2">
+                <label
+                  for="description"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 required-field"
+                >
+                  Event Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  placeholder="Provide a detailed description of your event, including activities, participants, and any special information"
+                  required
+                  rows="4"
+                  class="input-focus block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-vertical transition-all duration-300"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date & Time Section -->
+          <div class="form-section bg-gray-50 dark:bg-gray-700 rounded-2xl p-6">
+            <div class="flex items-center mb-6">
+              <div
+                class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
+              >
+                <i class="fas fa-clock text-white text-sm"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                Date & Time
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="datetime"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 required-field"
+                >
+                  Event Date & Time
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <i class="fas fa-calendar-alt text-gray-400"></i>
+                  </div>
+                  <input
+                    type="datetime-local"
+                    id="datetime"
+                    name="datetime"
+                    required
+                    class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="duration"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 required-field"
+                >
+                  Duration
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <i class="fas fa-hourglass-half text-gray-400"></i>
+                  </div>
+                  <input
+                    type="text"
+                    id="duration"
+                    name="duration"
+                    placeholder="2:30 (2 hours 30 minutes)"
+                    pattern="[0-9]{1,2}:[0-9]{2}"
+                    required
+                    class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
+                  />
+                </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Format: HH:MM (e.g., 02:30 for 2 hours 30 minutes)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Section -->
+          <div class="form-section bg-gray-50 dark:bg-gray-700 rounded-2xl p-6">
+            <div class="flex items-center mb-6">
+              <div
+                class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3"
+              >
+                <i class="fas fa-map-marker-alt text-white text-sm"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                Location
+              </h3>
+            </div>
+
+            <div class="space-y-6">
+              <div>
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 required-field"
+                >
+                  Select Location
+                </label>
+                <div class="flex flex-wrap gap-3 mb-4">
+                  <button
+                    type="button"
+                    id="useMyLocation"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    <i class="fas fa-location-arrow mr-2"></i>
+                    Use My Location
+                  </button>
+                  <button
+                    type="button"
+                    id="selectOnMap"
+                    class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                  >
+                    <i class="fas fa-map-marked-alt mr-2"></i>
+                    Select on Map
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    for="location"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 required-field"
+                  >
+                    Coordinates
+                  </label>
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-map-pin text-gray-400"></i>
+                    </div>
+                    <input
+                      type="text"
+                      id="location"
+                      name="location"
+                      placeholder="Coordinates will appear here"
+                      readonly
+                      required
+                      class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    for="location-description"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Address/Description
+                  </label>
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-road text-gray-400"></i>
+                    </div>
+                    <input
+                      type="text"
+                      id="location-description"
+                      name="location_description"
+                      placeholder="Street address, building name, or landmark"
+                      class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div id="osm-map" class="h-80 w-full"></div>
+            </div>
+          </div>
+
+          <!-- Media Section -->
+          <div class="form-section bg-gray-50 dark:bg-gray-700 rounded-2xl p-6">
+            <div class="flex items-center mb-6">
+              <div
+                class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-3"
+              >
+                <i class="fas fa-images text-white text-sm"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                Media Files
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Photos -->
+              <div>
+                <label
+                  for="photo"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
+                >
+                  Event Photos
+                </label>
+                <div class="relative">
+                  <input
+                    type="file"
+                    id="photo"
+                    name="photo"
+                    accept="image/*"
+                    multiple
+                    class="hidden"
+                  />
+                  <label
+                    for="photo"
+                    class="cursor-pointer block w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-white dark:bg-gray-800"
+                  >
+                    <div class="text-center">
+                      <i class="fas fa-camera text-3xl text-gray-400 mb-2"></i>
+                      <p
+                        class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                      >
+                        Click to upload photos
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        PNG, JPG, JPEG up to 10MB each
+                      </p>
+                    </div>
+                  </label>
+                </div>
+                <div
+                  id="photo-preview"
+                  class="mt-4 grid grid-cols-3 gap-3"
+                ></div>
+              </div>
+
+              <!-- Video -->
+              <div>
+                <label
+                  for="video"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
+                >
+                  Event Video
+                </label>
+                <div class="relative">
+                  <input
+                    type="file"
+                    id="video"
+                    name="video"
+                    accept="video/*"
+                    class="hidden"
+                  />
+                  <label
+                    for="video"
+                    class="cursor-pointer block w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-white dark:bg-gray-800"
+                  >
+                    <div class="text-center">
+                      <i class="fas fa-video text-3xl text-gray-400 mb-2"></i>
+                      <p
+                        class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                      >
+                        Click to upload video
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        MP4, AVI, MOV up to 50MB
+                      </p>
+                    </div>
+                  </label>
+                </div>
+                <div id="video-preview" class="mt-4"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-600"
+          >
+            <a
+              href="/"
+              class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+            >
+              <i class="fas fa-arrow-left mr-2"></i>
+              Back to Home
+            </a>
+
+            <button
+              type="submit"
+              class="btn-primary inline-flex items-center px-8 py-3 text-white rounded-xl font-semibold"
+            >
+              <i class="fas fa-check-circle mr-2"></i>
+              Create Event
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-12">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <div class="flex items-center justify-center mb-6">
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-city text-white text-xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Rockville City Portal</h3>
+        </div>
+        <p class="text-gray-400 mb-4">
+          Building a better community together through technology and civic
+          engagement.
+        </p>
+        <p class="text-gray-500">
+          © <span id="year"></span> Rockville City Portal. All rights reserved.
+        </p>
+      </div>
+    </footer>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-      // Initialize map
-      const map = L.map("osm-map").setView([40.8128, 44.4884], 13);
+      // Dark mode functionality
+      const darkModeToggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
+
+      const currentTheme = localStorage.getItem("theme") || "light";
+      html.classList.toggle("dark", currentTheme === "dark");
+
+      darkModeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        const theme = html.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", theme);
+      });
+
+      // Auth functionality
+      document.addEventListener("DOMContentLoaded", async function () {
+        const token = Cookies.get("access_token");
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        if (token) {
+          loginBtn?.classList.add("hidden");
+          logoutBtn?.classList.remove("hidden");
+
+          logoutBtn?.addEventListener("click", async () => {
+            try {
+              const response = await fetch("/auth/logout", { method: "POST" });
+              Cookies.remove("access_token");
+              window.location.href = response.redirected ? response.url : "/";
+            } catch (err) {
+              console.error("Logout failed:", err);
+              alert("Something went wrong while logging out.");
+            }
+          });
+        } else {
+          loginBtn?.classList.remove("hidden");
+          logoutBtn?.classList.add("hidden");
+        }
+      });
+
+      // Initialize map centered on Rockville, MD
+      const map = L.map("osm-map").setView([39.084, -77.1528], 13);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
@@ -739,7 +715,7 @@
         .addEventListener("click", function () {
           if (navigator.geolocation) {
             this.innerHTML =
-              '<i class="fas fa-spinner fa-spin"></i> Որոնում...';
+              '<i class="fas fa-spinner fa-spin mr-2"></i>Finding location...';
 
             navigator.geolocation.getCurrentPosition(
               function (position) {
@@ -759,12 +735,12 @@
                 )}, ${lng.toFixed(6)}`;
 
                 document.getElementById("useMyLocation").innerHTML =
-                  '<i class="fas fa-location-arrow"></i> Օգտագործել իմ տեղադրությունը';
+                  '<i class="fas fa-location-arrow mr-2"></i>Use My Location';
               },
               function (error) {
-                alert("Տեղադրությունը չի կարող որոշվել: " + error.message);
+                alert("Unable to retrieve location: " + error.message);
                 document.getElementById("useMyLocation").innerHTML =
-                  '<i class="fas fa-location-arrow"></i> Օգտագործել իմ տեղադրությունը';
+                  '<i class="fas fa-location-arrow mr-2"></i>Use My Location';
               }
             );
           } else {
@@ -776,7 +752,7 @@
       document
         .getElementById("selectOnMap")
         .addEventListener("click", function () {
-          alert("Խնդրում ենք սեղմել քարտեզի վրա՝ տեղադրությունը նշելու համար");
+          alert("Click anywhere on the map to set the event location");
         });
 
       // File preview functionality
@@ -789,13 +765,17 @@
 
           reader.onload = function (event) {
             const previewItem = document.createElement("div");
-            previewItem.className = "preview-item";
+            previewItem.className =
+              "preview-item relative rounded-lg overflow-hidden shadow-md";
 
             const img = document.createElement("img");
             img.src = event.target.result;
+            img.className = "w-full h-20 object-cover";
 
-            const removeBtn = document.createElement("div");
-            removeBtn.className = "remove-btn";
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.className =
+              "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors";
             removeBtn.innerHTML = "×";
             removeBtn.addEventListener("click", function () {
               previewItem.remove();
@@ -819,18 +799,23 @@
           const url = URL.createObjectURL(file);
 
           const previewItem = document.createElement("div");
-          previewItem.className = "preview-item";
+          previewItem.className =
+            "preview-item relative rounded-lg overflow-hidden shadow-md";
 
           const video = document.createElement("video");
           video.src = url;
           video.controls = true;
+          video.className = "w-full h-32 object-cover";
 
-          const removeBtn = document.createElement("div");
-          removeBtn.className = "remove-btn";
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className =
+            "absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm hover:bg-red-600 transition-colors";
           removeBtn.innerHTML = "×";
           removeBtn.addEventListener("click", function () {
             previewItem.remove();
             document.getElementById("video").value = "";
+            URL.revokeObjectURL(url);
           });
 
           previewItem.appendChild(video);
@@ -841,6 +826,101 @@
 
       // Set current year in footer
       document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Form validation and enhancement
+      const form = document.getElementById("eventForm");
+      const inputs = form.querySelectorAll(
+        "input[required], textarea[required]"
+      );
+
+      // Add real-time validation feedback
+      inputs.forEach((input) => {
+        input.addEventListener("blur", function () {
+          if (this.value.trim() === "") {
+            this.classList.add("border-red-500");
+            this.classList.remove("border-gray-300", "dark:border-gray-600");
+          } else {
+            this.classList.remove("border-red-500");
+            this.classList.add("border-green-500");
+          }
+        });
+
+        input.addEventListener("input", function () {
+          if (
+            this.classList.contains("border-red-500") &&
+            this.value.trim() !== ""
+          ) {
+            this.classList.remove("border-red-500");
+            this.classList.add("border-green-500");
+          }
+        });
+      });
+
+      // Form submission with loading state
+      form.addEventListener("submit", function (e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Event...';
+
+        // Re-enable button after 3 seconds if form hasn't actually submitted
+        setTimeout(() => {
+          if (submitBtn.disabled) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+          }
+        }, 3000);
+      });
+
+      // Duration input formatting
+      const durationInput = document.getElementById("duration");
+      durationInput.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/[^\d:]/g, "");
+
+        // Auto-format as user types
+        if (value.length === 2 && !value.includes(":")) {
+          value = value + ":";
+        }
+
+        e.target.value = value;
+      });
+
+      // Set minimum date to today
+      const dateTimeInput = document.getElementById("datetime");
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+
+      dateTimeInput.min = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+      // Smooth scrolling to sections on form errors
+      function scrollToFirstError() {
+        const firstError = form.querySelector(".border-red-500");
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+          firstError.focus();
+        }
+      }
+
+      // Enhanced map interaction
+      map.on("moveend", function () {
+        // Optional: Add any behavior when map view changes
+      });
+
+      // Add click handler for better UX
+      document.querySelectorAll(".form-section").forEach((section) => {
+        section.addEventListener("click", function () {
+          const firstInput = section.querySelector("input, textarea");
+          if (firstInput && !firstInput.matches(":focus")) {
+            firstInput.focus();
+          }
+        });
+      });
     </script>
   </body>
 </html>
