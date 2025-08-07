@@ -15,148 +15,121 @@
         --primary-blue: #1e40af;
         --secondary-blue: #3b82f6;
         --accent-gold: #f59e0b;
-        --dark-blue: #1e3a8a;
-        --light-blue: #dbeafe;
-        --white: #ffffff;
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-600: #4b5563;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
-          0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-          0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-          0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
-
-      .dark {
-        --primary-blue: #3b82f6;
-        --secondary-blue: #60a5fa;
-        --accent-gold: #fbbf24;
-        --dark-blue: #1e40af;
-        --light-blue: #1e3a8a;
-        --white: #111827;
-        --gray-50: #1f2937;
-        --gray-100: #374151;
-        --gray-200: #4b5563;
-        --gray-300: #6b7280;
-        --gray-600: #9ca3af;
-        --gray-800: #e5e7eb;
-        --gray-900: #f9fafb;
+      .badge-pending {
+        background-color: #fef3c7;
+        color: #b45309;
       }
-
-      body {
-        transition: background-color 0.3s ease, color 0.3s ease;
+      .badge-resolved {
+        background-color: #d1fae5;
+        color: #065f46;
       }
-      .glass-effect {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+      .badge-canceled {
+        background-color: #fee2e2;
+        color: #991b1b;
       }
-
-      .text-gradient {
+      #imageModal {
+        display: none;
+      }
+      .hero-gradient {
         background: linear-gradient(
           135deg,
-          var(--primary-blue),
-          var(--accent-gold)
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 50%,
+          var(--accent-gold) 100%
         );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
       }
-
-      .card-hover {
-        transition: all 0.3s ease;
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
       }
-
-      .card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-xl);
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
       }
     </style>
   </head>
-  <body
-    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
-  >
-    <header class="fixed w-full top-0 left-0 z-50 glass-effect">
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <header
+      class="fixed w-full top-0 left-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
+    >
       <div
         class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
         <div class="flex items-center space-x-4">
           <div
-            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-gold-500 rounded-full flex items-center justify-center"
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center"
           >
             <i class="fas fa-city text-white text-lg"></i>
           </div>
-          <h1 class="text-2xl font-bold text-gradient">Rockville</h1>
+          <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+            Rockville
+          </h1>
         </div>
-        <nav class="hidden md:flex items-center space-x-8">
+        <nav
+          class="hidden md:flex items-center space-x-8 text-gray-600 dark:text-gray-300 font-semibold"
+        >
           <a
-            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             href="/"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >Home</a
-          >
-          <a
-            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          ><a
             href="/about"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >About</a
-          >
-          <a
-            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          ><a
             href="/contact"
-            >Contact</a
-          >
-          <a
             class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >Contact</a
+          ><a
             href="/news"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >News</a
           >
         </nav>
         <div class="flex items-center space-x-4">
           <button
-            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
-            <i class="fas fa-moon dark:hidden"></i>
-            <i class="fas fa-sun hidden dark:block"></i>
-          </button>
-          <a
-            class="hidden px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            href="/auth/login"
-            id="login-btn"
-          >
-            Login
-          </a>
-          <button
-            class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            id="logout-btn"
-          >
-            Logout
+            <i class="fas fa-moon dark:hidden"></i
+            ><i class="fas fa-sun hidden dark:block"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <main class="pt-24 pb-12 bg-gray-50 dark:bg-gray-900">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold mb-4 text-gradient">
-            Reported Community Issues
+    <main class="pt-20">
+      <section
+        class="relative py-24 flex items-center justify-center hero-gradient overflow-hidden"
+      >
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+            alt="Rockville City"
+            class="w-full h-full object-cover opacity-30"
+          />
+        </div>
+        <div class="relative z-10 text-center px-4 text-white">
+          <h2 class="text-4xl font-bold mb-4 animate-float">
+            Reported Community <span class="text-yellow-400">Issues</span>
           </h2>
-          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p class="text-lg text-gray-200 max-w-3xl mx-auto">
             Browse through the issues reported by the Rockville community.
           </p>
         </div>
+      </section>
 
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="mb-8 flex justify-end">
           <select
-            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             id="filterStatus"
+            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
@@ -168,8 +141,8 @@
         <div class="space-y-8" id="issuesContainer">
           {% for issue in issues %}
           <div
-            class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 card-hover shadow-lg issue"
-            data-status="{{ issue.status|lower|replace(' ', '-') }}"
+            class="issue bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200 dark:border-gray-700"
+            data-status="{{ issue.status|lower }}"
           >
             <div
               class="flex flex-col md:flex-row justify-between gap-6 items-start"
@@ -180,7 +153,7 @@
                     {{ issue.title }}
                   </h3>
                   <span
-                    class="text-xs font-semibold px-3 py-1 rounded-full {% if issue.status == 'pending' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% elif issue.status == 'resolved' %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% elif issue.status == 'canceled' %} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 {% endif %}"
+                    class="text-xs font-semibold px-3 py-1 rounded-full badge-{{ issue.status|lower }}"
                     >{{ issue.status|title }}</span
                   >
                 </div>
@@ -190,27 +163,47 @@
                 >
                   {{ issue.description }}
                 </p>
+
                 <div
-                  class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-500 dark:text-gray-400"
+                  class="flex flex-col space-y-3 text-sm text-gray-500 dark:text-gray-400"
                 >
                   <div class="flex items-center gap-2">
-                    <i class="fas fa-map-marker-alt text-blue-500"></i>
-                    <span>{{ issue.location }}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      class="w-5 h-5 text-gray-400"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.1.4-.223.654-.369.259-.146.545-.31.85-.496.306-.187.628-.398.956-.629.328-.23.668-.48.992-.742.324-.263.629-.554.909-.868.28-.315.525-.655.738-1.01a11.95 11.95 0 0 0 .841-2.454c.063-.344.103-.7.132-1.061.029-.361.04-.734.04-1.123A8 8 0 0 0 10 2 8 8 0 0 0 2 10c0 .389.01.762.04 1.123.03.361.07.717.132 1.061a11.95 11.95 0 0 0 .842 2.454c.212.355.457.695.738 1.01.28.314.585.605.91.868.323.262.663.512.992.742.328.23.65.442.956-.63.305.185.591.35.85.495.254.147.468.27.654.37a5.741 5.741 0 0 0 .281.14l.018.008.006.003Z"
+                        clip-rule="evenodd"
+                      /></svg
+                    ><span>{{ issue.location }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <i class="fas fa-calendar-alt text-green-500"></i>
-                    <span>{{ issue.created_at }}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      class="w-5 h-5 text-gray-400"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5h10.5a.75.75 0 0 0 0-1.5H4.75a.75.75 0 0 0 0 1.5Z"
+                        clip-rule="evenodd"
+                      /></svg
+                    ><span>{{ issue.created_at }}</span>
                   </div>
                 </div>
               </div>
 
               <div class="w-full md:w-auto mt-4 md:mt-0">
                 <button
-                  class="w-full px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center justify-center gap-2"
+                  class="w-full px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                   onclick="getSuggestion('{{ issue._id }}')"
                 >
-                  <i class="fas fa-lightbulb"></i>
-                  <span>AI Suggestion</span>
+                  <i class="fas fa-lightbulb"></i><span>AI Suggestion</span>
                 </button>
               </div>
             </div>
@@ -224,15 +217,17 @@
               ></div>
             </div>
 
-            {% if issue.photo and issue.photo != "None" or issue.video and
-            issue.video != "None" %}
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% if issue.photo or issue.video %}
+            <div
+              class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
               {% if issue.photo and issue.photo != "None" %}
               <div>
                 <img
-                  class="w-full h-auto rounded-lg shadow-md"
                   src="{{ issue.photo }}"
+                  onclick="openModal('{{ issue.photo }}')"
                   alt="Issue Photo"
+                  class="w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-xl transition"
                 />
               </div>
               {% endif %} {% if issue.video and issue.video != "None" %}
@@ -247,158 +242,128 @@
             {% endif %}
           </div>
           {% else %}
-          <div
-            class="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-lg"
-          >
-            <div
-              class="w-20 h-20 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <i
-                class="fas fa-exclamation-circle text-3xl text-yellow-600 dark:text-yellow-400"
-              ></i>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              No Issues Found
-            </h3>
-            <p class="text-gray-600 dark:text-gray-400">
-              There are no reported issues to display at the moment.
-            </p>
+          <div class="text-center py-20">
+            <h3 class="text-2xl font-bold">No Issues Found</h3>
           </div>
           {% endfor %}
         </div>
       </div>
     </main>
 
-    <footer class="bg-gray-900 text-white py-12">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <div class="flex items-center justify-center mb-6">
-          <div
-            class="w-12 h-12 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center mr-4"
+    <div
+      id="imageModal"
+      class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4"
+    >
+      <div class="relative w-full max-w-4xl max-h-full">
+        <img
+          id="modalImage"
+          src=""
+          alt="Full-screen view"
+          class="w-full h-full object-contain rounded-lg"
+        />
+        <button
+          id="closeModal"
+          class="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/75 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <i class="fas fa-city text-white text-xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold">Rockville, Maryland</h3>
-        </div>
-        <p class="text-gray-400 mb-4">
-          Building a better community together through technology and civic
-          engagement.
-        </p>
-        <p class="text-gray-500">
-          © <span id="year"></span> Rockville City Portal. All rights reserved.
-        </p>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
       </div>
-    </footer>
+    </div>
 
     <script>
-      // Dark mode toggle
-      const darkModeToggle = document.getElementById("dark-mode-toggle");
-      const html = document.documentElement;
+      // ✅ Modal Logic ✅
+      const modal = document.getElementById("imageModal");
+      const modalImg = document.getElementById("modalImage");
+      const closeModalBtn = document.getElementById("closeModal");
 
-      const currentTheme = localStorage.getItem("theme") || "light";
-      html.classList.toggle("dark", currentTheme === "dark");
+      function openModal(src) {
+        modalImg.src = src;
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
 
-      darkModeToggle.addEventListener("click", () => {
-        html.classList.toggle("dark");
-        const theme = html.classList.contains("dark") ? "dark" : "light";
-        localStorage.setItem("theme", theme);
+      function closeModal() {
+        modal.style.display = "none";
+        modalImg.src = "";
+        document.body.style.overflow = "auto";
+      }
+
+      closeModalBtn.onclick = closeModal;
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
       });
-
-      // Auth buttons visibility
-      document.addEventListener("DOMContentLoaded", function () {
-        const token = Cookies.get("access_token");
-        const loginBtn = document.getElementById("login-btn");
-        const logoutBtn = document.getElementById("logout-btn");
-
-        if (token) {
-          loginBtn?.classList.add("hidden");
-          logoutBtn?.classList.remove("hidden");
-        } else {
-          loginBtn?.classList.remove("hidden");
-          logoutBtn?.classList.add("hidden");
-        }
-
-        logoutBtn?.addEventListener("click", async () => {
-          try {
-            await fetch("/auth/logout", { method: "POST" });
-            Cookies.remove("access_token");
-            window.location.href = "/";
-          } catch (err) {
-            console.error("Logout failed:", err);
-          }
-        });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.style.display === "flex") closeModal();
       });
-
-      // Update footer year
-      document.getElementById("year").textContent = new Date().getFullYear();
 
       // Filtering logic
       document
         .getElementById("filterStatus")
         .addEventListener("change", function () {
           const selectedStatus = this.value;
-          const issues = document.querySelectorAll(".issue");
-
-          issues.forEach((issue) => {
-            if (
+          document.querySelectorAll(".issue").forEach((issue) => {
+            issue.style.display =
               selectedStatus === "all" ||
               issue.dataset.status === selectedStatus
-            ) {
-              issue.style.display = "block";
-            } else {
-              issue.style.display = "none";
-            }
+                ? "block"
+                : "none";
           });
         });
 
       // AI Suggestion logic
       async function getSuggestion(issueId) {
-        const descriptionElement = document.getElementById(
-          `issueDescription-${issueId}`
-        );
+        const description = document
+          .getElementById(`issueDescription-${issueId}`)
+          .textContent.trim();
         const box = document.getElementById(`suggestion-box-${issueId}`);
-
-        if (!descriptionElement || !box) {
-          console.error("Required elements not found for issue:", issueId);
-          if (box) box.textContent = "Error: Could not find issue details.";
-          return;
-        }
-
-        const description = descriptionElement.textContent.trim();
-
         if (!description) {
-          box.textContent =
-            "No description available to generate a suggestion.";
+          box.textContent = "No description available.";
           return;
         }
-
-        box.innerHTML = `<div class="flex items-center gap-2 text-blue-500">
-                                 <i class="fas fa-spinner fa-spin"></i>
-                                 <span>Generating AI suggestion...</span>
-                               </div>`;
-
+        box.innerHTML = `<div class="flex items-center gap-2 text-blue-500"><i class="fas fa-spinner fa-spin"></i><span>Generating AI suggestion...</span></div>`;
         try {
           const formData = new FormData();
           formData.append("description", description);
-
           const response = await fetch("/ai/suggest", {
             method: "POST",
             body: formData,
           });
-
           const data = await response.json();
-
           if (response.ok && data.suggestion) {
             box.innerHTML = `<strong class="text-gray-800 dark:text-white">AI Suggestion:</strong><p class="mt-1">${data.suggestion}</p>`;
           } else {
-            box.textContent =
-              data.error || "Failed to get a suggestion from the AI.";
+            box.textContent = data.error || "Failed to get a suggestion.";
           }
         } catch (err) {
-          console.error("Fetch error:", err);
           box.textContent =
             "An error occurred while contacting the AI service.";
         }
       }
+
+      // Dark Mode
+      const toggle = document.getElementById("dark-mode-toggle");
+      const html = document.documentElement;
+      const setDarkMode = (isDark) => {
+        html.classList.toggle("dark", isDark);
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      };
+      toggle.addEventListener("click", () =>
+        setDarkMode(!html.classList.contains("dark"))
+      );
+      setDarkMode(localStorage.getItem("theme") === "dark");
     </script>
   </body>
 </html>

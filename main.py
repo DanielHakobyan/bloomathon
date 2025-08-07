@@ -14,6 +14,7 @@ from news_scraper import fetch_news
 from fastapi.responses import RedirectResponse
 from datetime import datetime
 import httpx
+from typing import List
 
 load_dotenv()
 
@@ -263,17 +264,24 @@ async def get_events(request: Request):
     events = await db.events.find().to_list(100)
     for event in events:
         event["_id"] = str(event["_id"])
-        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
-        event["video"] = f"/files/{event['video']}" if event.get('video') else None
+        # Handle multiple photos
+        if event.get("photos"):
+            event["photos"] = [f"/files/{photo_id}" for photo_id in event["photos"]]
+        else:
+            event["photos"] = []
+        event["video"] = f"/files/{event['video']}" if event.get("video") else None
     return templates.TemplateResponse("view_events.html", {"request": request, "events": events})
+
 
 @app.get("/create_event", response_class=HTMLResponse)
 async def create_event_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
     if not current_user.get("is_verified", False):
         raise HTTPException(status_code=403, detail="Verify email first.")
     return templates.TemplateResponse("create_event.html", {"request": request})
-@app.post("/event")
-async def report_issue(
+
+# ✅ FIXED: Changed `photo: UploadFile` to `photos: List[UploadFile]`
+@app.post("/event/")
+async def create_event(
     request: Request,
     title: str = Form(...),
     description: str = Form(...),
@@ -281,13 +289,13 @@ async def report_issue(
     duration: str = Form(...),
     location: str = Form(...),
     location_description: str = Form(...),
-    photo: UploadFile = File(None),
+    photos: List[UploadFile] = File(None), # Handles multiple files
     video: UploadFile = File(None),
     current_user: dict = Depends(auth.get_current_user)
 ):
     location_parts = location.split(",")
-    lat, lng = (float(location_parts[0].replace("Lat:", "").strip()), 
-                float(location_parts[1].replace("Lng:", "").strip())) if len(location_parts) == 2 else (None, None)
+    lat, lng = (float(location_parts[0].strip()), 
+                float(location_parts[1].strip())) if len(location_parts) == 2 else (None, None)
 
     event_data = {
         "title": title,
@@ -299,18 +307,24 @@ async def report_issue(
         "latitude": lat,
         "longitude": lng,
         "reported_by": current_user["email"],
-        "photo": None,
+        "photos": [], # Initialize as an empty list
         "video": None,
         "status": "pending",
     }
 
-    if photo and photo.filename:
-        event_data["photo"] = str(await upload_to_gridfs(photo))
+    # ✅ FIXED: Loop through all uploaded photos and save them
+    if photos:
+        for photo in photos:
+            if photo and photo.filename:
+                photo_id = await upload_to_gridfs(photo)
+                event_data["photos"].append(str(photo_id))
+
     if video and video.filename:
         event_data["video"] = str(await upload_to_gridfs(video))
 
-    result = await db.events.insert_one(event_data)
+    result = await events_collection.insert_one(event_data)
     return {"message": "Event submitted successfully!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
+
 
 # @app.get("/profile", response_class=HTMLResponse)
 # async def profile_panel(request: Request, current_user: dict = Depends(auth.get_current_user)):
@@ -335,19 +349,20 @@ async def full_profile(request: Request, current_user: dict = Depends(auth.get_c
 
     for event in events:
         event["_id"] = str(event["_id"])
-        event["photo"] = f"/files/{event['photo']}" if event.get('photo') else None
+        # Handle multiple photos
+        if event.get("photos"):
+            event["photos"] = [f"/files/{photo_id}" for photo_id in event["photos"]]
+        else:
+            event["photos"] = []
         event["video"] = f"/files/{event['video']}" if event.get('video') else None
         # Ensure 'date' is present and formatted correctly
         # If your event datetime is stored differently, adjust accordingly
         if isinstance(event.get("datetime"), str): # Assuming datetime is stored as string
-            event["date"] = event["datetime"].split(" ")[0] # Extract date part
+            event["date"] = event["datetime"].split("T")[0] # Extract date part
         elif isinstance(event.get("datetime"), datetime):
             event["date"] = event["datetime"].strftime("%Y-%m-%d") # Format datetime object
         elif "date" not in event:
             event["date"] = "N/A" # Provide a default if no date
-
-    print("Issues fetched:", issues) # For debugging
-    print("Events fetched:", events)   # For debugging
 
     return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues, "events": events})    
 
