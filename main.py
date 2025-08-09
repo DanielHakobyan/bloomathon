@@ -401,7 +401,8 @@ async def export_user_data(user_email: str, current_user=Depends(get_current_adm
         user_issues = await user_issues_cursor.to_list(length=None)
         
         # Get all user events
-        user_events_cursor = events_collection.find({"organizer_email": user_email})
+# Get all user events
+        user_events_cursor = events_collection.find({"reported_by": user_email}).sort("created_at", -1)
         user_events = await user_events_cursor.to_list(length=None)
         
         # Prepare data for export
@@ -757,7 +758,7 @@ async def get_full_profile(request: Request, current_user=Depends(auth.get_curre
         user_issues = await user_issues_cursor.to_list(length=None)
         
         # Get all user events
-        user_events_cursor = events_collection.find({"organizer_email": user_email}).sort("created_at", -1)
+        user_events_cursor = events_collection.find({"reported_by": user_email}).sort("created_at", -1)
         user_events = await user_events_cursor.to_list(length=None)
         
         # Format dates for template
@@ -768,10 +769,25 @@ async def get_full_profile(request: Request, current_user=Depends(auth.get_curre
                 issue["updated_at"] = issue["updated_at"]
         
         for event in user_events:
-            if event.get("created_at"):
-                event["created_at"] = event["created_at"]
-            if event.get("event_date"):
-                event["event_date"] = event["event_date"]
+                    event["_id"] = str(event["_id"])
+                    if event.get("created_at"):
+                        event["created_at"] = event["created_at"]
+                    if event.get("updated_at"):
+                        event["updated_at"] = event["updated_at"]
+                    
+                    # Process photos for issues
+                    if event.get("photos"):
+                        event["photos"] = [f"/files/{photo_id}" for photo_id in event["photos"]]
+                    else:
+                        event["photos"] = []
+                    
+                    # Process single photo (for backward compatibility)
+                    if event.get("photo"):
+                        if not event["photos"]:  # Only add if photos array is empty
+                            event["photos"] = [f"/files/{event['photo']}"]
+                    
+                    # Process video for issues
+                    event["video"] = f"/files/{event['video']}" if event.get("video") else None
         
         stats = {
             "total_issues": total_issues,
