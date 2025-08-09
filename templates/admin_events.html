@@ -1,268 +1,1230 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Issue Tracker | Admin Dashboard</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Events | Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-      :root {
-        --primary: #6366f1;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --dark: #1f2937;
-        --light: #f9fafb;
-        --gray: #e5e7eb;
-      }
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --dark-blue: #1e3a8a;
+            --light-blue: #dbeafe;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+        .dark {
+            --primary-blue: #3b82f6;
+            --secondary-blue: #60a5fa;
+            --accent-gold: #fbbf24;
+            --dark-blue: #1e40af;
+            --light-blue: #1e3a8a;
+            --white: #111827;
+            --gray-50: #1f2937;
+            --gray-100: #374151;
+            --gray-200: #4b5563;
+            --gray-300: #6b7280;
+            --gray-600: #9ca3af;
+            --gray-800: #e5e7eb;
+            --gray-900: #f9fafb;
+        }
 
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #f8fafc;
-        color: var(--dark);
-        min-height: 100vh;
-      }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-      .dashboard {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        min-height: 100vh;
-      }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
 
-      .sidebar {
-        background: white;
-        border-right: 1px solid var(--gray);
-        padding: 2rem 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
 
-      .sidebar-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 2rem;
-        padding-left: 1rem;
-      }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
 
-      .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        border-radius: 0.375rem;
-        margin-bottom: 0.5rem;
-        color: #64748b;
-        text-decoration: none;
-        transition: all 0.2s;
-      }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      .nav-item.active {
-        background-color: #eef2ff;
-        color: var(--primary);
-        font-weight: 500;
-      }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-      .nav-item:hover:not(.active) {
-        background-color: #f8fafc;
-        color: var(--dark);
-      }
+        .status-pending { 
+            background-color: #fffbeb; 
+            color: #d97706; 
+            border: 1px solid #fed7aa;
+        }
+        .status-completed { 
+            background-color: #f0fdf4; 
+            color: #16a34a; 
+            border: 1px solid #bbf7d0;
+        }
+        .status-canceled { 
+            background-color: #fef2f2; 
+            color: #dc2626; 
+            border: 1px solid #fecaca;
+        }
 
-      .main-content {
-        padding: 2rem 3rem;
-      }
+        .dark .status-pending { 
+            background-color: #78350f; 
+            color: #fcd34d; 
+        }
+        .dark .status-completed { 
+            background-color: #14532d; 
+            color: #86efac; 
+        }
+        .dark .status-canceled { 
+            background-color: #7f1d1d; 
+            color: #fca5a5; 
+        }
 
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-      }
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
 
-      .page-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-      }
+        .dark .search-highlight {
+            background-color: #451a03;
+            color: #fbbf24;
+        }
 
-      .user-profile {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+        .event-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
 
-      .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: var(--primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 500;
-      }
+        .event-card.status-pending {
+            border-left-color: #f59e0b;
+        }
 
-      .events-container {
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-      }
+        .event-card.status-completed {
+            border-left-color: #10b981;
+        }
 
-      .events-header {
-        display: grid;
-        grid-template-columns: 3fr 1fr 1fr;
-        padding: 1rem 1.5rem;
-        background-color: #f9fafb;
-        border-bottom: 1px solid var(--gray);
-        font-weight: 500;
-        color: #64748b;
-      }
+        .event-card.status-canceled {
+            border-left-color: #ef4444;
+        }
 
-      .event-card {
-        display: grid;
-        grid-template-columns: 3fr 1fr 1fr;
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--gray);
-        transition: background 0.2s;
-      }
-
-      .event-card:last-child {
-        border-bottom: none;
-      }
-
-      .event-card:hover {
-        background-color: #f9fafb;
-      }
-
-      .event-title {
-        font-weight: 500;
-        color: var(--dark);
-      }
-
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 500;
-      }
-
-      .status-pending {
-        background-color: #fffbeb;
-        color: var(--warning);
-      }
-
-      .status-completed {
-        background-color: #ecfdf5;
-        color: var(--success);
-      }
-
-      .status-canceled {
-        background-color: #fef2f2;
-        color: var(--danger);
-      }
-
-      .action-form {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .select-input {
-        padding: 0.5rem;
-        border: 1px solid var(--gray);
-        border-radius: 0.375rem;
-        font-family: inherit;
-        font-size: 0.875rem;
-        background-color: white;
-      }
-
-      .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: none;
-      }
-
-      .btn-primary {
-        background-color: var(--primary);
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background-color: #4f46e5;
-      }
+        .event-card:hover {
+            transform: translateX(4px);
+        }
     </style>
-  </head>
-  <body>
-    <div class="dashboard">
-      <aside class="sidebar">
-        <div class="sidebar-title">IssueTracker</div>
-        <nav>
-          <a href="/admin/issues" class="nav-item">Issues</a>
-          <a href="#" class="nav-item active">Events</a>
-        </nav>
-      </aside>
+</head>
 
-      <main class="main-content">
-        <div class="header">
-          <h1 class="page-title">Manage Issues</h1>
-          <div class="user-profile">
-            <div class="avatar">AD</div>
-            <span>Admin</span>
-          </div>
-        </div>
-
-        <div class="events-container">
-          <div class="events-header">
-            <div>Event</div>
-            <div>Status</div>
-            <div>Actions</div>
-          </div>
-
-          {% for event in events %}
-          <div class="event-card">
-            <div class="event-title">{{ event.title }}</div>
-            <div>
-              <span class="status-badge status-{{ event.status }}">
-                {{ event.status|capitalize }}
-              </span>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect bg-white/90 dark:bg-gray-800/90">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">Admin Portal</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Rockville City Management</p>
+                </div>
             </div>
-            <div class="action-form">
-              <form
-                action="/admin/events/{{ event._id }}/update"
-                method="post"
-                class="action-form"
-              >
-                <select class="select-input" name="status">
-                  <option value="completed">Completed</option>
-                  <option value="canceled">Canceled</option>
-                </select>
-                <button class="btn btn-primary" type="submit">Update</button>
-              </form>
+            
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="/admin/issues" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Issues
+                </a>
+                <a href="/admin/events" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg font-semibold">
+                    <i class="fas fa-calendar mr-2"></i>Events
+                </a>
+                <a href="/admin/users" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-users mr-2"></i>Users
+                </a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <!-- Dark Mode Toggle -->
+                <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+
+                <!-- Admin Profile -->
+                <div class="flex items-center space-x-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white text-sm"></i>
+                    </div>
+                    <span class="text-sm font-medium">Admin</span>
+                </div>
+
+                <!-- Logout Button -->
+                <button id="logout-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
-          </div>
-          {% endfor %}
         </div>
-      </main>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-24 min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Page Header -->
+            <div class="mb-8 animate-fade-in">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            <i class="fas fa-calendar-alt text-blue-600 mr-3"></i>
+                            Events Management
+                        </h1>
+                        <p class="text-gray-600 dark:text-gray-400">Monitor and manage community events</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
+                        <button id="export-events-btn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                            <i class="fas fa-download mr-2"></i>Export Events
+                        </button>
+                        <a href="/admin/statistics/events" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-center">
+                            <i class="fas fa-chart-line mr-2"></i>Event Analytics
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Events</p>
+                                <p class="text-3xl font-bold text-blue-600" id="total-events">{{ stats.total or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                                <p class="text-3xl font-bold text-orange-600" id="pending-events">{{ stats.pending or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-clock text-orange-600 dark:text-orange-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Completed</p>
+                                <p class="text-3xl font-bold text-green-600" id="completed-events">{{ stats.completed or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Canceled</p>
+                                <p class="text-3xl font-bold text-red-600" id="canceled-events">{{ stats.canceled or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-times-circle text-red-600 dark:text-red-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 mb-8">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- User Search -->
+                        <div class="flex-1">
+                            <label for="user-search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-user-search mr-1"></i>Search by Organizer Email
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="user-search" placeholder="Enter organizer email..." 
+                                       class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="lg:w-48">
+                            <label for="status-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-filter mr-1"></i>Status Filter
+                            </label>
+                            <select id="status-filter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="canceled">Canceled</option>
+                            </select>
+                        </div>
+
+                        <!-- Date Range Filter -->
+                        <div class="lg:w-48">
+                            <label for="date-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-calendar mr-1"></i>Date Range
+                            </label>
+                            <select id="date-filter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">All Dates</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="this_week">This Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="past">Past Events</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="lg:w-32 flex items-end">
+                            <button id="search-btn" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                <i class="fas fa-search mr-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Clear Search -->
+                    <div id="search-results-info" class="mt-4 hidden">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <span id="search-results-text"></span>
+                            </p>
+                            <button id="clear-search" class="px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                <i class="fas fa-times mr-1"></i>Clear Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Grid -->
+            <div class="animate-fade-in">
+                <!-- Loading State -->
+                <div id="loading-state" class="hidden p-8 text-center">
+                    <div class="inline-flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin text-blue-600"></i>
+                        <span class="text-gray-600 dark:text-gray-400">Loading events...</span>
+                    </div>
+                </div>
+
+                <!-- Events Grid -->
+                <div id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for event in events %}
+                    <div class="event-card bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden status-{{ event.status }}" data-event-id="{{ event._id }}">
+                        <!-- Event Image/Header -->
+                        <div class="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
+                            {% if event.image_path %}
+                                <img src="{{ event.image_path }}" alt="{{ event.title }}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            {% else %}
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i class="fas fa-calendar-alt text-white text-6xl opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Status Badge -->
+                            <div class="absolute top-4 right-4">
+                                <span class="status-badge status-{{ event.status }}">
+                                    {% if event.status == 'pending' %}
+                                        <i class="fas fa-clock mr-1"></i>
+                                    {% elif event.status == 'completed' %}
+                                        <i class="fas fa-check mr-1"></i>
+                                    {% else %}
+                                        <i class="fas fa-times mr-1"></i>
+                                    {% endif %}
+                                    {{ event.status.title() }}
+                                </span>
+                            </div>
+
+                            <!-- Event Date -->
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <div class="text-2xl font-bold">{{ event.event_date.strftime('%d') if event.event_date else '--' }}</div>
+                                <div class="text-sm opacity-90">{{ event.event_date.strftime('%b %Y') if event.event_date else 'TBD' }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Event Content -->
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">{{ event.title }}</h3>
+                            </div>
+
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ event.description }}</p>
+
+                            <!-- Event Details -->
+                            <div class="space-y-2 mb-4">
+                                <!-- Organizer -->
+                                <div class="flex items-center space-x-2 text-sm">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-user text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-gray-600 dark:text-gray-400">Organizer:</span>
+                                    <span class="text-gray-900 dark:text-white font-medium user-email">{{ event.organizer_email or 'Unknown' }}</span>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-map-marker-alt text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                    <span class="text-gray-600 dark:text-gray-400">Location:</span>
+                                    <span class="text-gray-900 dark:text-white">{{ event.location or 'Location TBD' }}</span>
+                                </div>
+
+                                <!-- Date & Time -->
+                                <div class="flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-calendar text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                    <span class="text-gray-600 dark:text-gray-400">Date:</span>
+                                    <span class="text-gray-900 dark:text-white">
+                                        {{ event.event_date.strftime('%B %d, %Y') if event.event_date else 'Date TBD' }}
+                                    </span>
+                                </div>
+
+                                <!-- Participants -->
+                                {% if event.max_participants %}
+                                <div class="flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-users text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                    <span class="text-gray-600 dark:text-gray-400">Capacity:</span>
+                                    <span class="text-gray-900 dark:text-white">{{ event.current_participants or 0 }}/{{ event.max_participants }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center space-x-2">
+                                    <button class="view-profile-btn text-blue-600 dark:text-blue-400 hover:underline text-sm" data-user-email="{{ event.organizer_email }}">
+                                        <i class="fas fa-user mr-1"></i>View Organizer
+                                    </button>
+                                    <button class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 text-sm" onclick="viewEventDetails('{{ event._id }}')">
+                                        <i class="fas fa-eye mr-1"></i>Details
+                                    </button>
+                                </div>
+
+                                <!-- Status Update -->
+                                <form action="/admin/events/{{ event._id }}/update" method="post" class="flex items-center space-x-2">
+                                    <select name="status" class="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                        <option value="pending" {{ 'selected' if event.status == 'pending' else '' }}>Pending</option>
+                                        <option value="completed" {{ 'selected' if event.status == 'completed' else '' }}>Completed</option>
+                                        <option value="canceled" {{ 'selected' if event.status == 'canceled' else '' }}>Canceled</option>
+                                    </select>
+                                    <button type="submit" class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden p-12 text-center">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar-times text-gray-400 dark:text-gray-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Events Found</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Try adjusting your search criteria or filters.</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8 flex items-center justify-between">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Showing <span id="showing-start">1</span> to <span id="showing-end">{{ events|length }}</span> of <span id="total-count">{{ events|length }}</span> events
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="prev-page" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" disabled>
+                        <i class="fas fa-chevron-left mr-1"></i>Previous
+                    </button>
+                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold">1</span>
+                    <button id="next-page" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Next<i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Event Details -->
+    <div id="event-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>Event Details
+                    </h2>
+                    <button onclick="closeEventModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="event-modal-content" class="p-6 overflow-y-auto max-h-96">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="footer">
-      <p>
-        Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-        reserved. This code is proprietary and confidential. Unauthorized
-        copying, redistribution, modification, or use is strictly prohibited.
-      </p>
+
+    <!-- Modal for User Profile (reused from issues page) -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <i class="fas fa-user text-blue-600 mr-2"></i>User Profile
+                    </h2>
+                    <button onclick="closeProfileModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="profile-modal-content" class="p-6 overflow-y-auto max-h-96">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
     </div>
-  </body>
+
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.classList.toggle('dark', currentTheme === 'dark');
+        
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+
+        // Search functionality
+        let currentSearchParams = {
+            user_email: '',
+            status: '',
+            date_range: '',
+            page: 1
+        };
+
+        document.getElementById('search-btn').addEventListener('click', performSearch);
+        document.getElementById('clear-search').addEventListener('click', clearSearch);
+        
+        // Enter key search
+        document.getElementById('user-search').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        async function performSearch() {
+            const userEmail = document.getElementById('user-search').value;
+            const status = document.getElementById('status-filter').value;
+            const dateRange = document.getElementById('date-filter').value;
+
+            currentSearchParams = { user_email: userEmail, status, date_range: dateRange, page: 1 };
+
+            try {
+                showLoading();
+                const response = await fetch('/admin/events/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    },
+                    body: JSON.stringify(currentSearchParams)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateEventsDisplay(data.events);
+                    updateSearchInfo(data);
+                    updateStats(data.stats);
+                } else {
+                    showError(data.message || 'Search failed');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showError('Failed to search events');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('user-search').value = '';
+            document.getElementById('status-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            currentSearchParams = { user_email: '', status: '', date_range: '', page: 1 };
+            
+            // Reload page to show all events
+            window.location.reload();
+        }
+
+        function updateEventsDisplay(events) {
+            const container = document.getElementById('events-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (events.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = events.map(event => createEventCard(event)).join('');
+                
+                // Highlight search terms
+                highlightSearchTerms();
+                
+                // Re-attach event listeners
+                attachEventListeners();
+            }
+        }
+
+        function createEventCard(event) {
+            const formatDate = (dateString) => {
+                if (!dateString) return { day: '--', month: 'TBD', full: 'Date TBD' };
+                const date = new Date(dateString);
+                return {
+                    day: date.getDate().toString().padStart(2, '0'),
+                    month: date.toLocaleString('default', { month: 'short', year: 'numeric' }),
+                    full: date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                };
+            };
+
+            const getStatusIcon = (status) => {
+                switch(status) {
+                    case 'pending': return 'fas fa-clock';
+                    case 'completed': return 'fas fa-check';
+                    default: return 'fas fa-times';
+                }
+            };
+
+            const date = formatDate(event.event_date);
+
+            return `
+                <div class="event-card bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden status-${event.status} animate-fade-in" data-event-id="${event._id}">
+                    <!-- Event Image/Header -->
+                    <div class="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
+                        ${event.image_path ? 
+                            `<img src="${event.image_path}" alt="${event.title}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>` :
+                            `<div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-white text-6xl opacity-50"></i>
+                            </div>`
+                        }
+                        
+                        <!-- Status Badge -->
+                        <div class="absolute top-4 right-4">
+                            <span class="status-badge status-${event.status}">
+                                <i class="${getStatusIcon(event.status)} mr-1"></i>
+                                ${event.status.replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                        </div>
+
+                        <!-- Event Date -->
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <div class="text-2xl font-bold">${date.day}</div>
+                            <div class="text-sm opacity-90">${date.month}</div>
+                        </div>
+                    </div>
+
+                    <!-- Event Content -->
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">${event.title}</h3>
+                        </div>
+
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">${event.description}</p>
+
+                        <!-- Event Details -->
+                        <div class="space-y-2 mb-4">
+                            <!-- Organizer -->
+                            <div class="flex items-center space-x-2 text-sm">
+                                <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-user text-white text-xs"></i>
+                                </div>
+                                <span class="text-gray-600 dark:text-gray-400">Organizer:</span>
+                                <span class="text-gray-900 dark:text-white font-medium user-email">${event.organizer_email || 'Unknown'}</span>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-map-marker-alt text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                <span class="text-gray-600 dark:text-gray-400">Location:</span>
+                                <span class="text-gray-900 dark:text-white">${event.location || 'Location TBD'}</span>
+                            </div>
+
+                            <!-- Date & Time -->
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-calendar text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                <span class="text-gray-600 dark:text-gray-400">Date:</span>
+                                <span class="text-gray-900 dark:text-white">${date.full}</span>
+                            </div>
+
+                            <!-- Participants -->
+                            ${event.max_participants ? `
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-users text-gray-400 w-6 text-center flex-shrink-0"></i>
+                                <span class="text-gray-600 dark:text-gray-400">Capacity:</span>
+                                <span class="text-gray-900 dark:text-white">${event.current_participants || 0}/${event.max_participants}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
+                            <div class="flex items-center space-x-2">
+                                ${event.organizer_email ? `
+                                <button class="view-profile-btn text-blue-600 dark:text-blue-400 hover:underline text-sm" data-user-email="${event.organizer_email}">
+                                    <i class="fas fa-user mr-1"></i>View Organizer
+                                </button>
+                                ` : ''}
+                                <button class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 text-sm" onclick="viewEventDetails('${event._id}')">
+                                    <i class="fas fa-eye mr-1"></i>Details
+                                </button>
+                            </div>
+
+                            <!-- Status Update -->
+                            <form action="/admin/events/${event._id}/update" method="post" class="flex items-center space-x-2">
+                                <select name="status" class="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="pending" ${event.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="completed" ${event.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="canceled" ${event.status === 'canceled' ? 'selected' : ''}>Canceled</option>
+                                </select>
+                                <button type="submit" class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-sync"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            // Attach view profile button listeners
+            document.querySelectorAll('.view-profile-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const userEmail = e.target.closest('.view-profile-btn').dataset.userEmail;
+                    await viewUserProfile(userEmail);
+                });
+            });
+        }
+
+        function highlightSearchTerms() {
+            const searchTerm = document.getElementById('user-search').value.toLowerCase();
+            if (!searchTerm) return;
+
+            document.querySelectorAll('.user-email').forEach(el => {
+                const text = el.textContent;
+                if (text.toLowerCase().includes(searchTerm)) {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    el.innerHTML = text.replace(regex, '<span class="search-highlight">$1</span>');
+                }
+            });
+        }
+
+        function updateSearchInfo(data) {
+            const searchInfo = document.getElementById('search-results-info');
+            const searchText = document.getElementById('search-results-text');
+            
+            if (data.total > 0) {
+                searchInfo.classList.remove('hidden');
+                const filters = [];
+                if (currentSearchParams.user_email) filters.push(`organizer "${currentSearchParams.user_email}"`);
+                if (currentSearchParams.status) filters.push(`status "${currentSearchParams.status}"`);
+                if (currentSearchParams.date_range) filters.push(`date range "${currentSearchParams.date_range}"`);
+                
+                const filterText = filters.length > 0 ? ` matching ${filters.join(', ')}` : '';
+                searchText.textContent = `Found ${data.total} event(s)${filterText}`;
+            } else {
+                searchInfo.classList.add('hidden');
+            }
+        }
+
+        function updateStats(stats) {
+            if (stats) {
+                document.getElementById('total-events').textContent = stats.total || 0;
+                document.getElementById('pending-events').textContent = stats.pending || 0;
+                document.getElementById('completed-events').textContent = stats.completed || 0;
+                document.getElementById('canceled-events').textContent = stats.canceled || 0;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('events-container').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('events-container').style.opacity = '1';
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            errorDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-red-200 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            successDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-green-200 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // View event details
+        async function viewEventDetails(eventId) {
+            try {
+                const response = await fetch(`/admin/events/${eventId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const event = await response.json();
+                
+                if (response.ok) {
+                    showEventModal(event);
+                } else {
+                    showError(event.message || 'Failed to load event details');
+                }
+            } catch (error) {
+                console.error('Error loading event details:', error);
+                showError('Failed to load event details');
+            }
+        }
+
+        function showEventModal(event) {
+            const modal = document.getElementById('event-modal');
+            const content = document.getElementById('event-modal-content');
+
+            const formatDate = (dateString) => {
+                if (!dateString) return 'N/A';
+                return new Date(dateString).toLocaleString();
+            };
+
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Event Header -->
+                    <div class="flex items-start space-x-4">
+                        ${event.image_path ? 
+                            `<img src="${event.image_path}" alt="Event" class="w-24 h-24 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600">` :
+                            `<div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-white text-2xl"></i>
+                            </div>`
+                        }
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${event.title}</h3>
+                            <div class="flex items-center space-x-4 text-sm">
+                                <span class="status-badge status-${event.status}">
+                                    ${event.status.replace(/\b\w/g, l => l.toUpperCase())}
+                                </span>
+                                <span class="text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-calendar mr-1"></i>${formatDate(event.event_date)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
+                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>Event Information
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Description:</span>
+                                    <p class="text-gray-900 dark:text-white">${event.description}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Organizer:</span>
+                                    <p class="text-gray-900 dark:text-white">${event.organizer_email || 'Unknown'}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Location:</span>
+                                    <p class="text-gray-900 dark:text-white">${event.location || 'Location TBD'}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Created:</span>
+                                    <p class="text-gray-900 dark:text-white">${formatDate(event.created_at)}</p>
+                                </div>
+                                ${event.updated_at ? `
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Last Updated:</span>
+                                    <p class="text-gray-900 dark:text-white">${formatDate(event.updated_at)}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
+                                <i class="fas fa-users text-blue-600 mr-2"></i>Participation
+                            </h4>
+                            <div class="space-y-3">
+                                ${event.max_participants ? `
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Capacity:</span>
+                                    <p class="text-gray-900 dark:text-white">${event.current_participants || 0}/${event.max_participants} participants</p>
+                                </div>
+                                ` : ''}
+                                ${event.participants && event.participants.length > 0 ? `
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Participants:</span>
+                                    <div class="mt-2 max-h-32 overflow-y-auto">
+                                        ${event.participants.map(p => `
+                                            <div class="flex items-center space-x-2 py-1">
+                                                <div class="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-user text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-gray-900 dark:text-white">${p.email || p}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                ` : '<p class="text-gray-500 dark:text-gray-400">No participants yet</p>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Actions -->
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-cogs text-blue-600 mr-2"></i>Admin Actions
+                        </h4>
+                        <form action="/admin/events/${event._id}/update" method="post" class="flex items-center space-x-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Update Status:</label>
+                                <select name="status" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="pending" ${event.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="completed" ${event.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="canceled" ${event.status === 'canceled' ? 'selected' : ''}>Canceled</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-save mr-2"></i>Update
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeEventModal() {
+            document.getElementById('event-modal').classList.add('hidden');
+        }
+
+        // View user profile (reused function from issues page)
+        async function viewUserProfile(userEmail) {
+            try {
+                const response = await fetch(`/admin/users/${encodeURIComponent(userEmail)}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showUserProfileModal(data);
+                } else {
+                    showError(data.message || 'Failed to load user profile');
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                showError('Failed to load user profile');
+            }
+        }
+
+        function showUserProfileModal(userData) {
+            const modal = document.getElementById('profile-modal');
+            const content = document.getElementById('profile-modal-content');
+
+            const formatDate = (dateString) => {
+                if (!dateString) return 'N/A';
+                return new Date(dateString).toLocaleDateString();
+            };
+
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <!-- User Info -->
+                    <div class="flex items-center space-x-4 p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">${userData.user.email}</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Member since ${formatDate(userData.user.created_at)}</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                                    <i class="fas fa-user-check mr-1"></i>Verified User
+                                </span>
+                                ${userData.user.is_admin ? 
+                                    '<span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-sm"><i class="fas fa-crown mr-1"></i>Admin</span>' : 
+                                    '<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm"><i class="fas fa-user mr-1"></i>User</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-exclamation-triangle text-blue-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-blue-600">${userData.stats.total_issues}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Issues</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-calendar text-green-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-green-600">${userData.stats.total_events}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Events Created</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle text-purple-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-purple-600">${userData.stats.resolved_issues}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Resolved</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Events -->
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>Recent Events
+                        </h4>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${userData.recent_events && userData.recent_events.length > 0 ? 
+                                userData.recent_events.map(event => `
+                                    <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h5 class="font-medium text-gray-900 dark:text-white">${event.title}</h5>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${event.location || 'Location TBD'}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">${formatDate(event.event_date)}</p>
+                                            </div>
+                                            <span class="status-badge status-${event.status}">
+                                                ${event.status.replace(/\b\w/g, l => l.toUpperCase())}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('') : 
+                                '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No events created yet</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Recent Issues -->
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-exclamation-triangle text-blue-600 mr-2"></i>Recent Issues
+                        </h4>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${userData.recent_issues && userData.recent_issues.length > 0 ? 
+                                userData.recent_issues.map(issue => `
+                                    <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h5 class="font-medium text-gray-900 dark:text-white">${issue.title}</h5>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${issue.category}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">${formatDate(issue.created_at)}</p>
+                                            </div>
+                                            <span class="status-badge status-${issue.status}">
+                                                ${issue.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('') : 
+                                '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No issues reported yet</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Admin Actions for User -->
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-tools text-blue-600 mr-2"></i>Admin Actions
+                        </h4>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="exportUserData('${userData.user.email}')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>Export User Data
+                            </button>
+                            <button onclick="viewUserIssues('${userData.user.email}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-list mr-2"></i>View All Issues
+                            </button>
+                            <button onclick="viewUserEvents('${userData.user.email}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-calendar mr-2"></i>View All Events
+                            </button>
+                            ${!userData.user.is_admin ? `
+                                <button onclick="toggleUserStatus('${userData.user.email}', 'suspend')" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                    <i class="fas fa-user-slash mr-2"></i>Suspend User
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        // Additional admin functions
+        function exportUserData(userEmail) {
+            window.location.href = `/admin/users/${encodeURIComponent(userEmail)}/export`;
+        }
+
+        function viewUserIssues(userEmail) {
+            window.location.href = `/admin/issues?user_email=${encodeURIComponent(userEmail)}`;
+        }
+
+        function viewUserEvents(userEmail) {
+            document.getElementById('user-search').value = userEmail;
+            performSearch();
+            closeProfileModal();
+        }
+
+        async function toggleUserStatus(userEmail, action) {
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                const response = await fetch(`/admin/users/${encodeURIComponent(userEmail)}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(`User ${action}ed successfully`);
+                    closeProfileModal();
+                } else {
+                    showError(data.message || `Failed to ${action} user`);
+                }
+            } catch (error) {
+                console.error(`Error ${action}ing user:`, error);
+                showError(`Failed to ${action} user`);
+            }
+        }
+
+        // Export functionality
+        document.getElementById('export-events-btn').addEventListener('click', () => {
+            const params = new URLSearchParams(currentSearchParams);
+            window.location.href = `/admin/events/export?${params.toString()}`;
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/auth/logout', { method: 'POST' });
+                Cookies.remove('access_token');
+                window.location.href = response.redirected ? response.url : '/auth/login';
+            } catch (err) {
+                console.error('Logout failed:', err);
+                showError('Something went wrong while logging out.');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attach event listeners to existing elements
+            attachEventListeners();
+        });
+
+        // Close modals on outside click
+        document.addEventListener('click', (e) => {
+            const eventModal = document.getElementById('event-modal');
+            const profileModal = document.getElementById('profile-modal');
+            
+            if (e.target === eventModal) {
+                closeEventModal();
+            }
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeEventModal();
+                closeProfileModal();
+            }
+        });
+    </script>
+</body>
 </html>

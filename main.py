@@ -12,9 +12,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from news_scraper import fetch_news
 from fastapi.responses import RedirectResponse
-from datetime import datetime
+from datetime import datetime, timedelta
 import httpx
-from typing import List
+from typing import List, Optional
+from pydantic import BaseModel
 
 load_dotenv()
 
@@ -56,7 +57,10 @@ def str_to_objectid(id: str) -> ObjectId:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format")
     
-
+async def get_current_admin(current_user: dict = Depends(auth.get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
 @app.get("/me")
 def get_current_user(request: Request, current_user: dict = Depends(auth.get_current_user)):
     return {"email": current_user.get("email")}
@@ -128,15 +132,751 @@ async def get_issues(request: Request):
         issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
     return templates.TemplateResponse("view_issues.html", {"request": request, "issues": issues})
 
-@app.get("/admin/issues", response_class=HTMLResponse)
-async def admin_issues_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
-    
-    issues = await db.issues.find().to_list()
-    for issue in issues:
+class SearchRequest(BaseModel):
+    user_email: Optional[str] = ""
+    status: Optional[str] = ""
+    priority: Optional[str] = ""
+    date_range: Optional[str] = ""
+    page: int = 1
+    limit: int = 20
+
+class UserProfileResponse(BaseModel):
+    user: dict
+    stats: dict
+    recent_issues: list
+    recent_events: list
+
+# Admin Issues Search Route
+@app.post("/admin/issues/search")
+async def search_issues(search_request: SearchRequest, current_user=Depends(get_current_admin)):
+    try:
+        # Build query filter
+        filter_query = {}
+
+        if search_request.user_email:
+            filter_query["reported_by"] = {"$regex": search_request.user_email, "$options": "i"}
+        if search_request.status:
+            filter_query["status"] = search_request.status
+        if search_request.priority:
+            filter_query["priority"] = search_request.priority
+        
+        skip = (search_request.page - 1) * search_request.limit
+        
+        issues_cursor = issues_collection.find(filter_query).sort("created_at", -1).skip(skip).limit(search_request.limit)
+        issues = await issues_cursor.to_list(length=search_request.limit)
+        
+        for issue in issues:
+            issue["_id"] = str(issue["_id"])
+            if issue.get("created_at"):
+                issue["created_at"] = issue["created_at"].isoformat()
+            if issue.get("updated_at"):
+                issue["updated_at"] = issue["updated_at"].isoformat()
+        
+        total_count = await issues_collection.count_documents(filter_query)
+        
+        return {
+            "issues": issues,
+            "total": total_count,
+            "page": search_request.page,
+            "limit": search_request.limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+# Admin Events Search Route
+@app.post("/admin/events/search")
+async def search_events(search_request: SearchRequest, current_user=Depends(get_current_admin)):
+    try:
+        # Build query filter
+        filter_query = {}
+        
+        # Search by organizer email
+        if search_request.user_email:
+            filter_query["organizer_email"] = {"$regex": search_request.user_email, "$options": "i"}
+        
+        # Filter by status
+        if search_request.status:
+            filter_query["status"] = search_request.status
+            
+        # Filter by date range
+        if search_request.date_range:
+            now = datetime.utcnow()
+            if search_request.date_range == "upcoming":
+                filter_query["event_date"] = {"$gte": now}
+            elif search_request.date_range == "this_week":
+                week_start = now - timedelta(days=now.weekday())
+                week_end = week_start + timedelta(days=6)
+                filter_query["event_date"] = {"$gte": week_start, "$lte": week_end}
+            elif search_request.date_range == "this_month":
+                month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                if now.month == 12:
+                    month_end = month_start.replace(year=now.year + 1, month=1) - timedelta(days=1)
+                else:
+                    month_end = month_start.replace(month=now.month + 1) - timedelta(days=1)
+                filter_query["event_date"] = {"$gte": month_start, "$lte": month_end}
+            elif search_request.date_range == "past":
+                filter_query["event_date"] = {"$lt": now}
+        
+        # Calculate pagination
+        skip = (search_request.page - 1) * search_request.limit
+        
+        # Get events with pagination
+        events_cursor = events_collection.find(filter_query).sort("created_at", -1).skip(skip).limit(search_request.limit)
+        events = await events_cursor.to_list(length=search_request.limit)
+        
+        # Convert ObjectId to string and format dates for JSON serialization
+        for event in events:
+            event["_id"] = str(event["_id"])
+            if event.get("created_at"):
+                event["created_at"] = event["created_at"].isoformat()
+            if event.get("updated_at"):
+                event["updated_at"] = event["updated_at"].isoformat()
+            if event.get("event_date"):
+                event["event_date"] = event["event_date"].isoformat()
+        
+        # Get total count for pagination
+        total_count = await events_collection.count_documents(filter_query)
+        
+        # Calculate statistics for filtered results
+        stats_pipeline = [
+            {"$match": filter_query},
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]
+        stats_cursor = events_collection.aggregate(stats_pipeline)
+        stats_list = await stats_cursor.to_list(length=None)
+        
+        stats = {
+            "total": total_count,
+            "pending": 0,
+            "completed": 0,
+            "canceled": 0
+        }
+        
+        for stat in stats_list:
+            if stat["_id"] in stats:
+                stats[stat["_id"]] = stat["count"]
+        
+        return {
+            "events": events,
+            "total": total_count,
+            "page": search_request.page,
+            "limit": search_request.limit,
+            "stats": stats
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+# Get User Profile for Admin
+@app.get("/admin/users/{user_email}/profile")
+async def get_user_profile(user_email: str, current_user=Depends(get_current_admin)):
+    try:
+        # Get user details
+        user = await users_collection.find_one({"email": user_email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Convert ObjectId to string
+        user["_id"] = str(user["_id"])
+        if user.get("created_at"):
+            user["created_at"] = user["created_at"].isoformat()
+        
+        # Get user statistics
+        issues_stats = await issues_collection.aggregate([
+            {"$match": {"reported_by": user_email}},
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]).to_list(length=None)
+        
+        events_count = await events_collection.count_documents({"organizer_email": user_email})
+        
+        total_issues = sum(stat["count"] for stat in issues_stats)
+        resolved_issues = next((stat["count"] for stat in issues_stats if stat["_id"] == "resolved"), 0)
+        
+        stats = {
+            "total_issues": total_issues,
+            "total_events": events_count,
+            "resolved_issues": resolved_issues
+        }
+        
+        # Get recent issues (last 5)
+        recent_issues_cursor = issues_collection.find({"reported_by": user_email}).sort("created_at", -1).limit(5)
+        recent_issues = await recent_issues_cursor.to_list(length=5)
+        
+        for issue in recent_issues:
+            issue["_id"] = str(issue["_id"])
+            if issue.get("created_at"):
+                issue["created_at"] = issue["created_at"].isoformat()
+        
+        # Get recent events (last 5)
+        recent_events_cursor = events_collection.find({"organizer_email": user_email}).sort("created_at", -1).limit(5)
+        recent_events = await recent_events_cursor.to_list(length=5)
+        
+        for event in recent_events:
+            event["_id"] = str(event["_id"])
+            if event.get("created_at"):
+                event["created_at"] = event["created_at"].isoformat()
+            if event.get("event_date"):
+                event["event_date"] = event["event_date"].isoformat()
+        
+        return {
+            "user": user,
+            "stats": stats,
+            "recent_issues": recent_issues,
+            "recent_events": recent_events
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get user profile: {str(e)}")
+
+# Get Individual Issue Details
+@app.get("/admin/issues/{issue_id}")
+async def get_issue_details(issue_id: str, current_user=Depends(get_current_admin)):
+    try:
+        from bson import ObjectId
+        
+        issue = await issues_collection.find_one({"_id": ObjectId(issue_id)})
+        if not issue:
+            raise HTTPException(status_code=404, detail="Issue not found")
+        
+        # Convert ObjectId to string and format dates
         issue["_id"] = str(issue["_id"])
-    return templates.TemplateResponse("admin_issues.html", {"request": request, "issues": issues})
+        if issue.get("created_at"):
+            issue["created_at"] = issue["created_at"].isoformat()
+        if issue.get("updated_at"):
+            issue["updated_at"] = issue["updated_at"].isoformat()
+        
+        return issue
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get issue details: {str(e)}")
+
+# Get Individual Event Details
+@app.get("/admin/events/{event_id}")
+async def get_event_details(event_id: str, current_user=Depends(get_current_admin)):
+    try:
+        from bson import ObjectId
+        
+        event = await events_collection.find_one({"_id": ObjectId(event_id)})
+        if not event:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        # Convert ObjectId to string and format dates
+        event["_id"] = str(event["_id"])
+        if event.get("created_at"):
+            event["created_at"] = event["created_at"].isoformat()
+        if event.get("updated_at"):
+            event["updated_at"] = event["updated_at"].isoformat()
+        if event.get("event_date"):
+            event["event_date"] = event["event_date"].isoformat()
+        
+        return event
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get event details: {str(e)}")
+
+# Export User Data
+@app.get("/admin/users/{user_email}/export")
+async def export_user_data(user_email: str, current_user=Depends(get_current_admin)):
+    try:
+        # Get user data
+        user = await users_collection.find_one({"email": user_email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get all user issues
+        user_issues_cursor = issues_collection.find({"reported_by": user_email})
+        user_issues = await user_issues_cursor.to_list(length=None)
+        
+        # Get all user events
+        user_events_cursor = events_collection.find({"organizer_email": user_email})
+        user_events = await user_events_cursor.to_list(length=None)
+        
+        # Prepare data for export
+        export_data = {
+            "user": {
+                "email": user["email"],
+                "created_at": user.get("created_at", "").isoformat() if user.get("created_at") else "",
+                "is_admin": user.get("is_admin", False)
+            },
+            "issues": [],
+            "events": []
+        }
+        
+        # Format issues
+        for issue in user_issues:
+            export_data["issues"].append({
+                "title": issue.get("title", ""),
+                "description": issue.get("description", ""),
+                "category": issue.get("category", ""),
+                "status": issue.get("status", ""),
+                "priority": issue.get("priority", ""),
+                "reported_by": issue.get("reported_by", ""),
+                "address": issue.get("address", ""),
+                "created_at": issue.get("created_at", "").isoformat() if issue.get("created_at") else "",
+                "updated_at": issue.get("updated_at", "").isoformat() if issue.get("updated_at") else ""
+            })
+        
+        # Format events
+        for event in user_events:
+            export_data["events"].append({
+                "title": event.get("title", ""),
+                "description": event.get("description", ""),
+                "location": event.get("location", ""),
+                "status": event.get("status", ""),
+                "event_date": event.get("event_date", "").isoformat() if event.get("event_date") else "",
+                "created_at": event.get("created_at", "").isoformat() if event.get("created_at") else "",
+                "updated_at": event.get("updated_at", "").isoformat() if event.get("updated_at") else ""
+            })
+        
+        # Create CSV response
+        from fastapi.responses import Response
+        import csv
+        import io
+        
+        output = io.StringIO()
+        
+        # Write user info
+        output.write(f"User Data Export for {user_email}\n")
+        output.write(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        # Write issues
+        output.write("ISSUES\n")
+        if export_data["issues"]:
+            fieldnames = ["title", "description", "category", "status", "priority", "reported_by", "address", "created_at", "updated_at"]
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            for issue in export_data["issues"]:
+                writer.writerow(issue)
+        else:
+            output.write("No issues found\n")
+        
+        output.write("\n\nEVENTS\n")
+        if export_data["events"]:
+            fieldnames = ["title", "description", "location", "status", "event_date", "created_at", "updated_at"]
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            for event in export_data["events"]:
+                writer.writerow(event)
+        else:
+            output.write("No events found\n")
+        
+        csv_content = output.getvalue()
+        output.close()
+        
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={user_email}_data_export.csv"}
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export user data: {str(e)}")
+
+# Export Issues with Filters
+@app.get("/admin/issues/export")
+async def export_issues(
+    user_email: Optional[str] = "",
+    status: Optional[str] = "",
+    priority: Optional[str] = "",
+    current_user=Depends(get_current_admin)
+):
+    try:
+        # Build query filter
+        filter_query = {}
+        
+        if user_email:
+            filter_query["reported_by"] = {"$regex": user_email, "$options": "i"}
+        if status:
+            filter_query["status"] = status
+        if priority:
+            filter_query["priority"] = priority
+        
+        # Get filtered issues
+        issues_cursor = issues_collection.find(filter_query).sort("created_at", -1)
+        issues = await issues_cursor.to_list(length=None)
+        
+        # Create CSV response
+        from fastapi.responses import Response
+        import csv
+        import io
+        
+        output = io.StringIO()
+        
+        if issues:
+            fieldnames = ["title", "description", "category", "status", "priority", "reported_by", "location", "created_at", "updated_at"]
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            
+            for issue in issues:
+                writer.writerow({
+                    "title": issue.get("title", ""),
+                    "description": issue.get("description", ""),
+                    "category": issue.get("category", ""),
+                    "status": issue.get("status", ""),
+                    "priority": issue.get("priority", ""),
+                    "reported_by": issue.get("reported_by", ""),
+                    "location": issue.get("location", ""),
+                    "created_at": issue.get("created_at", "").isoformat() if issue.get("created_at") else "",
+                    "updated_at": issue.get("updated_at", "").isoformat() if issue.get("updated_at") else ""
+                })
+        else:
+            output.write("No issues found matching the criteria")
+        
+        csv_content = output.getvalue()
+        output.close()
+        
+        # Generate filename based on filters
+        filename_parts = ["issues_export"]
+        if user_email:
+            filename_parts.append(f"user_{user_email.replace('@', '_at_')}")
+        if status:
+            filename_parts.append(f"status_{status}")
+        if priority:
+            filename_parts.append(f"priority_{priority}")
+        filename_parts.append(datetime.now().strftime("%Y%m%d_%H%M%S"))
+        filename = "_".join(filename_parts) + ".csv"
+        
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export issues: {str(e)}")
+
+# Export Events with Filters
+@app.get("/admin/events/export")
+async def export_events(
+    user_email: Optional[str] = "",
+    status: Optional[str] = "",
+    date_range: Optional[str] = "",
+    current_user=Depends(get_current_admin)
+):
+    try:
+        # Build query filter (same logic as search)
+        filter_query = {}
+        
+        if user_email:
+            filter_query["organizer_email"] = {"$regex": user_email, "$options": "i"}
+        if status:
+            filter_query["status"] = status
+        if date_range:
+            now = datetime.utcnow()
+            if date_range == "upcoming":
+                filter_query["event_date"] = {"$gte": now}
+            elif date_range == "this_week":
+                week_start = now - timedelta(days=now.weekday())
+                week_end = week_start + timedelta(days=6)
+                filter_query["event_date"] = {"$gte": week_start, "$lte": week_end}
+            elif date_range == "this_month":
+                month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                if now.month == 12:
+                    month_end = month_start.replace(year=now.year + 1, month=1) - timedelta(days=1)
+                else:
+                    month_end = month_start.replace(month=now.month + 1) - timedelta(days=1)
+                filter_query["event_date"] = {"$gte": month_start, "$lte": month_end}
+            elif date_range == "past":
+                filter_query["event_date"] = {"$lt": now}
+        
+        # Get filtered events
+        events_cursor = events_collection.find(filter_query).sort("created_at", -1)
+        events = await events_cursor.to_list(length=None)
+        
+        # Create CSV response
+        from fastapi.responses import Response
+        import csv
+        import io
+        
+        output = io.StringIO()
+        
+        if events:
+            fieldnames = ["title", "description", "location", "status", "organizer_email", "event_date", "max_participants", "current_participants", "created_at", "updated_at"]
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            
+            for event in events:
+                writer.writerow({
+                    "title": event.get("title", ""),
+                    "description": event.get("description", ""),
+                    "location": event.get("location", ""),
+                    "status": event.get("status", ""),
+                    "organizer_email": event.get("organizer_email", ""),
+                    "event_date": event.get("event_date", "").isoformat() if event.get("event_date") else "",
+                    "max_participants": event.get("max_participants", ""),
+                    "current_participants": event.get("current_participants", 0),
+                    "created_at": event.get("created_at", "").isoformat() if event.get("created_at") else "",
+                    "updated_at": event.get("updated_at", "").isoformat() if event.get("updated_at") else ""
+                })
+        else:
+            output.write("No events found matching the criteria")
+        
+        csv_content = output.getvalue()
+        output.close()
+        
+        # Generate filename based on filters
+        filename_parts = ["events_export"]
+        if user_email:
+            filename_parts.append(f"organizer_{user_email.replace('@', '_at_')}")
+        if status:
+            filename_parts.append(f"status_{status}")
+        if date_range:
+            filename_parts.append(f"date_{date_range}")
+        filename_parts.append(datetime.now().strftime("%Y%m%d_%H%M%S"))
+        filename = "_".join(filename_parts) + ".csv"
+        
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export events: {str(e)}")
+
+# Suspend User
+@app.post("/admin/users/{user_email}/suspend")
+async def suspend_user(user_email: str, current_user=Depends(get_current_admin)):
+    try:
+        # Check if user exists
+        user = await users_collection.find_one({"email": user_email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Don't allow suspending other admins
+        if user.get("role") == "admin":
+            raise HTTPException(status_code=403, detail="Cannot suspend admin users")
+        
+        # Update user status
+        result = await users_collection.update_one(
+            {"email": user_email},
+            {
+                "$set": {
+                    "is_suspended": True,
+                    "suspended_at": datetime.utcnow(),
+                    "suspended_by": current_user["email"]
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=500, detail="Failed to suspend user")
+        
+        return {"message": "User suspended successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to suspend user: {str(e)}")
+
+# Helper function to get current admin (you'll need to implement this based on your auth system)
+async def get_current_admin(current_user=Depends(auth.get_current_user)):
+    """
+    This function should verify that the current user is an admin.
+    Modify this according to your existing authentication system.
+    """
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+# Update the existing issue update route to handle priority
+@app.post("/admin/issues/{issue_id}/update")
+async def update_issue_admin(
+    issue_id: str, 
+    request: Request,
+    current_user=Depends(get_current_admin)
+):
+    try:
+        from bson import ObjectId
+        
+        form = await request.form()
+        status = form.get("status")
+        priority = form.get("priority")
+        
+        update_data = {
+            "updated_at": datetime.utcnow(),
+            "updated_by": current_user["email"]
+        }
+        
+        if status:
+            update_data["status"] = status
+        if priority:
+            update_data["priority"] = priority
+        
+        result = await issues_collection.update_one(
+            {"_id": ObjectId(issue_id)},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Issue not found or not updated")
+        
+        # Redirect back to admin issues page
+        return RedirectResponse(url="/admin/issues", status_code=303)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update issue: {str(e)}")
+
+# User Profile Route (accessible to users themselves)
+@app.get("/profile/full")
+async def get_full_profile(request: Request, current_user=Depends(auth.get_current_user)):
+    try:
+        user_email = current_user["email"]
+        
+        # Get user statistics
+        issues_stats = await issues_collection.aggregate([
+            {"$match": {"reported_by": user_email}},
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]).to_list(length=None)
+        
+        events_count = await events_collection.count_documents({"organizer_email": user_email})
+        
+        total_issues = sum(stat["count"] for stat in issues_stats)
+        resolved_issues = next((stat["count"] for stat in issues_stats if stat["_id"] == "resolved"), 0)
+        
+        # Get all user issues
+        user_issues_cursor = issues_collection.find({"reported_by": user_email}).sort("created_at", -1)
+        user_issues = await user_issues_cursor.to_list(length=None)
+        
+        # Get all user events
+        user_events_cursor = events_collection.find({"organizer_email": user_email}).sort("created_at", -1)
+        user_events = await user_events_cursor.to_list(length=None)
+        
+        # Format dates for template
+        for issue in user_issues:
+            if issue.get("created_at"):
+                issue["created_at"] = issue["created_at"]
+            if issue.get("updated_at"):
+                issue["updated_at"] = issue["updated_at"]
+        
+        for event in user_events:
+            if event.get("created_at"):
+                event["created_at"] = event["created_at"]
+            if event.get("event_date"):
+                event["event_date"] = event["event_date"]
+        
+        stats = {
+            "total_issues": total_issues,
+            "total_events": events_count,
+            "resolved_issues": resolved_issues,
+            "pending_issues": next((stat["count"] for stat in issues_stats if stat["_id"] == "pending"), 0),
+            "in_progress_issues": next((stat["count"] for stat in issues_stats if stat["_id"] == "in_progress"), 0)
+        }
+        
+        return templates.TemplateResponse("profile_full.html", {
+            "request": request,
+            "user": current_user,
+            "stats": stats,
+            "user_issues": user_issues,
+            "user_events": user_events
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load profile: {str(e)}")
+
+# Additional route to get admin dashboard statistics
+@app.get("/admin/stats")
+async def get_admin_stats(current_user=Depends(get_current_admin)):
+    try:
+        # Issues statistics
+        issues_stats = await issues_collection.aggregate([
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]).to_list(length=None)
+        
+        # Events statistics  
+        events_stats = await events_collection.aggregate([
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]).to_list(length=None)
+        
+        # Users count
+        total_users = await users_collection.count_documents({})
+        
+        # Format statistics
+        issue_stats_formatted = {
+            "total": sum(stat["count"] for stat in issues_stats),
+            "pending": 0,
+            "in_progress": 0,
+            "resolved": 0,
+            "closed": 0
+        }
+        
+        for stat in issues_stats:
+            if stat["_id"] in issue_stats_formatted:
+                issue_stats_formatted[stat["_id"]] = stat["count"]
+        
+        event_stats_formatted = {
+            "total": sum(stat["count"] for stat in events_stats),
+            "pending": 0,
+            "completed": 0,
+            "canceled": 0
+        }
+        
+        for stat in events_stats:
+            if stat["_id"] in event_stats_formatted:
+                event_stats_formatted[stat["_id"]] = stat["count"]
+        
+        return {
+            "issues": issue_stats_formatted,
+            "events": event_stats_formatted,
+            "users": {"total": total_users}
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get admin stats: {str(e)}")
+
+@app.get("/admin/issues")
+async def admin_issues_page(request: Request, current_user=Depends(get_current_admin)):
+    try:
+        issues_cursor = issues_collection.find({}).sort("created_at", -1).limit(50)
+        issues = await issues_cursor.to_list(length=50)
+        
+        for issue in issues:
+            issue["_id"] = str(issue["_id"])
+            if issue.get('photo'):
+                issue["photo"] = f"/files/{issue['photo']}"
+
+        stats_response = await get_admin_stats(current_user)
+        
+        return templates.TemplateResponse("admin_issues.html", {
+            "request": request,
+            "issues": issues,
+            "stats": stats_response["issues"]
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load admin issues page: {str(e)}")
+
+# NEW ROUTE for Admin Users Page
+@app.get("/admin/users", response_class=HTMLResponse)
+async def admin_users_page(request: Request, current_user: dict = Depends(get_current_admin)):
+    users = await users_collection.find({}).to_list(length=None)
+    for user in users:
+        user["_id"] = str(user["_id"])
+    return templates.TemplateResponse("admin_users.html", {"request": request, "users": users})
 
 @app.post("/admin/issues/{issue_id}/update")
 async def update_issue_status(issue_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
@@ -160,20 +900,26 @@ async def update_issue_status(issue_id: str, status: str = Form(...), current_us
 
 
 @app.get("/admin/events", response_class=HTMLResponse)
-async def admin_events_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
-    
+async def admin_events_page(request: Request, current_user: dict = Depends(get_current_admin)):
+    # The redundant role check is removed, as Depends(get_current_admin) handles it.
     events = await db.events.find().to_list()
     for event in events:
         event["_id"] = str(event["_id"])
-    return templates.TemplateResponse("admin_events.html", {"request": request, "events": events})
+
+    stats_response = await get_admin_stats(current_user)
+
+    return templates.TemplateResponse(
+        "admin_events.html", 
+        {
+            "request": request, 
+            "events": events,
+            "stats": stats_response["events"]
+        }
+    )
 
 @app.post("/admin/events/{event_id}/update")
-async def update_events_status(event_id: str, status: str = Form(...), current_user: dict = Depends(auth.get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
-
+async def update_events_status(event_id: str, status: str = Form(...), current_user: dict = Depends(get_current_admin)):
+    # The redundant role check is removed, as Depends(get_current_admin) handles it.
     if not ObjectId.is_valid(event_id):
         raise HTTPException(status_code=400, detail="Invalid event ID format")
 
@@ -264,7 +1010,6 @@ async def get_events(request: Request):
     events = await db.events.find().to_list(100)
     for event in events:
         event["_id"] = str(event["_id"])
-        # Handle multiple photos
         if event.get("photos"):
             event["photos"] = [f"/files/{photo_id}" for photo_id in event["photos"]]
         else:
@@ -272,14 +1017,12 @@ async def get_events(request: Request):
         event["video"] = f"/files/{event['video']}" if event.get("video") else None
     return templates.TemplateResponse("view_events.html", {"request": request, "events": events})
 
-
 @app.get("/create_event", response_class=HTMLResponse)
 async def create_event_page(request: Request, current_user: dict = Depends(auth.get_current_user)):
     if not current_user.get("is_verified", False):
         raise HTTPException(status_code=403, detail="Verify email first.")
     return templates.TemplateResponse("create_event.html", {"request": request})
 
-# ✅ FIXED: Changed `photo: UploadFile` to `photos: List[UploadFile]`
 @app.post("/event/")
 async def create_event(
     request: Request,
@@ -289,7 +1032,7 @@ async def create_event(
     duration: str = Form(...),
     location: str = Form(...),
     location_description: str = Form(...),
-    photos: List[UploadFile] = File(None), # Handles multiple files
+    photos: List[UploadFile] = File(None),
     video: UploadFile = File(None),
     current_user: dict = Depends(auth.get_current_user)
 ):
@@ -307,12 +1050,11 @@ async def create_event(
         "latitude": lat,
         "longitude": lng,
         "reported_by": current_user["email"],
-        "photos": [], # Initialize as an empty list
+        "photos": [],
         "video": None,
         "status": "pending",
     }
 
-    # ✅ FIXED: Loop through all uploaded photos and save them
     if photos:
         for photo in photos:
             if photo and photo.filename:
@@ -324,47 +1066,6 @@ async def create_event(
 
     result = await events_collection.insert_one(event_data)
     return {"message": "Event submitted successfully!", "id": str(result.inserted_id)} if result.inserted_id else HTTPException(500, "Failed")
-
-
-# @app.get("/profile", response_class=HTMLResponse)
-# async def profile_panel(request: Request, current_user: dict = Depends(auth.get_current_user)):
-#     return templates.TemplateResponse("profile.html", {"request": request, "user": current_user})
-
-
-@app.get("/profile/full", response_class=HTMLResponse)
-async def full_profile(request: Request, current_user: dict = Depends(auth.get_current_user)):
-    user_email = current_user["email"]
-
-    # Filter only issues reported by this user
-    issues = await issues_collection.find({"reported_by": user_email}).to_list(100)
-    events = await events_collection.find({"reported_by": user_email}).to_list(100)
-
-    for issue in issues:
-        issue["_id"] = str(issue["_id"])
-        issue["photo"] = f"/files/{issue['photo']}" if issue.get('photo') else None
-        issue["video"] = f"/files/{issue['video']}" if issue.get('video') else None
-        # Ensure 'created_at' is in the correct format for display
-        if isinstance(issue.get("created_at"), datetime):
-            issue["created_at"] = issue["created_at"].strftime("%Y-%m-%d") # Adjust format as needed
-
-    for event in events:
-        event["_id"] = str(event["_id"])
-        # Handle multiple photos
-        if event.get("photos"):
-            event["photos"] = [f"/files/{photo_id}" for photo_id in event["photos"]]
-        else:
-            event["photos"] = []
-        event["video"] = f"/files/{event['video']}" if event.get('video') else None
-        # Ensure 'date' is present and formatted correctly
-        # If your event datetime is stored differently, adjust accordingly
-        if isinstance(event.get("datetime"), str): # Assuming datetime is stored as string
-            event["date"] = event["datetime"].split("T")[0] # Extract date part
-        elif isinstance(event.get("datetime"), datetime):
-            event["date"] = event["datetime"].strftime("%Y-%m-%d") # Format datetime object
-        elif "date" not in event:
-            event["date"] = "N/A" # Provide a default if no date
-
-    return templates.TemplateResponse("profile_full.html", {"request": request, "issues": issues, "events": events})    
 
 @app.post("/profile/issues/{issue_id}/edit")
 async def edit_issue(issue_id: str, 
@@ -449,10 +1150,6 @@ Suggest one or more actionable steps that city officials can take to resolve it.
             return {"suggestion": suggestion.strip()}
     except Exception as e:
         return {"error": str(e)}
-
-
-
-
 
 @app.on_event("startup")
 async def startup():

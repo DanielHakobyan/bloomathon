@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Users | Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --accent-gold: #f59e0b;
+      }
+      .dark {
+        --primary-blue: #3b82f6;
+        --secondary-blue: #60a5fa;
+        --accent-gold: #fbbf24;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      .status-verified {
+        background-color: #dcfce7;
+        color: #166534;
+      }
+      .status-suspended {
+        background-color: #fef2f2;
+        color: #b91c1c;
+      }
+      .status-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .role-admin {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+      .role-user {
+        background-color: #e0e7ff;
+        color: #3730a3;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <header
+      class="fixed w-full top-0 left-0 z-50 glass-effect bg-white/90 dark:bg-gray-800/90"
+    >
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center"
+          >
+            <i class="fas fa-shield-alt text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">
+              Admin Portal
+            </h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Rockville City Management
+            </p>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-6">
+          <a
+            href="/admin/issues"
+            class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <i class="fas fa-exclamation-triangle mr-2"></i>Issues
+          </a>
+          <a
+            href="/admin/events"
+            class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <i class="fas fa-calendar mr-2"></i>Events
+          </a>
+          <a
+            href="/admin/users"
+            class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg font-semibold"
+          >
+            <i class="fas fa-users mr-2"></i>Users
+          </a>
+        </nav>
+
+        <div class="flex items-center space-x-4">
+          <button
+            id="dark-mode-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+          <div
+            class="flex items-center space-x-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg"
+          >
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-user-shield text-white text-sm"></i>
+            </div>
+            <span class="text-sm font-medium">Admin</span>
+          </div>
+          <button
+            id="logout-btn"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="pt-24 min-h-screen">
+      <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="mb-8 animate-fade-in">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <i class="fas fa-users-cog text-blue-600 mr-3"></i>
+            User Management
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            View and manage all registered users.
+          </p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in"
+        >
+          <div class="overflow-x-auto">
+            <table
+              class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+            >
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    Role
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    Date Joined
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+              >
+                {% for user in users %}
+                <tr
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div
+                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4"
+                      >
+                        <i class="fas fa-user text-white text-lg"></i>
+                      </div>
+                      <div
+                        class="text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        {{ user.email }}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if user.role == 'admin' %}
+                    <span class="status-badge role-admin font-semibold">
+                      <i class="fas fa-crown mr-2"></i>Admin
+                    </span>
+                    {% else %}
+                    <span class="status-badge role-user">
+                      <i class="fas fa-user mr-2"></i>User
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if user.is_suspended %}
+                    <span class="status-badge status-suspended">
+                      <i class="fas fa-user-slash mr-2"></i>Suspended
+                    </span>
+                    {% elif user.is_verified %}
+                    <span class="status-badge status-verified">
+                      <i class="fas fa-check-circle mr-2"></i>Verified
+                    </span>
+                    {% else %}
+                    <span class="status-badge status-pending">
+                      <i class="fas fa-hourglass-start mr-2"></i>Not Verified
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400"
+                  >
+                    {{ user.created_at.strftime('%Y-%m-%d') if user.created_at
+                    else 'N/A' }}
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
+                  >
+                    <button
+                      class="view-profile-btn text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      data-user-email="{{ user.email }}"
+                    >
+                      View Profile
+                    </button>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center py-12">
+                    <div class="text-gray-500">
+                      <i class="fas fa-users-slash fa-3x mb-4"></i>
+                      <h3 class="text-lg font-semibold">No Users Found</h3>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+      <div
+        class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+      ></div>
+      <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+        >
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600"
+          >
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+              <i class="fas fa-user text-blue-600 mr-2"></i>User Profile
+            </h2>
+            <button
+              onclick="closeProfileModal()"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <div
+            id="profile-modal-content"
+            class="p-6 overflow-y-auto"
+            style="max-height: calc(90vh - 140px)"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Dark mode
+      document
+        .getElementById("dark-mode-toggle")
+        .addEventListener("click", () => {
+          document.documentElement.classList.toggle("dark");
+          localStorage.setItem(
+            "theme",
+            document.documentElement.classList.contains("dark")
+              ? "dark"
+              : "light"
+          );
+        });
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Logout
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", async () => {
+          try {
+            const response = await fetch("/auth/logout", { method: "POST" });
+            Cookies.remove("access_token");
+            window.location.href = response.redirected
+              ? response.url
+              : "/auth/login";
+          } catch (err) {
+            console.error("Logout failed:", err);
+            alert("Something went wrong while logging out.");
+          }
+        });
+
+      // Attach listeners for View Profile buttons
+      document.querySelectorAll(".view-profile-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const userEmail =
+            e.target.closest(".view-profile-btn").dataset.userEmail;
+          await viewUserProfile(userEmail);
+        });
+      });
+
+      async function viewUserProfile(userEmail) {
+        try {
+          const response = await fetch(
+            `/admin/users/${encodeURIComponent(userEmail)}/profile`,
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get("access_token")}`,
+              },
+            }
+          );
+          const data = await response.json();
+          if (response.ok) {
+            showUserProfileModal(data);
+          } else {
+            alert(data.message || "Failed to load user profile");
+          }
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+          alert("Failed to load user profile");
+        }
+      }
+
+      function showUserProfileModal(userData) {
+        const modal = document.getElementById("profile-modal");
+        const content = document.getElementById("profile-modal-content");
+        const formatDate = (dateString) =>
+          dateString ? new Date(dateString).toLocaleDateString() : "N/A";
+
+        content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4 p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center"><i class="fas fa-user text-white text-2xl"></i></div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">${
+                              userData.user.email
+                            }</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Member since ${formatDate(
+                              userData.user.created_at
+                            )}</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"><i class="fas fa-user-check mr-1"></i>Verified User</span>
+                                ${
+                                  userData.user.role === "admin"
+                                    ? '<span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-sm"><i class="fas fa-crown mr-1"></i>Admin</span>'
+                                    : '<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm"><i class="fas fa-user mr-1"></i>User</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4"><i class="fas fa-tools text-blue-600 mr-2"></i>Admin Actions</h4>
+                        <div class="flex flex-wrap gap-3">
+                            ${
+                              userData.user.role !== "admin"
+                                ? `<button onclick="toggleUserStatus('${userData.user.email}', 'suspend')" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"><i class="fas fa-user-slash mr-2"></i>Suspend User</button>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                </div>`;
+        modal.classList.remove("hidden");
+      }
+
+      async function toggleUserStatus(userEmail, action) {
+        if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+        try {
+          const response = await fetch(
+            `/admin/users/${encodeURIComponent(userEmail)}/${action}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${Cookies.get("access_token")}`,
+              },
+            }
+          );
+          const data = await response.json();
+          if (response.ok) {
+            alert(`User ${action}ed successfully`);
+            window.location.reload(); // Reload to show updated status
+          } else {
+            alert(data.message || `Failed to ${action} user`);
+          }
+        } catch (error) {
+          console.error(`Error ${action}ing user:`, error);
+          alert(`Failed to ${action} user`);
+        }
+      }
+
+      function closeProfileModal() {
+        document.getElementById("profile-modal").classList.add("hidden");
+      }
+
+      // Close modal on outside click
+      document
+        .getElementById("profile-modal")
+        .addEventListener("click", (e) => {
+          if (e.target === document.getElementById("profile-modal")) {
+            closeProfileModal();
+          }
+        });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeProfileModal();
+      });
+    </script>
+  </body>
+</html>

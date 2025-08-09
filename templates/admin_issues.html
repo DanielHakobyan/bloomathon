@@ -1,271 +1,1193 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Issue Tracker | Admin Dashboard</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Issues | Rockville City Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-      :root {
-        --primary: #6366f1;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --dark: #1f2937;
-        --light: #f9fafb;
-        --gray: #e5e7eb;
-      }
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --dark-blue: #1e3a8a;
+            --light-blue: #dbeafe;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+        .dark {
+            --primary-blue: #3b82f6;
+            --secondary-blue: #60a5fa;
+            --accent-gold: #fbbf24;
+            --dark-blue: #1e40af;
+            --light-blue: #1e3a8a;
+            --white: #111827;
+            --gray-50: #1f2937;
+            --gray-100: #374151;
+            --gray-200: #4b5563;
+            --gray-300: #6b7280;
+            --gray-600: #9ca3af;
+            --gray-800: #e5e7eb;
+            --gray-900: #f9fafb;
+        }
 
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #f8fafc;
-        color: var(--dark);
-        min-height: 100vh;
-      }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-      .dashboard {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        min-height: 100vh;
-      }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
 
-      .sidebar {
-        background: white;
-        border-right: 1px solid var(--gray);
-        padding: 2rem 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
 
-      .sidebar-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 2rem;
-        padding-left: 1rem;
-      }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
 
-      .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        border-radius: 0.375rem;
-        margin-bottom: 0.5rem;
-        color: #64748b;
-        text-decoration: none;
-        transition: all 0.2s;
-      }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      .nav-item.active {
-        background-color: #eef2ff;
-        color: var(--primary);
-        font-weight: 500;
-      }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-      .nav-item:hover:not(.active) {
-        background-color: #f8fafc;
-        color: var(--dark);
-      }
+        .priority-high { 
+            background-color: #fef2f2; 
+            color: #dc2626; 
+            border: 1px solid #fecaca;
+        }
+        .priority-medium { 
+            background-color: #fffbeb; 
+            color: #d97706; 
+            border: 1px solid #fed7aa;
+        }
+        .priority-low { 
+            background-color: #f0fdf4; 
+            color: #16a34a; 
+            border: 1px solid #bbf7d0;
+        }
 
-      .main-content {
-        padding: 2rem 3rem;
-      }
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        .status-in_progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        .status-resolved {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status-closed {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
 
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-      }
+        .dark .priority-high { 
+            background-color: #7f1d1d; 
+            color: #fca5a5; 
+        }
+        .dark .priority-medium { 
+            background-color: #78350f; 
+            color: #fcd34d; 
+        }
+        .dark .priority-low { 
+            background-color: #14532d; 
+            color: #86efac; 
+        }
 
-      .page-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-      }
+        .dark .status-pending {
+            background-color: #451a03;
+            color: #fbbf24;
+        }
+        .dark .status-in_progress {
+            background-color: #1e3a8a;
+            color: #93c5fd;
+        }
+        .dark .status-resolved {
+            background-color: #14532d;
+            color: #86efac;
+        }
+        .dark .status-closed {
+            background-color: #374151;
+            color: #9ca3af;
+        }
 
-      .user-profile {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
 
-      .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: var(--primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 500;
-      }
-
-      .issues-container {
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-      }
-
-      .issues-header {
-        display: grid;
-        grid-template-columns: 3fr 1fr 1fr;
-        padding: 1rem 1.5rem;
-        background-color: #f9fafb;
-        border-bottom: 1px solid var(--gray);
-        font-weight: 500;
-        color: #64748b;
-      }
-
-      .issue-card {
-        display: grid;
-        grid-template-columns: 3fr 1fr 1fr;
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--gray);
-        transition: background 0.2s;
-      }
-
-      .issue-card:last-child {
-        border-bottom: none;
-      }
-
-      .issue-card:hover {
-        background-color: #f9fafb;
-      }
-
-      .issue-title {
-        font-weight: 500;
-        color: var(--dark);
-      }
-
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 500;
-      }
-
-      .status-pending {
-        background-color: #fffbeb;
-        color: var(--warning);
-      }
-
-      .status-resolved {
-        background-color: #ecfdf5;
-        color: var(--success);
-      }
-
-      .status-canceled {
-        background-color: #fef2f2;
-        color: var(--danger);
-      }
-
-      .action-form {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .select-input {
-        padding: 0.5rem;
-        border: 1px solid var(--gray);
-        border-radius: 0.375rem;
-        font-family: inherit;
-        font-size: 0.875rem;
-        background-color: white;
-      }
-
-      .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: none;
-      }
-
-      .btn-primary {
-        background-color: var(--primary);
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background-color: #4f46e5;
-      }
+        .dark .search-highlight {
+            background-color: #451a03;
+            color: #fbbf24;
+        }
     </style>
-  </head>
-  <body>
-    <div class="dashboard">
-      <aside class="sidebar">
-        <div class="sidebar-title">IssueTracker</div>
-        <nav>
-          <a href="#" class="nav-item active">Issues</a>
-          <a href="/admin/events" class="nav-item">Events</a>
-        </nav>
-      </aside>
+</head>
 
-      <main class="main-content">
-        <div class="header">
-          <h1 class="page-title">Manage Issues</h1>
-          <div class="user-profile">
-            <div class="avatar">AD</div>
-            <span>Admin</span>
-          </div>
-        </div>
-
-        <div class="issues-container">
-          <div class="issues-header">
-            <div>Issue</div>
-            <div>Status</div>
-            <div>Actions</div>
-          </div>
-
-          {% for issue in issues %}
-          <div class="issue-card">
-            <div class="issue-title">{{ issue.title }}</div>
-            <div>
-              <span class="status-badge status-{{ issue.status }}">
-                {{ issue.status|capitalize }}
-              </span>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <header class="fixed w-full top-0 left-0 z-50 glass-effect bg-white/90 dark:bg-gray-800/90">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-yellow-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">Admin Portal</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Rockville City Management</p>
+                </div>
             </div>
-            <div class="action-form">
-              <form
-                action="/admin/issues/{{ issue._id }}/update"
-                method="post"
-                class="action-form"
-              >
-                <select class="select-input" name="status">
-                  <option value="resolved">Resolved</option>
-                  <option value="canceled">Canceled</option>
-                </select>
-                <button class="btn btn-primary" type="submit">Update</button>
-              </form>
+            
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="/admin/issues" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg font-semibold">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Issues
+                </a>
+                <a href="/admin/events" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-calendar mr-2"></i>Events
+                </a>
+                <a href="/admin/users" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-users mr-2"></i>Users
+                </a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button id="dark-mode-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+
+                <div class="flex items-center space-x-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white text-sm"></i>
+                    </div>
+                    <span class="text-sm font-medium">Admin</span>
+                </div>
+
+                <button id="logout-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
-          </div>
-          {% endfor %}
         </div>
-      </main>
+    </header>
+
+    <main class="pt-24 min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="mb-8 animate-fade-in">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            <i class="fas fa-exclamation-triangle text-blue-600 mr-3"></i>
+                            Issues Management
+                        </h1>
+                        <p class="text-gray-600 dark:text-gray-400">Monitor and manage community-reported issues</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
+                        <button id="export-btn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                            <i class="fas fa-download mr-2"></i>Export Data
+                        </button>
+                        <a href="/city-statistics" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-center">
+                            <i class="fas fa-chart-bar mr-2"></i>View Analytics
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Issues</p>
+                                <p class="text-3xl font-bold text-blue-600" id="total-issues">{{ stats.total or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-list text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                                <p class="text-3xl font-bold text-orange-600" id="pending-issues">{{ stats.pending or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-clock text-orange-600 dark:text-orange-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
+                                <p class="text-3xl font-bold text-blue-600" id="progress-issues">{{ stats.in_progress or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-spinner text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg card-hover border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Resolved</p>
+                                <p class="text-3xl font-bold text-green-600" id="resolved-issues">{{ stats.resolved or 0 }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 mb-8">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1">
+                            <label for="user-search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-user-search mr-1"></i>Search by User Email
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="user-search" placeholder="Enter user email..." 
+                                       class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="lg:w-48">
+                            <label for="status-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-filter mr-1"></i>Status Filter
+                            </label>
+                            <select id="status-filter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <div class="lg:w-48">
+                            <label for="priority-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-exclamation mr-1"></i>Priority
+                            </label>
+                            <select id="priority-filter" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option value="">All Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+
+                        <div class="lg:w-32 flex items-end">
+                            <button id="search-btn" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                <i class="fas fa-search mr-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="search-results-info" class="mt-4 hidden">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <span id="search-results-text"></span>
+                            </p>
+                            <button id="clear-search" class="px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                <i class="fas fa-times mr-1"></i>Clear Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in">
+                <div id="loading-state" class="hidden p-8 text-center">
+                    <div class="inline-flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin text-blue-600"></i>
+                        <span class="text-gray-600 dark:text-gray-400">Loading issues...</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                    <div class="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <div class="col-span-3">
+                            <i class="fas fa-info-circle mr-2"></i>Issue Details
+                        </div>
+                        <div class="col-span-2">
+                            <i class="fas fa-user mr-2"></i>Reporter
+                        </div>
+                        <div class="col-span-2">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Location
+                        </div>
+                        <div class="col-span-1 text-center">
+                            <i class="fas fa-flag mr-2"></i>Priority
+                        </div>
+                        <div class="col-span-1 text-center">
+                            <i class="fas fa-tasks mr-2"></i>Status
+                        </div>
+                        <div class="col-span-1 text-center">
+                            <i class="fas fa-calendar mr-2"></i>Date
+                        </div>
+                        <div class="col-span-2 text-center">
+                            <i class="fas fa-cogs mr-2"></i>Actions
+                        </div>
+                    </div>
+                </div>
+
+                <div id="issues-container">
+                    {% for issue in issues %}
+                    <div class="issue-row border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-issue-id="{{ issue._id }}">
+                        <div class="px-6 py-6 grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-3">
+                                <div class="flex items-start space-x-3">
+                                    {% if issue.photo %}
+                                    <img src="/files/{{ issue.photo }}" alt="Issue" class="w-12 h-12 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600">
+                                    {% else %}
+                                    <div class="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-image text-gray-400 dark:text-gray-500"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ issue.title }}</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2">{{ issue.description[:50] }}...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white text-sm user-email">{{ issue.reported_by or 'Anonymous' }}</p>
+                                        <button class="view-profile-btn text-xs text-blue-600 dark:text-blue-400 hover:underline" data-user-email="{{ issue.reported_by }}">
+                                            <i class="fas fa-eye mr-1"></i>View Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="text-sm">
+                                    <p class="text-gray-900 dark:text-white font-medium">{{ issue.location or 'Location not specified' }}</p>
+                                    {% if issue.latitude and issue.longitude %}
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">{{ "%.4f"|format(issue.latitude) }}, {{ "%.4f"|format(issue.longitude) }}</p>
+                                    <button class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1" onclick="openMap({{ issue.latitude }}, {{ issue.longitude }})">
+                                        <i class="fas fa-map mr-1"></i>View Map
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-span-1 text-center">
+                                <span class="status-badge priority-{{ issue.priority or 'medium' }}">
+                                    <i class="fas fa-flag mr-1"></i> {{ issue.priority or 'Medium' }}
+                                </span>
+                            </div>
+                            <div class="col-span-1 text-center">
+                                <span class="status-badge status-{{ issue.status }}">
+                                    {% if issue.status == 'pending' %}
+                                    <i class="fas fa-clock mr-1"></i>
+                                    {% elif issue.status == 'in_progress' %}
+                                    <i class="fas fa-spinner mr-1"></i>
+                                    {% elif issue.status == 'resolved' %}
+                                    <i class="fas fa-check mr-1"></i>
+                                    {% else %}
+                                    <i class="fas fa-times mr-1"></i>
+                                    {% endif %}
+                                    {{ issue.status.replace('_', ' ').title() }}
+                                </span>
+                            </div>
+                            <div class="col-span-1 text-center">
+                                <div class="text-sm">
+                                    <p class="text-gray-900 dark:text-white font-medium">{{ issue.created_at.strftime('%m/%d') if issue.created_at else 'N/A' }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">{{ issue.created_at.strftime('%Y') if issue.created_at else '' }}</p>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex flex-col items-center justify-center space-y-2">
+                                    <form action="/admin/issues/{{ issue._id }}/update" method="post" class="flex items-center space-x-2">
+                                        <select name="status" class="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <option value="pending" {{ 'selected' if issue.status == 'pending' else '' }}>Pending</option>
+                                            <option value="in_progress" {{ 'selected' if issue.status == 'in_progress' else '' }}>In Progress</option>
+                                            <option value="resolved" {{ 'selected' if issue.status == 'resolved' else '' }}>Resolved</option>
+                                            <option value="closed" {{ 'selected' if issue.status == 'closed' else '' }}>Closed</option>
+                                        </select>
+                                        <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
+                                            <i class="fas fa-sync mr-1"></i>Update
+                                        </button>
+                                    </form>
+                                    <button class="px-3 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700 transition-colors" onclick="viewIssueDetails('{{ issue._id }}')">
+                                        <i class="fas fa-eye mr-1"></i>Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div id="empty-state" class="hidden p-12 text-center">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-inbox text-gray-400 dark:text-gray-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Issues Found</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Try adjusting your search criteria or filters.</p>
+                </div>
+            </div>
+
+            <div class="mt-8 flex items-center justify-between">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Showing <span id="showing-start">1</span> to <span id="showing-end">10</span> of <span id="total-count">{{ issues|length }}</span> issues
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="prev-page" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" disabled>
+                        <i class="fas fa-chevron-left mr-1"></i>Previous
+                    </button>
+                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold">1</span>
+                    <button id="next-page" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Next<i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="issue-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>Issue Details
+                    </h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="modal-content" class="p-6 overflow-y-auto max-h-96">
+                    </div>
+            </div>
+        </div>
     </div>
-    <div class="footer">
-      <p>
-        Copyright © <span id="year"></span> Daniel Hakobyan. All rights
-        reserved.
-      </p>
-      <p>
-        This code is proprietary and confidential. Unauthorized copying,
-        redistribution, modification, or use is strictly prohibited.
-      </p>
+
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <i class="fas fa-user text-blue-600 mr-2"></i>User Profile
+                    </h2>
+                    <button onclick="closeProfileModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="profile-modal-content" class="p-6 overflow-y-auto max-h-96">
+                    </div>
+            </div>
+        </div>
     </div>
-  </body>
+
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.classList.toggle('dark', currentTheme === 'dark');
+        
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+
+        // Search functionality
+        let currentSearchParams = {
+            user_email: '',
+            status: '',
+            priority: '',
+            page: 1
+        };
+
+        document.getElementById('search-btn').addEventListener('click', performSearch);
+        document.getElementById('clear-search').addEventListener('click', clearSearch);
+        
+        // Enter key search
+        document.getElementById('user-search').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        async function performSearch() {
+            const userEmail = document.getElementById('user-search').value;
+            const status = document.getElementById('status-filter').value;
+            const priority = document.getElementById('priority-filter').value;
+
+            currentSearchParams = { user_email: userEmail, status, priority, page: 1 };
+
+            try {
+                showLoading();
+                const response = await fetch('/admin/issues/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    },
+                    body: JSON.stringify(currentSearchParams)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateIssuesDisplay(data.issues);
+                    updateSearchInfo(data);
+                    updateStats(data.stats);
+                } else {
+                    showError(data.message || 'Search failed');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showError('Failed to search issues');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('user-search').value = '';
+            document.getElementById('status-filter').value = '';
+            document.getElementById('priority-filter').value = '';
+            currentSearchParams = { user_email: '', status: '', priority: '', page: 1 };
+            
+            // Reload page to show all issues
+            window.location.reload();
+        }
+
+        function updateIssuesDisplay(issues) {
+            const container = document.getElementById('issues-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (issues.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = issues.map(issue => createIssueRow(issue)).join('');
+                
+                // Highlight search terms
+                highlightSearchTerms();
+                
+                // Re-attach event listeners
+                attachEventListeners();
+            }
+        }
+
+        function createIssueRow(issue) {
+            const formatDate = (dateString) => {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return {
+                    short: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`,
+                    year: date.getFullYear().toString()
+                };
+            };
+
+            const getStatusIcon = (status) => {
+                switch(status) {
+                    case 'pending': return 'fas fa-clock';
+                    case 'in_progress': return 'fas fa-spinner';
+                    case 'resolved': return 'fas fa-check';
+                    default: return 'fas fa-times';
+                }
+            };
+
+            const date = formatDate(issue.created_at);
+
+            return `
+                <div class="issue-row border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors animate-fade-in" data-issue-id="${issue._id}">
+                    <div class="px-6 py-6 grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-3">
+                            <div class="flex items-start space-x-3">
+                                ${issue.photo ? 
+                                    `<img src="/files/${issue.photo}" alt="Issue" class="w-12 h-12 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600">` :
+                                    `<div class="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-image text-gray-400 dark:text-gray-500"></i>
+                                    </div>`
+                                }
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">${issue.title}</h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2">${issue.description.substring(0, 50)}...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white text-sm user-email">${issue.reported_by || 'Anonymous'}</p>
+                                    ${issue.reported_by ? 
+                                        `<button class="view-profile-btn text-xs text-blue-600 dark:text-blue-400 hover:underline" data-user-email="${issue.reported_by}">
+                                            <i class="fas fa-eye mr-1"></i>View Profile
+                                        </button>` : ''
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="text-sm">
+                                <p class="text-gray-900 dark:text-white font-medium">${issue.location || 'Location not specified'}</p>
+                                ${issue.latitude && issue.longitude ? 
+                                    `<p class="text-xs text-gray-500 dark:text-gray-500">${issue.latitude.toFixed(4)}, ${issue.longitude.toFixed(4)}</p>
+                                    <button class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1" onclick="openMap(${issue.latitude}, ${issue.longitude})">
+                                        <i class="fas fa-map mr-1"></i>View Map
+                                    </button>` : ''
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-span-1 text-center">
+                            <span class="status-badge priority-${issue.priority || 'medium'}">
+                                <i class="fas fa-flag mr-1"></i>
+                                ${issue.priority || 'Medium'}
+                            </span>
+                        </div>
+
+                        <div class="col-span-1 text-center">
+                            <span class="status-badge status-${issue.status}">
+                                <i class="${getStatusIcon(issue.status)} mr-1"></i>
+                                ${issue.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                        </div>
+
+                        <div class="col-span-1 text-center">
+                            <div class="text-sm">
+                                <p class="text-gray-900 dark:text-white font-medium">${date.short}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500">${date.year}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="flex flex-col items-center justify-center space-y-2">
+                                <form action="/admin/issues/${issue._id}/update" method="post" class="flex items-center space-x-2">
+                                    <select name="status" class="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                        <option value="pending" ${issue.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="in_progress" ${issue.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                                        <option value="resolved" ${issue.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                                        <option value="closed" ${issue.status === 'closed' ? 'selected' : ''}>Closed</option>
+                                    </select>
+                                    <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-sync mr-1"></i>Update
+                                    </button>
+                                </form>
+
+                                <button class="px-3 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700 transition-colors" onclick="viewIssueDetails('${issue._id}')">
+                                    <i class="fas fa-eye mr-1"></i>Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            // Attach view profile button listeners
+            document.querySelectorAll('.view-profile-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const userEmail = e.target.closest('.view-profile-btn').dataset.userEmail;
+                    await viewUserProfile(userEmail);
+                });
+            });
+        }
+
+        function highlightSearchTerms() {
+            const searchTerm = document.getElementById('user-search').value.toLowerCase();
+            if (!searchTerm) return;
+
+            document.querySelectorAll('.user-email').forEach(el => {
+                const text = el.textContent;
+                if (text.toLowerCase().includes(searchTerm)) {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    el.innerHTML = text.replace(regex, '<span class="search-highlight">$1</span>');
+                }
+            });
+        }
+
+        function updateSearchInfo(data) {
+            const searchInfo = document.getElementById('search-results-info');
+            const searchText = document.getElementById('search-results-text');
+            
+            if (data.total > 0) {
+                searchInfo.classList.remove('hidden');
+                const filters = [];
+                if (currentSearchParams.user_email) filters.push(`user "${currentSearchParams.user_email}"`);
+                if (currentSearchParams.status) filters.push(`status "${currentSearchParams.status}"`);
+                if (currentSearchParams.priority) filters.push(`priority "${currentSearchParams.priority}"`);
+                
+                const filterText = filters.length > 0 ? ` matching ${filters.join(', ')}` : '';
+                searchText.textContent = `Found ${data.total} issue(s)${filterText}`;
+            } else {
+                searchInfo.classList.add('hidden');
+            }
+        }
+
+        function updateStats(stats) {
+            if (stats) {
+                document.getElementById('total-issues').textContent = stats.total || 0;
+                document.getElementById('pending-issues').textContent = stats.pending || 0;
+                document.getElementById('progress-issues').textContent = stats.in_progress || 0;
+                document.getElementById('resolved-issues').textContent = stats.resolved || 0;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('issues-container').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('issues-container').style.opacity = '1';
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            errorDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-red-200 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // View issue details
+        async function viewIssueDetails(issueId) {
+            try {
+                const response = await fetch(`/admin/issues/${issueId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const issue = await response.json();
+                
+                if (response.ok) {
+                    showIssueModal(issue);
+                } else {
+                    showError(issue.message || 'Failed to load issue details');
+                }
+            } catch (error) {
+                console.error('Error loading issue details:', error);
+                showError('Failed to load issue details');
+            }
+        }
+
+        function showIssueModal(issue) {
+            const modal = document.getElementById('issue-modal');
+            const content = document.getElementById('modal-content');
+
+            const formatDate = (dateString) => {
+                if (!dateString) return 'N/A';
+                return new Date(dateString).toLocaleString();
+            };
+
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        ${issue.photo ? 
+                            `<img src="/files/${issue.photo}" alt="Issue" class="w-24 h-24 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600">` :
+                            `<div class="w-24 h-24 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 dark:text-gray-500 text-2xl"></i>
+                            </div>`
+                        }
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${issue.title}</h3>
+                            <div class="flex items-center space-x-4 text-sm">
+                                <span class="status-badge status-${issue.status}">
+                                    ${issue.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                </span>
+                                <span class="status-badge priority-${issue.priority || 'medium'}">
+                                    ${issue.priority || 'Medium'} Priority
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
+                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>Details
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Description:</span>
+                                    <p class="text-gray-900 dark:text-white">${issue.description}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Reporter:</span>
+                                    <p class="text-gray-900 dark:text-white">${issue.reported_by || 'Anonymous'}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Created:</span>
+                                    <p class="text-gray-900 dark:text-white">${formatDate(issue.created_at)}</p>
+                                </div>
+                                ${issue.updated_at ? `
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Last Updated:</span>
+                                    <p class="text-gray-900 dark:text-white">${formatDate(issue.updated_at)}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
+                                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>Location
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Address:</span>
+                                    <p class="text-gray-900 dark:text-white">${issue.location || 'Not specified'}</p>
+                                </div>
+                                ${issue.latitude && issue.longitude ? `
+                                <div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Coordinates:</span>
+                                    <p class="text-gray-900 dark:text-white">${issue.latitude.toFixed(6)}, ${issue.longitude.toFixed(6)}</p>
+                                    <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onclick="openMap(${issue.latitude}, ${issue.longitude})">
+                                        <i class="fas fa-map mr-2"></i>View on Map
+                                    </button>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-cogs text-blue-600 mr-2"></i>Admin Actions
+                        </h4>
+                        <form action="/admin/issues/${issue._id}/update" method="post" class="flex items-center space-x-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Update Status:</label>
+                                <select name="status" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="pending" ${issue.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="in_progress" ${issue.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                                    <option value="resolved" ${issue.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                                    <option value="closed" ${issue.status === 'closed' ? 'selected' : ''}>Closed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Priority:</label>
+                                <select name="priority" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="low" ${issue.priority === 'low' ? 'selected' : ''}>Low</option>
+                                    <option value="medium" ${issue.priority === 'medium' || !issue.priority ? 'selected' : ''}>Medium</option>
+                                    <option value="high" ${issue.priority === 'high' ? 'selected' : ''}>High</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-save mr-2"></i>Update
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('issue-modal').classList.add('hidden');
+        }
+
+        // View user profile
+        async function viewUserProfile(userEmail) {
+            try {
+                const response = await fetch(`/admin/users/${encodeURIComponent(userEmail)}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showUserProfileModal(data);
+                } else {
+                    showError(data.message || 'Failed to load user profile');
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                showError('Failed to load user profile');
+            }
+        }
+
+        function showUserProfileModal(userData) {
+            const modal = document.getElementById('profile-modal');
+            const content = document.getElementById('profile-modal-content');
+
+            const formatDate = (dateString) => {
+                if (!dateString) return 'N/A';
+                return new Date(dateString).toLocaleDateString();
+            };
+
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4 p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">${userData.user.email}</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Member since ${formatDate(userData.user.created_at)}</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                                    <i class="fas fa-user-check mr-1"></i>Verified User
+                                </span>
+                                ${userData.user.role === 'admin' ? 
+                                    '<span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-sm"><i class="fas fa-crown mr-1"></i>Admin</span>' : 
+                                    '<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm"><i class="fas fa-user mr-1"></i>User</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-exclamation-triangle text-blue-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-blue-600">${userData.stats.total_issues}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Issues</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-calendar text-green-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-green-600">${userData.stats.total_events}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Events Created</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle text-purple-600 text-xl"></i>
+                                <div>
+                                    <p class="text-2xl font-bold text-purple-600">${userData.stats.resolved_issues}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Resolved</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-history text-blue-600 mr-2"></i>Recent Issues
+                        </h4>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${userData.recent_events && userData.recent_events.length > 0 ? 
+                                userData.recent_events.map(event => `
+                                    <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h5 class="font-medium text-gray-900 dark:text-white">${event.title}</h5>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${event.location || 'Location TBD'}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">${formatDate(event.datetime || event.created_at)}</p>
+                                            </div>
+                                            <span class="status-badge status-${event.status}">
+                                                ${event.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('') : 
+                                '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No events created yet</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-4">
+                            <i class="fas fa-tools text-blue-600 mr-2"></i>Admin Actions
+                        </h4>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="exportUserData('${userData.user.email}')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>Export User Data
+                            </button>
+                            <button onclick="viewUserIssues('${userData.user.email}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-list mr-2"></i>View All Issues
+                            </button>
+                            <button onclick="viewUserEvents('${userData.user.email}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-calendar mr-2"></i>View All Events
+                            </button>
+                            ${userData.user.role !== 'admin' ? `
+                                <button onclick="toggleUserStatus('${userData.user.email}', 'suspend')" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                    <i class="fas fa-user-slash mr-2"></i>Suspend User
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        // Additional admin functions
+        function openMap(lat, lng) {
+            window.open(`https://maps.google.com/maps?q=${lat},${lng}&z=15`, '_blank');
+        }
+
+        function exportUserData(userEmail) {
+            window.location.href = `/admin/users/${encodeURIComponent(userEmail)}/export`;
+        }
+
+        function viewUserIssues(userEmail) {
+            document.getElementById('user-search').value = userEmail;
+            performSearch();
+            closeProfileModal();
+        }
+
+        function viewUserEvents(userEmail) {
+            window.location.href = `/admin/events?user_email=${encodeURIComponent(userEmail)}`;
+        }
+
+        async function toggleUserStatus(userEmail, action) {
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                const response = await fetch(`/admin/users/${encodeURIComponent(userEmail)}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access_token')}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(`User ${action}ed successfully`);
+                    closeProfileModal();
+                } else {
+                    showError(data.message || `Failed to ${action} user`);
+                }
+            } catch (error) {
+                console.error(`Error ${action}ing user:`, error);
+                showError(`Failed to ${action} user`);
+            }
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            successDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-green-200 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // Export functionality
+        document.getElementById('export-btn').addEventListener('click', () => {
+            const params = new URLSearchParams(currentSearchParams);
+            window.location.href = `/admin/issues/export?${params.toString()}`;
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/auth/logout', { method: 'POST' });
+                Cookies.remove('access_token');
+                window.location.href = response.redirected ? response.url : '/auth/login';
+            } catch (err) {
+                console.error('Logout failed:', err);
+                showError('Something went wrong while logging out.');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attach event listeners to existing elements
+            attachEventListeners();
+        });
+
+        // Close modals on outside click
+        document.addEventListener('click', (e) => {
+            const issueModal = document.getElementById('issue-modal');
+            const profileModal = document.getElementById('profile-modal');
+            
+            if (e.target === issueModal) {
+                closeModal();
+            }
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeProfileModal();
+            }
+        });
+    </script>
+</body>
 </html>
